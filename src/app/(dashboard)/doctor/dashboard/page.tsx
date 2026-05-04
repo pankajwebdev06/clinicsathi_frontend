@@ -10,6 +10,8 @@ import { ClinicSidebar } from '@/shared/components/ClinicSidebar';
 import { patientsApi } from '@/features/patients/api';
 import { queueApi } from '@/features/queue/api';
 import { useEffect } from 'react';
+import { ConsultPanel } from '@/features/consultation/ConsultPanel';
+import { QueueBoard } from '@/features/queue/QueueBoard';
 
 type Tab = 'queue' | 'summary' | 'settings';
 
@@ -82,6 +84,7 @@ export default function DoctorDashboard() {
         const p = pData.find((pat: any) => pat.id === q.patient_id) || {};
         return {
           id: q.id,
+          patientId: q.patient_id,
           token: q.token_number,
           name: p.name || 'Unknown',
           age: p.age || 0,
@@ -232,110 +235,38 @@ export default function DoctorDashboard() {
 
         <div className="p-5 md:p-8">
 
-          {/* Stats */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {stats.map(stat => (
-              <div key={stat.label} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl mb-3 ${stat.color}`}>{stat.icon}</div>
-                <p className="text-3xl font-extrabold text-slate-900">{stat.value}</p>
-                <p className="text-xs font-medium text-slate-500 mt-1">{stat.label}</p>
-              </div>
-            ))}
-          </div>
+
 
           {/* Tab: Queue */}
           {activeTab === 'queue' && (
             <div className="flex flex-col-reverse md:grid md:grid-cols-5 gap-6">
-              {/* Queue List */}
-              <div className="md:col-span-2 space-y-3">
-                <h3 className="text-lg font-bold text-slate-800 mb-4">Today&apos;s Queue</h3>
-                {queue.map(patient => (
-                  <button key={patient.id} onClick={() => selectPatient(patient)}
-                    className={`w-full text-left p-4 rounded-2xl border transition-all duration-200 ${selectedPatient?.id === patient.id ? 'border-blue-500 bg-blue-50 shadow-md shadow-blue-100' : 'border-slate-100 bg-white hover:border-slate-300 shadow-sm'}`}>
-                    <div className="flex justify-between items-start">
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-extrabold text-slate-800 text-lg">{patient.token}</span>
-                          {patient.isNew && <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-100 text-blue-700 uppercase">New</span>}
-                        </div>
-                        <p className="text-slate-700 font-semibold text-sm">{patient.name}</p>
-                        <p className="text-slate-400 text-xs mt-0.5">{patient.age} yrs • {patient.gender}</p>
-                        {patient.symptoms && <p className="text-slate-500 text-xs mt-1 truncate max-w-[160px]">🩺 {patient.symptoms}</p>}
-                      </div>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider flex-shrink-0 ${patient.status === 'waiting' ? 'bg-amber-100 text-amber-700' : patient.status === 'in_consultation' ? 'bg-blue-100 text-blue-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                        {patient.status === 'in_consultation' ? 'In Room' : patient.status === 'done' ? 'Done' : 'Waiting'}
-                      </span>
-                    </div>
-                  </button>
-                ))}
+              {/* Queue List (Now using the modular QueueBoard) */}
+              <div className="md:col-span-2">
+                <QueueBoard 
+                  clinicId={clinic.id} 
+                  queue={queue.map(p => ({
+                    id: p.id,
+                    token_number: p.token,
+                    patient_name: p.name,
+                    status: p.status,
+                    priority: 0
+                  }))} 
+                />
               </div>
 
-              {/* Consultation Panel */}
+              {/* Consultation Panel (Now using the modular ConsultPanel) */}
               <div className="md:col-span-3">
                 {selectedPatient ? (
-                  <div className="bg-white rounded-3xl border border-slate-100 shadow-sm overflow-hidden animate-in fade-in duration-300">
-                    <div className="p-6 border-b border-slate-100 flex justify-between items-start">
-                      <div className="flex items-center gap-3">
-                        <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-teal-400 text-white flex items-center justify-center font-bold text-lg">{selectedPatient.name[0]}</div>
-                        <div>
-                          <h3 className="text-xl font-bold text-slate-900">{selectedPatient.name}</h3>
-                          <p className="text-slate-500 text-sm">{selectedPatient.age} yrs • {selectedPatient.gender} • +91 {selectedPatient.mobile}</p>
-                        </div>
-                      </div>
-                      <span className="px-3 py-1.5 rounded-full text-sm font-bold bg-slate-900 text-white">{selectedPatient.token}</span>
-                    </div>
-
-                    <div className="p-6 space-y-4">
-                      {/* Vitals from Reception */}
-                      {selectedPatient.bp && (
-                        <div>
-                          <p className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Vitals (filled by Reception)</p>
-                          <VitalsGrid vitals={selectedPatient} />
-                        </div>
-                      )}
-
-                      {/* Symptoms */}
-                      <div className="bg-amber-50 rounded-xl p-4 border border-amber-100">
-                        <p className="text-amber-600 text-xs font-bold mb-1">Chief Complaint</p>
-                        <p className="text-slate-800 font-medium text-sm">{selectedPatient.symptoms ?? '—'}</p>
-                      </div>
-
-                      {/* Doctor Notes */}
-                      <div>
-                        <label className="text-sm font-semibold text-slate-600 mb-2 block">Additional Notes / Observations</label>
-                        <textarea rows={3} className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl resize-none focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-700 text-sm" placeholder="Doctor's clinical notes..." />
-                      </div>
-
-                      {/* 3-Button Action Row */}
-                      <div className="grid grid-cols-3 gap-3 pt-2">
-                        <button
-                          onClick={() => markDone(selectedPatient.id)}
-                          disabled={selectedPatient.status === 'completed'}
-                          className="py-3.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-md shadow-emerald-600/20 transition-all active:scale-[0.98] text-sm flex flex-col items-center gap-0.5">
-                          <span className="text-base">✅</span>
-                          <span>Complete</span>
-                        </button>
-                        <button
-                          onClick={() => skipPatient(selectedPatient.id)}
-                          disabled={selectedPatient.status === 'completed'}
-                          className="py-3.5 bg-amber-500 hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed text-white rounded-xl font-bold shadow-md shadow-amber-500/20 transition-all active:scale-[0.98] text-sm flex flex-col items-center gap-0.5">
-                          <span className="text-base">⏭️</span>
-                          <span>Skip</span>
-                        </button>
-                        <button
-                          onClick={() => cancelPatient(selectedPatient.id)}
-                          className="py-3.5 bg-red-500 hover:bg-red-600 text-white rounded-xl font-bold shadow-md shadow-red-500/20 transition-all active:scale-[0.98] text-sm flex flex-col items-center gap-0.5">
-                          <span className="text-base">❌</span>
-                          <span>Cancel</span>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
+                  <ConsultPanel 
+                    patientId={selectedPatient.patientId} 
+                    queueId={selectedPatient.id} 
+                    onActionComplete={() => selectPatient(null)} 
+                  />
                 ) : (
-                  <div className="bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center p-16 text-center">
+                  <div className="bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center p-16 text-center h-full">
                     <p className="text-5xl mb-4">🩺</p>
                     <p className="font-bold text-slate-700 text-lg">Select a patient from the queue</p>
-                    <p className="text-slate-400 text-sm mt-1">Vitals and symptoms filled by reception will appear here.</p>
+                    <p className="text-slate-400 text-sm mt-1">Start consultation to see details and history.</p>
                   </div>
                 )}
               </div>
@@ -552,6 +483,16 @@ export default function DoctorDashboard() {
             </div>
           )}
 
+          {/* Stats (Moved to bottom) */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
+            {stats.map(stat => (
+              <div key={stat.label} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
+                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl mb-3 ${stat.color}`}>{stat.icon}</div>
+                <p className="text-3xl font-extrabold text-slate-900">{stat.value}</p>
+                <p className="text-xs font-medium text-slate-500 mt-1">{stat.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
     </div>

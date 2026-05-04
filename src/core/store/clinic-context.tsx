@@ -3,6 +3,7 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
 export interface ClinicData {
+  id: string;
   doctorName: string;
   degree: string;
   specialization: string;
@@ -20,6 +21,7 @@ export interface ClinicData {
 }
 
 const DEFAULT_CLINIC: ClinicData = {
+  id: 'default-clinic',
   doctorName: 'Dr. Anil Mehra',
   degree: 'MBBS, MD',
   specialization: 'General Physician',

@@ -7,6 +7,7 @@ import { VitalsGrid } from '@/shared/components/VitalsGrid';
 import { ClinicSidebar } from '@/shared/components/ClinicSidebar';
 import { patientsApi } from '@/features/patients/api';
 import { queueApi } from '@/features/queue/api';
+import { DocumentUpload } from '@/features/reception/DocumentUpload';
 
 type FlowState = 'search' | 'loading' | 'history' | 'new_patient' | 'vitals' | 'token';
 
@@ -21,34 +22,29 @@ export default function ReceptionDashboard() {
   const [patientData, setPatientData] = useState({ id: '', name: '', age: '', gender: '', symptoms: '' });
   const [vitals, setVitals] = useState<PatientVitals>({ bp: '', weight: '', temperature: '', pulse: '' });
   const [token, setToken] = useState('');
-  const [activeTab, setActiveTab] = useState<'entry' | 'queue'>('entry');
   const [queue, setQueue] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
   const [error, setError] = useState('');
 
-  // Fetch queue when tab changes
   useEffect(() => {
-    if (activeTab === 'queue') {
-      const loadQueue = async () => {
-        try {
-          const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-          if (!userInfo.clinic_id) return;
-          const [qData, pData] = await Promise.all([
-            queueApi.getQueue(userInfo.clinic_id),
-            patientsApi.getPatients(userInfo.clinic_id)
-          ]);
-          setQueue(qData);
-          setPatients(pData);
-        } catch (err) {
-          console.error(err);
-        }
-      };
-      loadQueue();
-      // Simple polling
-      const interval = setInterval(loadQueue, 5000);
-      return () => clearInterval(interval);
-    }
-  }, [activeTab]);
+    const loadQueue = async () => {
+      try {
+        const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+        if (!userInfo.clinic_id) return;
+        const [qData, pData] = await Promise.all([
+          queueApi.getQueue(userInfo.clinic_id),
+          patientsApi.getPatients(userInfo.clinic_id)
+        ]);
+        setQueue(qData);
+        setPatients(pData);
+      } catch (err) {
+        console.error(err);
+      }
+    };
+    loadQueue();
+    const interval = setInterval(loadQueue, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   useEffect(() => {
     if (mobileNumber.length === 10 && flowState === 'search') {
@@ -97,18 +93,19 @@ export default function ReceptionDashboard() {
        const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
        if (!userInfo.clinic_id) throw new Error("Clinic ID missing");
 
-       let pId = patientData.id;
-       if (flowState === 'new_patient' || flowState === 'loading') {
-         // Create patient if it's new
-         const newPatient = await patientsApi.createPatient({
+        let pId = patientData.id;
+        if (!pId) {
+          // Create patient if it's new (no ID yet)
+          const newPatient = await patientsApi.createPatient({
             name: patientData.name,
             mobile_number: mobileNumber,
             age: parseInt(patientData.age),
             gender: patientData.gender,
             clinic_id: userInfo.clinic_id
-         });
-         pId = newPatient.id;
-       }
+          });
+          pId = newPatient.id;
+          setPatientData(prev => ({ ...prev, id: pId }));
+        }
 
        // Add to queue
        const queueEntry = await queueApi.addToQueue({
@@ -150,10 +147,9 @@ export default function ReceptionDashboard() {
         doctorName={clinic.doctorName}
         specialization={clinic.specialization}
         navItems={[
-          { id: 'entry', icon: '➕', label: 'Patient Entry', onClick: () => setActiveTab('entry') },
-          { id: 'queue', icon: '📋', label: 'Queue Management', onClick: () => setActiveTab('queue') },
+          { id: 'entry', icon: '➕', label: 'Dashboard', onClick: () => {} },
         ]}
-        activeId={activeTab}
+        activeId={'entry'}
       />
 
       {/* Main */}
@@ -169,7 +165,6 @@ export default function ReceptionDashboard() {
         </div>
 
         {/* Page title with breadcrumb */}
-        {activeTab === 'entry' && (
         <div className="mb-8 print:hidden">
           <Breadcrumbs 
             items={[
@@ -186,10 +181,8 @@ export default function ReceptionDashboard() {
           <p className="text-slate-500 mt-2">Enter mobile number to search <strong>{clinic.clinicName}</strong> patient database.</p>
           {error && <div className="mt-4 p-3 bg-red-50 text-red-500 rounded-md text-sm">{error}</div>}
         </div>
-        )}
 
-        {/* Card for Entry Tab */}
-        {activeTab === 'entry' && (
+        {/* Card for Entry */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative">
 
           {/* Progress Bar */}
@@ -254,7 +247,9 @@ export default function ReceptionDashboard() {
                       <select required value={patientData.gender} onChange={e => setPatientData(p => ({ ...p, gender: e.target.value }))}
                         className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-900">
                         <option value="">Select</option>
-                        <option>Male</option><option>Female</option><option>Other</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="O">Other</option>
                       </select>
                     </div>
                   </div>
@@ -321,7 +316,7 @@ export default function ReceptionDashboard() {
                     <div>
                       <p className="text-slate-400 text-xs mb-1 font-semibold uppercase tracking-wider">Patient</p>
                       <p className="font-bold text-slate-800 text-lg">{patientData.name}</p>
-                      <p className="text-slate-600">{patientData.age} yrs • {patientData.gender} • +91 {mobileNumber}</p>
+                      <p className="text-slate-600">{patientData.age} yrs • {patientData.gender === 'M' ? 'Male' : patientData.gender === 'F' ? 'Female' : patientData.gender === 'O' ? 'Other' : patientData.gender} • +91 {mobileNumber}</p>
                     </div>
                     <VitalsGrid vitals={vitals} variant="slate" />
                   </div>
@@ -351,10 +346,8 @@ export default function ReceptionDashboard() {
 
           </div>
         </div>
-        )}
 
-        {/* Queue Management Tab */}
-        {activeTab === 'queue' && (
+        {/* Queue Management Section */}
           <div>
             <div className="mb-8 print:hidden">
               <Breadcrumbs 
@@ -376,28 +369,35 @@ export default function ReceptionDashboard() {
                  ) : queue.map(q => {
                     const p = patients.find(pat => pat.id === q.patient_id) || { name: 'Unknown', mobile_number: '', gender: '', age: 0 };
                     return (
-                      <div key={q.id} className="flex justify-between items-center p-5 bg-slate-50 border border-slate-100 rounded-2xl">
-                        <div className="flex items-center gap-4">
-                          <span className="font-black text-slate-900 text-xl w-16">{q.token_number}</span>
-                          <div>
-                            <p className="font-bold text-slate-800">{p.name}</p>
-                            <p className="text-sm text-slate-500">{p.age} yrs • {p.gender} • +91 {p.mobile_number}</p>
+                      <div key={q.id} className="p-5 bg-slate-50 border border-slate-100 rounded-2xl mb-3">
+                        <div className="flex justify-between items-center">
+                          <div className="flex items-center gap-4">
+                            <span className="font-black text-slate-900 text-xl w-16">{q.token_number}</span>
+                            <div>
+                              <p className="font-bold text-slate-800">{p.name}</p>
+                              <p className="text-sm text-slate-500">{p.age} yrs • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : p.gender === 'O' ? 'Other' : p.gender} • +91 {p.mobile_number}</p>
+                            </div>
                           </div>
+                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
+                             q.status === 'done' ? 'bg-emerald-100 text-emerald-700' : 
+                             q.status === 'in_consultation' ? 'bg-blue-100 text-blue-700' : 
+                             q.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
+                          }`}>
+                            {q.status.replace('_', ' ')}
+                          </span>
                         </div>
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                           q.status === 'done' ? 'bg-emerald-100 text-emerald-700' : 
-                           q.status === 'in_consultation' ? 'bg-blue-100 text-blue-700' : 
-                           q.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
-                        }`}>
-                          {q.status.replace('_', ' ')}
-                        </span>
+                        
+                        {q.status === 'done' && (
+                          <div className="mt-4 pt-4 border-t border-slate-100">
+                            <DocumentUpload patientId={q.patient_id} />
+                          </div>
+                        )}
                       </div>
                     );
                  })}
                </div>
             </div>
           </div>
-        )}
       </main>
     </div>
   );

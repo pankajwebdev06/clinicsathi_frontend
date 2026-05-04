@@ -1,7 +1,7 @@
 import { apiClient } from "@/core/api/apiClient";
 
 export const authApi = {
-  async registerClinic(data: { name: string; doctor_name: string; phone?: string }) {
+  async registerClinic(data: { name: string; doctor_name: string; specialization?: string; city?: string; address?: string; phone?: string }) {
     return apiClient("/auth/clinics", {
       method: "POST",
       body: JSON.stringify(data),

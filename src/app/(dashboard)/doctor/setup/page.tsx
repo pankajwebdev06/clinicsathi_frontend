@@ -28,7 +28,7 @@ export default function ClinicSetup() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [form, setForm] = useState<ClinicData & { doctorMobile?: string; doctorPassword?: string }>({
-    doctorName: '', doctorMobile: '', doctorPassword: '', degree: '', specialization: '', experience: '',
+    id: '', doctorName: '', doctorMobile: '', doctorPassword: '', degree: '', specialization: '', experience: '',
     clinicName: '', city: '', address: '', phone: '',
     morningStart: '09:00', morningEnd: '13:00',
     eveningStart: '17:00', eveningEnd: '20:00',
@@ -56,6 +56,9 @@ export default function ClinicSetup() {
       const clinicRes = await authApi.registerClinic({
         name: form.clinicName || 'My Clinic',
         doctor_name: form.doctorName || 'Doctor',
+        specialization: form.specialization,
+        city: form.city,
+        address: form.address,
         phone: form.phone,
       });
 
