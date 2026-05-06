@@ -65,6 +65,7 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-slate-900 transition-colors">How it Works</a>
             <a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a>
+            <Link href="/blog" className="hover:text-slate-900 transition-colors">Blog</Link>
           </nav>
           <div className="flex items-center gap-3">
             <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors px-4 py-2">Login</Link>
@@ -262,9 +263,12 @@ export default function LandingPage() {
             </div>
             <div className="text-6xl font-black text-slate-900 mb-1">
               <span className="text-2xl font-bold text-slate-500 align-top mt-3 inline-block">₹</span>
-              2,499
+              499
             </div>
-            <p className="text-slate-500 font-semibold mb-8">/month • Billed monthly</p>
+            <p className="text-slate-500 font-semibold mb-2">/month • Billed monthly</p>
+            <div className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-full uppercase tracking-wider mb-8">
+              🎁 2 Month Free Trial (First 100 Doctors)
+            </div>
             <ul className="space-y-4 text-left mb-10">
               {[
                 '✅ Unlimited patients per day',
@@ -279,7 +283,7 @@ export default function LandingPage() {
               ))}
             </ul>
             <Link href="/doctor/setup" className="block w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-lg shadow-lg shadow-blue-600/25 transition-all active:scale-[0.98] hover:-translate-y-0.5">
-              Start Free 14-Day Trial →
+              Claim My Free Trial →
             </Link>
             <p className="text-slate-400 text-sm mt-4 font-medium">No credit card required.</p>
           </div>
@@ -314,9 +318,10 @@ export default function LandingPage() {
           </div>
           <p className="text-slate-400 text-sm font-medium">© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
           <div className="flex gap-5 text-sm font-semibold text-slate-500">
-            <a href="#" className="hover:text-slate-900 transition-colors">Privacy</a>
-            <a href="#" className="hover:text-slate-900 transition-colors">Terms</a>
-            <a href="#" className="hover:text-slate-900 transition-colors">Contact</a>
+            <Link href="/privacy" className="hover:text-slate-900 transition-colors">Privacy</Link>
+            <Link href="/terms" className="hover:text-slate-900 transition-colors">Terms</Link>
+            <Link href="/contact" className="hover:text-slate-900 transition-colors">Contact</Link>
+            <Link href="/blog" className="hover:text-slate-900 transition-colors">Blog</Link>
           </div>
         </div>
       </footer>

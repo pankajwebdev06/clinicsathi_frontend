@@ -1,6 +1,8 @@
 'use client';
 
 import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import { authApi } from '@/features/auth/api';
 import { useClinic } from '@/core/store/clinic-context';
 import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { VitalsGrid } from '@/shared/components/VitalsGrid';
@@ -28,7 +30,8 @@ function statusBadge(status: string) {
 }
 
 export default function ReceptionDashboard() {
-  const { clinic } = useClinic();
+  const router = useRouter();
+  const { clinic, setClinic } = useClinic();
   const [mobileNumber, setMobileNumber] = useState('');
   const [flowState, setFlowState] = useState<FlowState>('search');
   const [patientData, setPatientData] = useState({ id: '', name: '', age: '', gender: '', symptoms: '' });
@@ -37,6 +40,53 @@ export default function ReceptionDashboard() {
   const [queue, setQueue] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
   const [error, setError] = useState('');
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
+  // Authentication check and dynamic clinic fetching
+  useEffect(() => {
+    const checkAuthAndFetchClinic = async () => {
+      const token = localStorage.getItem('auth_token');
+      const userInfoStr = localStorage.getItem('user_info');
+      
+      if (!token || !userInfoStr) {
+        router.push('/login');
+        return;
+      }
+
+      try {
+        const userInfo = JSON.parse(userInfoStr);
+        // Fetch real clinic data from backend
+        const realClinicData = await authApi.getClinic(userInfo.clinic_id);
+        
+        // Map backend response to frontend ClinicData structure
+        const mappedData = {
+          id: realClinicData.id,
+          clinicName: realClinicData.name,
+          doctorName: realClinicData.doctor_name,
+          specialization: realClinicData.specialization || 'General Physician',
+          degree: 'MBBS',
+          experience: '10',
+          city: realClinicData.city || '',
+          address: realClinicData.address || '',
+          phone: realClinicData.phone || '',
+          morningStart: '09:00',
+          morningEnd: '13:00',
+          eveningStart: '17:00',
+          eveningEnd: '20:00',
+          offDays: ['Sunday'],
+          selectedTemplate: 't1'
+        };
+        
+        setClinic(mappedData);
+        setIsAuthChecking(false);
+      } catch (err) {
+        console.error('Auth or Fetch error:', err);
+        router.push('/login');
+      }
+    };
+
+    checkAuthAndFetchClinic();
+  }, []);
 
   useEffect(() => {
     const loadQueue = async () => {
@@ -145,6 +195,16 @@ export default function ReceptionDashboard() {
     : (flowState === 'new_patient' || flowState === 'history') ? 60
     : flowState === 'vitals' ? 80
     : 100;
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-500 font-medium">Authenticating Reception...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
@@ -159,6 +219,19 @@ export default function ReceptionDashboard() {
           { id: 'entry', icon: '➕', label: 'Dashboard', onClick: () => {} },
         ]}
         activeId={'entry'}
+        footerContent={
+          <button 
+            onClick={() => {
+              localStorage.removeItem('auth_token');
+              localStorage.removeItem('user_info');
+              router.push('/login');
+            }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-red-900/30 hover:text-red-400 transition-colors"
+          >
+            <span className="text-lg">🚪</span>
+            <span>Logout</span>
+          </button>
+        }
       />
 
       {/* Main */}

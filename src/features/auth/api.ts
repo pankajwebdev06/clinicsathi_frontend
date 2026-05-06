@@ -22,6 +22,12 @@ export const authApi = {
     });
   },
 
+  async getClinic(clinicId: string) {
+    return apiClient(`/auth/clinics/${clinicId}`, {
+      method: "GET",
+    });
+  },
+
   async getMe() {
     return apiClient("/auth/me", {
       method: "GET",

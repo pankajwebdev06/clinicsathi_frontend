@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 
 import { useClinic } from '@/core/store/clinic-context';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Breadcrumbs } from '@/shared/components/Breadcrumbs';
 import { VitalsGrid } from '@/shared/components/VitalsGrid';
@@ -57,6 +58,7 @@ function formatTime(t: string) {
 }
 
 export default function DoctorDashboard() {
+  const router = useRouter();
   const { clinic, setClinic } = useClinic();
   const [activeTab, setActiveTab] = useState<Tab>('queue');
   const [queue, setQueue] = useState<any[]>([]);
@@ -64,6 +66,54 @@ export default function DoctorDashboard() {
   const [focusMode, setFocusMode] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
   const [settingsForm, setSettingsForm] = useState(clinic);
+  const [isAuthChecking, setIsAuthChecking] = useState(true);
+
+  // Authentication check and dynamic clinic fetching
+  useEffect(() => {
+    const checkAuthAndFetchClinic = async () => {
+      const token = localStorage.getItem('auth_token');
+      const userInfoStr = localStorage.getItem('user_info');
+      
+      if (!token || !userInfoStr) {
+        router.push('/login');
+        return;
+      }
+
+      try {
+        const userInfo = JSON.parse(userInfoStr);
+        // Fetch real clinic data from backend
+        const realClinicData = await authApi.getClinic(userInfo.clinic_id);
+        
+        // Map backend response to frontend ClinicData structure
+        const mappedData = {
+          id: realClinicData.id,
+          clinicName: realClinicData.name,
+          doctorName: realClinicData.doctor_name,
+          specialization: realClinicData.specialization || 'General Physician',
+          degree: 'MBBS', // Backend should ideally provide this, using fallback
+          experience: '10',
+          city: realClinicData.city || '',
+          address: realClinicData.address || '',
+          phone: realClinicData.phone || '',
+          morningStart: '09:00',
+          morningEnd: '13:00',
+          eveningStart: '17:00',
+          eveningEnd: '20:00',
+          offDays: ['Sunday'],
+          selectedTemplate: 't1'
+        };
+        
+        setClinic(mappedData);
+        setSettingsForm(mappedData);
+        setIsAuthChecking(false);
+      } catch (err) {
+        console.error('Auth or Fetch error:', err);
+        router.push('/login');
+      }
+    };
+
+    checkAuthAndFetchClinic();
+  }, []);
 
   // Staff management state
   const [staffList, setStaffList] = useState<any[]>([]);
@@ -208,6 +258,17 @@ export default function DoctorDashboard() {
     { label: 'Avg. Wait Time', value: '12m', icon: '⚡', color: 'bg-purple-50 text-purple-700' },
   ];
 
+  if (isAuthChecking) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <p className="text-slate-500 font-medium">Authenticating...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-slate-50 flex">
 
@@ -226,10 +287,17 @@ export default function DoctorDashboard() {
           { id: 'settings', icon: '⚙️', label: 'Settings & Staff', onClick: () => setActiveTab('settings') },
         ]}
         footerContent={
-          <Link href="/" className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-red-900/30 hover:text-red-400 transition-colors">
+          <button 
+            onClick={() => {
+              localStorage.removeItem('auth_token');
+              localStorage.removeItem('user_info');
+              router.push('/login');
+            }}
+            className="w-full flex items-center gap-3 px-3 py-3 rounded-xl text-sm font-medium text-slate-400 hover:bg-red-900/30 hover:text-red-400 transition-colors"
+          >
             <span className="text-lg">🚪</span>
             {!focusMode && <span>Logout</span>}
-          </Link>
+          </button>
         }
       />
 

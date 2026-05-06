@@ -10,9 +10,11 @@ export function useQueueSocket(clinicId: string) {
   useEffect(() => {
     if (!clinicId) return
 
-    // In production, use your actual domain
-    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
-    const wsUrl = `${protocol}//${window.location.host}/api/v1/queue/ws/${clinicId}`
+    // Use the backend host from environment variables
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
+    const host = apiUrl.replace(/^https?:\/\//, '').split('/')[0];
+    const protocol = apiUrl.startsWith('https') ? 'wss:' : 'ws:';
+    const wsUrl = `${protocol}//${host}/api/v1/queue/ws/${clinicId}`;
     
     const socket = new WebSocket(wsUrl)
 
