@@ -52,7 +52,7 @@ export function ClinicProvider({ children }: { children: ReactNode }) {
   const [clinic, setClinicState] = useState<ClinicData>(DEFAULT_CLINIC);
 
   useEffect(() => {
-    const saved = localStorage.getItem('clinicflow_clinic');
+    const saved = localStorage.getItem('clinicsathi_clinic');
     if (saved) {
       try { setClinicState(JSON.parse(saved)); } catch {}
     }
@@ -60,7 +60,7 @@ export function ClinicProvider({ children }: { children: ReactNode }) {
 
   const setClinic = (data: ClinicData) => {
     setClinicState(data);
-    localStorage.setItem('clinicflow_clinic', JSON.stringify(data));
+    localStorage.setItem('clinicsathi_clinic', JSON.stringify(data));
   };
 
   return (

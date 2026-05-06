@@ -5,6 +5,7 @@ import { authApi } from "@/features/auth/api";
 import { useRouter } from "next/navigation";
 import { Button } from "@/shared/components/ui/Button";
 import { Input } from "@/shared/components/ui/Input";
+import Link from "next/link";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -24,12 +25,19 @@ export default function LoginPage() {
         password: password,
       });
 
-      // Save token to localStorage
+      // Save token and user info to localStorage
       localStorage.setItem("auth_token", response.access_token);
       localStorage.setItem("user_info", JSON.stringify(response.user));
 
-      // Redirect to dashboard
-      router.push("/reception"); // Or another dashboard route depending on role
+      // Role-based redirect
+      const role: string = response.user.role;
+      if (role === "doctor") {
+        router.push("/doctor/dashboard");
+      } else if (role === "receptionist") {
+        router.push("/reception");
+      } else {
+        router.push("/");
+      }
     } catch (err: any) {
       setError(err.message || "Failed to login. Please check your credentials.");
     } finally {
@@ -38,34 +46,40 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50">
-      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-xl shadow-lg border border-gray-100">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            Sign in to your account
-          </h2>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <div className="max-w-md w-full p-8 bg-white rounded-2xl shadow-lg border border-slate-100">
+        {/* Logo */}
+        <div className="flex items-center gap-2.5 mb-8">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-sm shadow-md">
+            CS
+          </div>
+          <span className="font-extrabold text-slate-900 text-xl tracking-tight">ClinicSathi</span>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+
+        <h2 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>
+        <p className="text-slate-500 text-sm mb-8">Sign in to your clinic dashboard</p>
+
+        <form className="space-y-5" onSubmit={handleLogin}>
           {error && (
-            <div className="bg-red-50 text-red-500 p-3 rounded-md text-sm text-center">
+            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm text-center border border-red-100">
               {error}
             </div>
           )}
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                 Mobile Number
               </label>
               <Input
-                type="text"
+                type="tel"
                 required
                 value={mobileNumber}
                 onChange={(e) => setMobileNumber(e.target.value)}
-                placeholder="Enter your 10 digit mobile number"
+                placeholder="10-digit mobile number"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                 Password
               </label>
               <Input
@@ -73,20 +87,25 @@ export default function LoginPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder="Your password"
               />
             </div>
           </div>
 
-          <div>
-            <Button
-              type="submit"
-              className="w-full flex justify-center py-2 px-4"
-              disabled={loading}
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </Button>
-          </div>
+          <Button
+            type="submit"
+            className="w-full py-3"
+            disabled={loading}
+          >
+            {loading ? "Signing in..." : "Sign in →"}
+          </Button>
+
+          <p className="text-center text-sm text-slate-500">
+            New clinic?{" "}
+            <Link href="/doctor/setup" className="font-semibold text-blue-600 hover:text-blue-700">
+              Register here
+            </Link>
+          </p>
         </form>
       </div>
     </div>

@@ -67,7 +67,7 @@ export function ConsultPanel({ patientId, queueId, onActionComplete }: { patient
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white/80 backdrop-blur-md border-t">
         <div className="max-w-4xl mx-auto flex gap-3">
           <button
-            onClick={() => handleAction('done')}
+            onClick={() => handleAction('completed')}
             disabled={isProcessing}
             className="flex-1 py-4 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-xl font-bold shadow-md shadow-emerald-600/20 transition-all active:scale-[0.98] flex flex-col items-center gap-0.5">
             <span className="text-xl">✅</span>

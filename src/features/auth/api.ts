@@ -27,4 +27,10 @@ export const authApi = {
       method: "GET",
     });
   },
+
+  async getStaff(clinicId: string) {
+    return apiClient(`/auth/staff?clinic_id=${clinicId}`, {
+      method: "GET",
+    });
+  },
 };

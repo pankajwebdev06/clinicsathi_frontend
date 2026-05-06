@@ -15,6 +15,18 @@ interface PatientVitals {
   bp: string; weight: string; temperature: string; pulse: string;
 }
 
+// Consistent status badge helper
+function statusBadge(status: string) {
+  const map: Record<string, string> = {
+    completed:       'bg-emerald-100 text-emerald-700',
+    in_consultation: 'bg-blue-100 text-blue-700',
+    cancelled:       'bg-red-100 text-red-700',
+    skipped:         'bg-orange-100 text-orange-700',
+    waiting:         'bg-amber-100 text-amber-700',
+  };
+  return map[status] ?? 'bg-slate-100 text-slate-600';
+}
+
 export default function ReceptionDashboard() {
   const { clinic } = useClinic();
   const [mobileNumber, setMobileNumber] = useState('');
@@ -52,17 +64,12 @@ export default function ReceptionDashboard() {
         setFlowState('loading');
         setError('');
         try {
-          // In reality we should fetch all patients or search by mobile directly
-          // For now we get all clinic patients and find the mobile number
-          // In production, we'd add a `/patients/search?mobile=` endpoint
-          
-          // Use user info from local storage to get clinic_id
           const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-          if (!userInfo.clinic_id) throw new Error("Clinic ID missing");
-          
-          const patients = await patientsApi.getPatients(userInfo.clinic_id);
-          const found = patients.find((p: any) => p.mobile_number === mobileNumber);
-          
+          if (!userInfo.clinic_id) throw new Error('Clinic ID missing');
+
+          const pts = await patientsApi.getPatients(userInfo.clinic_id);
+          const found = pts.find((p: any) => p.mobile_number === mobileNumber);
+
           if (found) {
             setPatientData({ id: found.id, name: found.name, age: found.age.toString(), gender: found.gender, symptoms: '' });
             setFlowState('history');
@@ -70,9 +77,9 @@ export default function ReceptionDashboard() {
             setFlowState('new_patient');
           }
         } catch (err: any) {
-           console.error("Search Patient Error:", err);
-           setError(err.message || "Failed to search patient");
-           setFlowState('search');
+          console.error('Search Patient Error:', err);
+          setError(err.message || 'Failed to search patient');
+          setFlowState('search');
         }
       };
       searchPatient();
@@ -88,42 +95,40 @@ export default function ReceptionDashboard() {
     e.preventDefault();
     setFlowState('loading');
     setError('');
-    
+
     try {
-       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-       if (!userInfo.clinic_id) throw new Error("Clinic ID missing");
+      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+      if (!userInfo.clinic_id) throw new Error('Clinic ID missing');
 
-        let pId = patientData.id;
-        if (!pId) {
-          // Create patient if it's new (no ID yet)
-          const newPatient = await patientsApi.createPatient({
-            name: patientData.name,
-            mobile_number: mobileNumber,
-            age: parseInt(patientData.age),
-            gender: patientData.gender,
-            clinic_id: userInfo.clinic_id
-          });
-          pId = newPatient.id;
-          setPatientData(prev => ({ ...prev, id: pId }));
-        }
+      let pId = patientData.id;
+      if (!pId) {
+        const newPatient = await patientsApi.createPatient({
+          name: patientData.name,
+          mobile_number: mobileNumber,
+          age: parseInt(patientData.age),
+          gender: patientData.gender,
+          clinic_id: userInfo.clinic_id
+        });
+        pId = newPatient.id;
+        setPatientData(prev => ({ ...prev, id: pId }));
+      }
 
-       // Add to queue
-       const queueEntry = await queueApi.addToQueue({
-          clinic_id: userInfo.clinic_id,
-          patient_id: pId,
-          priority: 0,
-          symptoms: patientData.symptoms,
-          bp: vitals.bp,
-          weight: vitals.weight,
-          temperature: vitals.temperature,
-          pulse: vitals.pulse
-       });
+      const queueEntry = await queueApi.addToQueue({
+        clinic_id: userInfo.clinic_id,
+        patient_id: pId,
+        priority: 0,
+        symptoms: patientData.symptoms,
+        bp: vitals.bp,
+        weight: vitals.weight,
+        temperature: vitals.temperature,
+        pulse: vitals.pulse
+      });
 
-       setToken(queueEntry.token_number);
-       setFlowState('token');
+      setToken(queueEntry.token_number);
+      setFlowState('token');
     } catch (err: any) {
-       setError(err.message || "Failed to generate token");
-       setFlowState('vitals');
+      setError(err.message || 'Failed to generate token');
+      setFlowState('vitals');
     }
   };
 
@@ -135,13 +140,17 @@ export default function ReceptionDashboard() {
     setFlowState('search');
   };
 
-  const progress = flowState === 'search' ? 10 : flowState === 'loading' ? 40 : flowState === 'new_patient' || flowState === 'history' ? 60 : flowState === 'vitals' ? 80 : 100;
+  const progress = flowState === 'search' ? 10
+    : flowState === 'loading' ? 40
+    : (flowState === 'new_patient' || flowState === 'history') ? 60
+    : flowState === 'vitals' ? 80
+    : 100;
 
   return (
     <div className="min-h-screen bg-slate-50 flex flex-col md:flex-row">
 
       {/* Sidebar */}
-      <ClinicSidebar 
+      <ClinicSidebar
         clinicName={clinic.clinicName}
         subtitle="Reception Desk"
         doctorName={clinic.doctorName}
@@ -164,15 +173,18 @@ export default function ReceptionDashboard() {
           <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">R</div>
         </div>
 
-        {/* Page title with breadcrumb */}
+        {/* Page title */}
         <div className="mb-8 print:hidden">
-          <Breadcrumbs 
+          <Breadcrumbs
             items={[
               { label: 'Home', href: '/', icon: '🏠' },
               { label: 'Doctor Dashboard', href: '/doctor/dashboard' },
               { label: 'Reception', isCurrent: flowState === 'search' },
               ...(flowState !== 'search' && flowState !== 'loading' ? [{
-                label: flowState === 'new_patient' ? 'New Patient' : flowState === 'history' ? 'Existing Patient' : flowState === 'vitals' ? 'Vitals' : 'Token Generated',
+                label: flowState === 'new_patient' ? 'New Patient'
+                  : flowState === 'history' ? 'Existing Patient'
+                  : flowState === 'vitals' ? 'Vitals'
+                  : 'Token Generated',
                 isCurrent: true
               }] : [])
             ]}
@@ -182,12 +194,12 @@ export default function ReceptionDashboard() {
           {error && <div className="mt-4 p-3 bg-red-50 text-red-500 rounded-md text-sm">{error}</div>}
         </div>
 
-        {/* Card for Entry */}
+        {/* Main card */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative">
 
           {/* Progress Bar */}
           <div className="h-1.5 w-full bg-slate-100 print:hidden">
-            <div className={`h-full bg-blue-600 transition-all duration-700 ease-out`} style={{ width: `${progress}%` }}></div>
+            <div className="h-full bg-blue-600 transition-all duration-700 ease-out" style={{ width: `${progress}%` }}></div>
           </div>
 
           <div className="p-6 md:p-10">
@@ -199,11 +211,16 @@ export default function ReceptionDashboard() {
                 <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                   <span className="text-slate-400 font-medium border-r border-slate-200 pr-3">+91</span>
                 </div>
-                <input id="search" type="tel" maxLength={10} value={mobileNumber}
+                <input
+                  id="search"
+                  type="tel"
+                  maxLength={10}
+                  value={mobileNumber}
                   onChange={e => { const v = e.target.value.replace(/\D/g, ''); setMobileNumber(v); if (v.length < 10) setFlowState('search'); }}
                   disabled={flowState === 'loading'}
                   className="block w-full pl-16 pr-12 py-5 bg-slate-50 border border-slate-200 rounded-2xl text-2xl font-semibold tracking-widest text-slate-800 focus:bg-white focus:ring-4 focus:ring-blue-500/20 focus:border-blue-500 transition-all disabled:opacity-70 placeholder:text-slate-300 placeholder:font-normal placeholder:tracking-normal"
-                  placeholder="Enter 10 digits" />
+                  placeholder="Enter 10 digits"
+                />
                 {flowState === 'loading' && (
                   <div className="absolute inset-y-0 right-4 flex items-center">
                     <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-600"></div>
@@ -216,7 +233,7 @@ export default function ReceptionDashboard() {
               </p>
             </div>
 
-            {/* Step 2a: Patient Form (New or History) */}
+            {/* Step 2a: Patient Form */}
             {(flowState === 'history' || flowState === 'new_patient') && (
               <form onSubmit={handlePatientSubmit} className="space-y-6 animate-in fade-in slide-in-from-bottom-4 print:hidden">
                 <div className="flex justify-between items-start mb-4">
@@ -295,7 +312,7 @@ export default function ReceptionDashboard() {
                   ))}
                 </div>
                 <div className="flex gap-4 pt-4 border-t border-slate-100">
-                  <button type="button" onClick={() => setFlowState(flowState === 'vitals' ? 'new_patient' : 'history')}
+                  <button type="button" onClick={() => setFlowState(patientData.id ? 'history' : 'new_patient')}
                     className="px-6 py-4 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">← Back</button>
                   <button type="submit" className="flex-1 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-md shadow-blue-600/20 transition-all active:scale-[0.98]">
                     Save & Generate Token →
@@ -316,7 +333,7 @@ export default function ReceptionDashboard() {
                     <div>
                       <p className="text-slate-400 text-xs mb-1 font-semibold uppercase tracking-wider">Patient</p>
                       <p className="font-bold text-slate-800 text-lg">{patientData.name}</p>
-                      <p className="text-slate-600">{patientData.age} yrs • {patientData.gender === 'M' ? 'Male' : patientData.gender === 'F' ? 'Female' : patientData.gender === 'O' ? 'Other' : patientData.gender} • +91 {mobileNumber}</p>
+                      <p className="text-slate-600">{patientData.age} yrs • {patientData.gender === 'M' ? 'Male' : patientData.gender === 'F' ? 'Female' : 'Other'} • +91 {mobileNumber}</p>
                     </div>
                     <VitalsGrid vitals={vitals} variant="slate" />
                   </div>
@@ -348,56 +365,53 @@ export default function ReceptionDashboard() {
         </div>
 
         {/* Queue Management Section */}
-          <div>
-            <div className="mb-8 print:hidden">
-              <Breadcrumbs 
-                items={[
-                  { label: 'Home', href: '/', icon: '🏠' },
-                  { label: 'Doctor Dashboard', href: '/doctor/dashboard' },
-                  { label: 'Queue Management', isCurrent: true },
-                ]}
-              />
-              <h1 className="text-3xl font-bold text-slate-900 mt-2">Queue Management</h1>
-              <p className="text-slate-500 mt-2">Live patient queue for <strong>{clinic.clinicName}</strong>.</p>
-            </div>
-            
-            <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden p-6 md:p-8">
-               <h3 className="text-xl font-bold text-slate-800 mb-6">Today's Queue</h3>
-               <div className="space-y-4">
-                 {queue.length === 0 ? (
-                    <div className="text-center py-10 text-slate-500">No patients in queue yet.</div>
-                 ) : queue.map(q => {
-                    const p = patients.find(pat => pat.id === q.patient_id) || { name: 'Unknown', mobile_number: '', gender: '', age: 0 };
-                    return (
-                      <div key={q.id} className="p-5 bg-slate-50 border border-slate-100 rounded-2xl mb-3">
-                        <div className="flex justify-between items-center">
-                          <div className="flex items-center gap-4">
-                            <span className="font-black text-slate-900 text-xl w-16">{q.token_number}</span>
-                            <div>
-                              <p className="font-bold text-slate-800">{p.name}</p>
-                              <p className="text-sm text-slate-500">{p.age} yrs • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : p.gender === 'O' ? 'Other' : p.gender} • +91 {p.mobile_number}</p>
-                            </div>
-                          </div>
-                          <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${
-                             q.status === 'done' ? 'bg-emerald-100 text-emerald-700' : 
-                             q.status === 'in_consultation' ? 'bg-blue-100 text-blue-700' : 
-                             q.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'
-                          }`}>
-                            {q.status.replace('_', ' ')}
-                          </span>
+        <div className="mt-10">
+          <div className="mb-6 print:hidden">
+            <Breadcrumbs
+              items={[
+                { label: 'Home', href: '/', icon: '🏠' },
+                { label: 'Doctor Dashboard', href: '/doctor/dashboard' },
+                { label: 'Queue Management', isCurrent: true },
+              ]}
+            />
+            <h1 className="text-3xl font-bold text-slate-900 mt-2">Queue Management</h1>
+            <p className="text-slate-500 mt-2">Live patient queue for <strong>{clinic.clinicName}</strong>.</p>
+          </div>
+
+          <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden p-6 md:p-8">
+            <h3 className="text-xl font-bold text-slate-800 mb-6">Today&apos;s Queue</h3>
+            <div className="space-y-4">
+              {queue.length === 0 ? (
+                <div className="text-center py-10 text-slate-500">No patients in queue yet.</div>
+              ) : queue.map(q => {
+                const p = patients.find(pat => pat.id === q.patient_id) || { name: 'Unknown', mobile_number: '', gender: '', age: 0 };
+                return (
+                  <div key={q.id} className="p-5 bg-slate-50 border border-slate-100 rounded-2xl">
+                    <div className="flex justify-between items-center">
+                      <div className="flex items-center gap-4">
+                        <span className="font-black text-slate-900 text-xl w-16">{q.token_number}</span>
+                        <div>
+                          <p className="font-bold text-slate-800">{p.name}</p>
+                          <p className="text-sm text-slate-500">{p.age} yrs • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : 'Other'} • +91 {p.mobile_number}</p>
                         </div>
-                        
-                        {q.status === 'done' && (
-                          <div className="mt-4 pt-4 border-t border-slate-100">
-                            <DocumentUpload patientId={q.patient_id} />
-                          </div>
-                        )}
                       </div>
-                    );
-                 })}
-               </div>
+                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${statusBadge(q.status)}`}>
+                        {q.status.replace('_', ' ')}
+                      </span>
+                    </div>
+
+                    {q.status === 'completed' && (
+                      <div className="mt-4 pt-4 border-t border-slate-100">
+                        <DocumentUpload patientId={q.patient_id} />
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
           </div>
+        </div>
+
       </main>
     </div>
   );

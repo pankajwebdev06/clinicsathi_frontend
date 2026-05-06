@@ -57,9 +57,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/20">
-              CF
+              CS
             </div>
-            <span className="font-extrabold text-slate-900 text-lg tracking-tight">ClinicFlow</span>
+            <span className="font-extrabold text-slate-900 text-lg tracking-tight">ClinicSathi</span>
           </div>
           <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500">
             <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
@@ -91,11 +91,11 @@ export default function LandingPage() {
           </div>
 
           <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] tracking-tight mb-6">
-            Empower Your Clinic.{' '}
+            Your Clinic&apos;s{' '}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
-              Effortless Flow
+              Digital Saathi.
             </span>{' '}
-            for Doctors.
+            Effortless Flow.
           </h1>
 
           <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto mb-10 font-medium">
@@ -121,7 +121,7 @@ export default function LandingPage() {
                   <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
                   <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
                   <div className="flex-1 ml-3 bg-slate-700/50 rounded-md h-5 flex items-center px-3">
-                    <span className="text-slate-400 text-xs font-mono">app.clinicflow.in/reception</span>
+                    <span className="text-slate-400 text-xs font-mono">app.clinicsathi.in/reception</span>
                   </div>
                 </div>
                 {/* Mock Dashboard UI */}
@@ -309,10 +309,10 @@ export default function LandingPage() {
       <footer className="py-10 border-t border-slate-100 bg-white">
         <div className="max-w-6xl mx-auto px-5 flex flex-col md:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CF</div>
-            <span className="font-extrabold text-slate-900">ClinicFlow</span>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CS</div>
+            <span className="font-extrabold text-slate-900">ClinicSathi</span>
           </div>
-          <p className="text-slate-400 text-sm font-medium">© 2026 ClinicFlow. Built for the Indian Subcontinent.</p>
+          <p className="text-slate-400 text-sm font-medium">© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
           <div className="flex gap-5 text-sm font-semibold text-slate-500">
             <a href="#" className="hover:text-slate-900 transition-colors">Privacy</a>
             <a href="#" className="hover:text-slate-900 transition-colors">Terms</a>

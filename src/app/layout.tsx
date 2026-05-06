@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "ClinicFlow — Modern Clinic Management",
-  description: "Queue management, digital records, and patient check-in for Indian clinics.",
+  title: "ClinicSathi — Modern Clinic Management",
+  description: "Queue management, digital records, and patient check-in for Indian clinics. Coming soon on clinicsathi.in",
 };
 
 import Providers from "./providers";

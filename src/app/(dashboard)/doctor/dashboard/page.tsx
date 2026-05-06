@@ -12,6 +12,7 @@ import { queueApi } from '@/features/queue/api';
 import { useEffect } from 'react';
 import { ConsultPanel } from '@/features/consultation/ConsultPanel';
 import { QueueBoard } from '@/features/queue/QueueBoard';
+import { authApi } from '@/features/auth/api';
 
 type Tab = 'queue' | 'summary' | 'settings';
 
@@ -30,13 +31,7 @@ interface Patient {
   pulse?: string;
 }
 
-const MOCK_QUEUE: Patient[] = [
-  { token: 'M-001', name: 'Rahul Sharma', age: 34, gender: 'Male', mobile: '9876543212', status: 'in_consultation', isNew: false, symptoms: 'Fever, headache since 2 days', bp: '120/80', weight: '72', temperature: '101.2°F', pulse: '88' },
-  { token: 'M-002', name: 'Priya Verma', age: 27, gender: 'Female', mobile: '9812345670', status: 'waiting', isNew: true, symptoms: 'Stomach ache, nausea', bp: '110/70', weight: '58', temperature: '99.1°F', pulse: '78' },
-  { token: 'M-003', name: 'Suresh Patel', age: 52, gender: 'Male', mobile: '9898001122', status: 'waiting', isNew: false, symptoms: 'Back pain, difficulty walking', bp: '140/90', weight: '85', temperature: '98.6°F', pulse: '92' },
-  { token: 'M-004', name: 'Ananya Singh', age: 19, gender: 'Female', mobile: '7654321098', status: 'waiting', isNew: true, symptoms: 'Cold, sore throat, mild fever', bp: '100/65', weight: '52', temperature: '100.4°F', pulse: '80' },
-  { token: 'M-005', name: 'Mohit Gupta', age: 41, gender: 'Male', mobile: '9001234567', status: 'done', isNew: false, symptoms: 'Routine checkup', bp: '118/76', weight: '78', temperature: '98.6°F', pulse: '72' },
-];
+// MOCK_QUEUE removed — using live data from API
 
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
@@ -70,11 +65,19 @@ export default function DoctorDashboard() {
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
   const [settingsForm, setSettingsForm] = useState(clinic);
 
+  // Staff management state
+  const [staffList, setStaffList] = useState<any[]>([]);
+  const [newStaffMobile, setNewStaffMobile] = useState('');
+  const [newStaffName, setNewStaffName] = useState('');
+  const [newStaffPassword, setNewStaffPassword] = useState('');
+  const [staffError, setStaffError] = useState('');
+  const [staffLoading, setStaffLoading] = useState(false);
+
   const fetchQueue = async () => {
     try {
       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
       if (!userInfo.clinic_id) return;
-      
+
       const [qData, pData] = await Promise.all([
         queueApi.getQueue(userInfo.clinic_id),
         patientsApi.getPatients(userInfo.clinic_id)
@@ -96,7 +99,7 @@ export default function DoctorDashboard() {
           weight: q.weight,
           temperature: q.temperature,
           pulse: q.pulse,
-          isNew: false // Can be calculated based on previous visits if needed
+          isNew: false
         };
       });
 
@@ -107,12 +110,50 @@ export default function DoctorDashboard() {
       }
       setLoading(false);
     } catch (err) {
-      console.error("Error fetching queue:", err);
+      console.error('Error fetching queue:', err);
+    }
+  };
+
+  const fetchStaff = async () => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+      if (!userInfo.clinic_id) return;
+      const staff = await authApi.getStaff(userInfo.clinic_id);
+      setStaffList(staff);
+    } catch (err) {
+      console.error('Error fetching staff:', err);
+    }
+  };
+
+  const addStaff = async () => {
+    setStaffError('');
+    if (!newStaffMobile || newStaffMobile.length !== 10) { setStaffError('Enter a valid 10-digit mobile number.'); return; }
+    if (!newStaffName) { setStaffError('Enter staff name.'); return; }
+    if (!newStaffPassword || newStaffPassword.length < 6) { setStaffError('Password must be at least 6 characters.'); return; }
+    setStaffLoading(true);
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+      await authApi.registerUser({
+        mobile_number: newStaffMobile,
+        name: newStaffName,
+        password: newStaffPassword,
+        role: 'receptionist',
+        clinic_id: userInfo.clinic_id,
+      });
+      setNewStaffMobile('');
+      setNewStaffName('');
+      setNewStaffPassword('');
+      await fetchStaff();
+    } catch (err: any) {
+      setStaffError(err.message || 'Failed to add staff.');
+    } finally {
+      setStaffLoading(false);
     }
   };
 
   useEffect(() => {
     fetchQueue();
+    fetchStaff();
     const interval = setInterval(fetchQueue, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -163,7 +204,7 @@ export default function DoctorDashboard() {
   const stats = [
     { label: "Today's Patients", value: queue.length.toString(), icon: '👥', color: 'bg-blue-50 text-blue-700' },
     { label: 'In Queue', value: queue.filter(p => p.status === 'waiting').length.toString(), icon: '⏳', color: 'bg-amber-50 text-amber-700' },
-    { label: 'Completed', value: queue.filter(p => p.status === 'done').length.toString(), icon: '✅', color: 'bg-emerald-50 text-emerald-700' },
+    { label: 'Completed', value: queue.filter(p => p.status === 'completed').length.toString(), icon: '✅', color: 'bg-emerald-50 text-emerald-700' },
     { label: 'Avg. Wait Time', value: '12m', icon: '⚡', color: 'bg-purple-50 text-purple-700' },
   ];
 
@@ -301,8 +342,12 @@ export default function DoctorDashboard() {
                         <p className="text-slate-400 text-xs">{p.age} yrs • {p.gender}</p>
                       </div>
                     </div>
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${p.status === 'done' ? 'bg-emerald-100 text-emerald-700' : p.status === 'in_consultation' ? 'bg-blue-100 text-blue-700' : 'bg-amber-100 text-amber-700'}`}>
-                      {p.status === 'done' ? 'Done' : p.status === 'in_consultation' ? 'In Room' : 'Waiting'}
+                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
+                      p.status === 'completed' ? 'bg-emerald-100 text-emerald-700' :
+                      p.status === 'in_consultation' ? 'bg-blue-100 text-blue-700' :
+                      p.status === 'skipped' ? 'bg-orange-100 text-orange-700' :
+                      p.status === 'cancelled' ? 'bg-red-100 text-red-700' : 'bg-amber-100 text-amber-700'}`}>
+                      {p.status === 'completed' ? 'Done' : p.status === 'in_consultation' ? 'In Room' : p.status === 'skipped' ? 'Skipped' : p.status === 'cancelled' ? 'Cancelled' : 'Waiting'}
                     </span>
                   </div>
                 ))}
@@ -457,25 +502,49 @@ export default function DoctorDashboard() {
               {/* Staff Management */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
                 <h3 className="text-xl font-bold text-slate-900 mb-2">👥 Staff Management</h3>
-                <p className="text-slate-500 text-sm mb-6">Add or remove reception staff by mobile number.</p>
-                <div className="flex gap-3 mb-5">
-                  <div className="relative flex-1">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 text-sm font-medium border-r border-slate-200 pr-3">+91</span>
-                    <input type="tel" maxLength={10} placeholder="New staff mobile" className="w-full pl-16 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none tracking-widest" />
+                <p className="text-slate-500 text-sm mb-6">Add reception staff by mobile number. They can log in immediately.</p>
+
+                {staffError && (
+                  <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100">{staffError}</div>
+                )}
+
+                <div className="grid md:grid-cols-3 gap-3 mb-4">
+                  <div className="relative">
+                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm border-r border-slate-200 pr-3">+91</span>
+                    <input type="tel" maxLength={10} value={newStaffMobile}
+                      onChange={e => setNewStaffMobile(e.target.value.replace(/\D/g, ''))}
+                      placeholder="Mobile number"
+                      className="w-full pl-14 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none tracking-widest text-sm" />
                   </div>
-                  <button className="px-6 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all active:scale-[0.98]">Add</button>
+                  <input type="text" value={newStaffName}
+                    onChange={e => setNewStaffName(e.target.value)}
+                    placeholder="Full name"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
+                  <input type="password" value={newStaffPassword}
+                    onChange={e => setNewStaffPassword(e.target.value)}
+                    placeholder="Password (min 6 chars)"
+                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
                 </div>
+                <button onClick={addStaff} disabled={staffLoading}
+                  className="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 text-white rounded-xl font-bold transition-all active:scale-[0.98] text-sm mb-6">
+                  {staffLoading ? 'Adding...' : '+ Add Receptionist'}
+                </button>
+
                 <div className="space-y-3">
-                  {['9876100001', '9876100002'].map((num, i) => (
-                    <div key={num} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
+                  {staffList.length === 0 ? (
+                    <p className="text-slate-400 text-sm text-center py-6">No staff added yet.</p>
+                  ) : staffList.map((s: any, i: number) => (
+                    <div key={s.id} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl">
                       <div className="flex items-center gap-3">
                         <div className="w-9 h-9 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-sm">R{i + 1}</div>
                         <div>
-                          <p className="font-semibold text-slate-800 text-sm">+91 {num}</p>
-                          <p className="text-xs text-emerald-600 font-medium">● Active Staff</p>
+                          <p className="font-semibold text-slate-800 text-sm">{s.name}</p>
+                          <p className="text-xs text-slate-500">+91 {s.mobile_number}</p>
+                          <p className={`text-xs font-medium mt-0.5 ${s.is_active ? 'text-emerald-600' : 'text-red-500'}`}>
+                            {s.is_active ? '● Active' : '● Inactive'}
+                          </p>
                         </div>
                       </div>
-                      <button className="text-xs font-bold text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors">Remove</button>
                     </div>
                   ))}
                 </div>
