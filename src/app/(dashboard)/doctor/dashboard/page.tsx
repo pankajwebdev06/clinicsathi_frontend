@@ -443,7 +443,7 @@ export default function DoctorDashboard() {
                       <input
                         value={settingsForm[key as keyof typeof settingsForm] as string}
                         onChange={e => setSettingsForm(f => ({ ...f, [key]: e.target.value }))}
-                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-900"
                         placeholder={placeholder}
                       />
                     </div>

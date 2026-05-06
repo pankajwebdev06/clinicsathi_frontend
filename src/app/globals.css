@@ -12,11 +12,8 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+input, select, textarea {
+  color: #0f172a !important; /* Enforce slate-900 for readability */
 }
 
 body {

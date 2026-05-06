@@ -29,7 +29,7 @@ export const Input = forwardRef<HTMLInputElement, InputProps>(
           <input
             ref={ref}
             className={cn(
-              'block w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-gray-900 placeholder-gray-400 transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none focus:bg-white disabled:opacity-70',
+              'block w-full p-4 bg-slate-50 border border-slate-200 rounded-xl text-slate-950 placeholder-slate-400 transition-all focus:ring-2 focus:ring-blue-500 focus:outline-none focus:bg-white disabled:opacity-70',
               prefixText && 'pl-16',
               error && 'border-red-500 focus:ring-red-500/20',
               className
