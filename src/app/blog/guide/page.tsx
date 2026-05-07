@@ -5,23 +5,513 @@ export const metadata = {
   description: 'A comprehensive visual guide to using ClinicSathi - from clinic registration to managing patients, prescriptions, and staff.',
 };
 
-interface ScreenshotPlaceholderProps {
-  step: number;
+interface VisualMockupProps {
+  type: 'doctor-form' | 'clinic-form' | 'timings-form' | 'staff-form' | 'login' | 'patient-search' | 'patient-form' | 'vitals-form' | 'token' | 'queue' | 'doctor-dashboard' | 'consultation' | 'prescription' | 'settings';
   title: string;
   description: string;
 }
 
-function ScreenshotPlaceholder({ step, title, description }: ScreenshotPlaceholderProps) {
+// Lightweight CSS-based visual mockups - no images, fast on 3G
+function VisualMockup({ type, title, description }: VisualMockupProps) {
+  const mockups: Record<string, JSX.Element> = {
+    'doctor-form': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-4">
+          <div className="flex items-center gap-2 text-white">
+            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-sm">🏥</div>
+            <span className="font-bold">Register Your Clinic</span>
+          </div>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">1</div>
+            <span className="text-sm font-semibold text-slate-700">Professional Details</span>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Full Name</div>
+              <div className="h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">Dr. Ramesh Kumar</div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <div className="text-xs text-slate-500 mb-1">Mobile Number</div>
+                <div className="h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">98765 43210</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500 mb-1">Password</div>
+                <div className="h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">••••••••</div>
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Specialization</div>
+              <div className="h-10 bg-blue-50 rounded-lg border border-blue-200 px-3 flex items-center text-sm text-blue-700">General Physician</div>
+            </div>
+          </div>
+          <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
+            <div className="px-4 py-2 bg-slate-100 rounded-lg text-xs text-slate-600">Back</div>
+            <div className="px-4 py-2 bg-blue-600 rounded-lg text-xs text-white font-medium">Next Step →</div>
+          </div>
+        </div>
+      </div>
+    ),
+    'clinic-form': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-4">
+          <div className="flex items-center gap-2 text-white">
+            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-sm">🏥</div>
+            <span className="font-bold">Clinic Information</span>
+          </div>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">2</div>
+            <span className="text-sm font-semibold text-slate-700">Clinic Details</span>
+          </div>
+          <div className="space-y-3">
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Clinic Name</div>
+              <div className="h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">Shree Sai Clinic</div>
+            </div>
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <div className="text-xs text-slate-500 mb-1">City</div>
+                <div className="h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">Mumbai</div>
+              </div>
+              <div>
+                <div className="text-xs text-slate-500 mb-1">MCI Number</div>
+                <div className="h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">MCI-12345</div>
+              </div>
+            </div>
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Full Address</div>
+              <div className="h-16 bg-slate-100 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-600">123, Main Road, Andheri West, Mumbai - 400053</div>
+            </div>
+          </div>
+          <div className="flex justify-between pt-4 border-t border-slate-100">
+            <div className="px-4 py-2 bg-slate-100 rounded-lg text-xs text-slate-600">← Back</div>
+            <div className="px-4 py-2 bg-blue-600 rounded-lg text-xs text-white font-medium">Next: Timings →</div>
+          </div>
+        </div>
+      </div>
+    ),
+    'timings-form': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-4">
+          <div className="flex items-center gap-2 text-white">
+            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-sm">⏰</div>
+            <span className="font-bold">Clinic Timings</span>
+          </div>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">3</div>
+            <span className="text-sm font-semibold text-slate-700">Set Your Schedule</span>
+          </div>
+          <div className="space-y-3">
+            <div className="bg-blue-50 rounded-lg p-4">
+              <div className="text-sm font-semibold text-blue-800 mb-3">Morning Session</div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-xs text-slate-500 mb-1">Start Time</div>
+                  <div className="h-10 bg-white rounded-lg border border-blue-200 px-3 flex items-center text-sm text-slate-700">09:00 AM</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500 mb-1">End Time</div>
+                  <div className="h-10 bg-white rounded-lg border border-blue-200 px-3 flex items-center text-sm text-slate-700">01:00 PM</div>
+                </div>
+              </div>
+            </div>
+            <div className="bg-amber-50 rounded-lg p-4">
+              <div className="text-sm font-semibold text-amber-800 mb-3">Evening Session</div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <div className="text-xs text-slate-500 mb-1">Start Time</div>
+                  <div className="h-10 bg-white rounded-lg border border-amber-200 px-3 flex items-center text-sm text-slate-700">05:00 PM</div>
+                </div>
+                <div>
+                  <div className="text-xs text-slate-500 mb-1">End Time</div>
+                  <div className="h-10 bg-white rounded-lg border border-amber-200 px-3 flex items-center text-sm text-slate-700">08:00 PM</div>
+                </div>
+              </div>
+            </div>
+            <div className="flex flex-wrap gap-2 pt-2">
+              {['Mon', 'Tue', 'Wed', 'Thu', 'Fri'].map(d => (
+                <div key={d} className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">{d}</div>
+              ))}
+              {['Sat', 'Sun'].map(d => (
+                <div key={d} className="px-3 py-1 bg-slate-100 text-slate-500 rounded-full text-xs">{d}</div>
+              ))}
+            </div>
+          </div>
+          <div className="flex justify-between pt-4 border-t border-slate-100">
+            <div className="px-4 py-2 bg-slate-100 rounded-lg text-xs text-slate-600">← Back</div>
+            <div className="px-4 py-2 bg-blue-600 rounded-lg text-xs text-white font-medium">Next: Staff →</div>
+          </div>
+        </div>
+      </div>
+    ),
+    'staff-form': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-4">
+          <div className="flex items-center gap-2 text-white">
+            <div className="w-8 h-8 bg-white/20 rounded-lg flex items-center justify-center text-sm">👥</div>
+            <span className="font-bold">Add Reception Staff</span>
+          </div>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-6 h-6 rounded-full bg-blue-600 text-white text-xs flex items-center justify-center font-bold">4</div>
+            <span className="text-sm font-semibold text-slate-700">Staff Management</span>
+          </div>
+          <div className="space-y-3">
+            <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+              <div className="w-10 h-10 bg-teal-100 rounded-full flex items-center justify-center text-teal-600 font-bold">R</div>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-slate-700">Receptionist</div>
+                <div className="text-xs text-slate-500">Mobile: 98765 12345</div>
+              </div>
+              <div className="px-2 py-1 bg-emerald-100 text-emerald-700 rounded text-xs font-medium">Added</div>
+            </div>
+            <div className="border-2 border-dashed border-blue-200 rounded-lg p-4">
+              <div className="text-xs text-slate-500 mb-2">Add New Staff</div>
+              <div className="flex gap-2">
+                <div className="flex-1 h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">Enter mobile number</div>
+                <div className="px-4 py-2 bg-blue-600 rounded-lg text-xs text-white font-medium">Add</div>
+              </div>
+            </div>
+          </div>
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+            <div className="flex items-center gap-2 text-emerald-700">
+              <span className="text-lg">✅</span>
+              <span className="text-sm font-medium">Ready to finish registration</span>
+            </div>
+          </div>
+          <div className="flex justify-between pt-4 border-t border-slate-100">
+            <div className="px-4 py-2 bg-slate-100 rounded-lg text-xs text-slate-600">← Back</div>
+            <div className="px-4 py-2 bg-gradient-to-r from-blue-600 to-teal-500 rounded-lg text-xs text-white font-medium">Finish & Open Dashboard</div>
+          </div>
+        </div>
+      </div>
+    ),
+    'login': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 max-w-sm mx-auto">
+        <div className="text-center mb-6">
+          <div className="w-16 h-16 bg-gradient-to-tr from-blue-600 to-teal-400 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">CS</div>
+          <h3 className="text-xl font-bold text-slate-800">Welcome Back</h3>
+          <p className="text-sm text-slate-500">Sign in to your clinic dashboard</p>
+        </div>
+        <div className="space-y-4">
+          <div>
+            <div className="text-xs text-slate-500 mb-1">Mobile Number</div>
+            <div className="h-12 bg-slate-50 rounded-xl border border-slate-200 px-4 flex items-center text-sm text-slate-700">98765 43210</div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 mb-1">Password</div>
+            <div className="h-12 bg-slate-50 rounded-xl border border-slate-200 px-4 flex items-center text-sm text-slate-700">••••••••</div>
+          </div>
+          <div className="h-12 bg-gradient-to-r from-blue-600 to-teal-500 rounded-xl flex items-center justify-center text-white font-semibold shadow-md shadow-blue-500/25">
+            Sign In
+          </div>
+          <div className="text-center">
+            <span className="text-xs text-slate-400">Don't have an account? </span>
+            <span className="text-xs text-blue-600 font-medium">Register</span>
+          </div>
+        </div>
+      </div>
+    ),
+    'patient-search': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-teal-600 px-6 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-white">
+            <span className="text-sm font-semibold">📋 Reception Desk</span>
+          </div>
+          <div className="text-xs text-teal-100">Dr. Ramesh Kumar</div>
+        </div>
+        <div className="p-6">
+          <div className="text-lg font-bold text-slate-800 mb-4">Patient Check-In</div>
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+            <div className="text-xs text-amber-700 font-medium mb-2">Step 1: Search Patient</div>
+            <div className="h-12 bg-white rounded-lg border border-amber-300 px-4 flex items-center text-sm text-slate-700">📱 Enter 10-digit mobile number</div>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-slate-400">
+            <span>Search auto-triggers at 10 digits</span>
+          </div>
+        </div>
+      </div>
+    ),
+    'patient-form': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-teal-600 px-6 py-3">
+          <div className="text-white text-sm font-semibold">📝 New Patient Registration</div>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+            <span>Step 2 of 3</span>
+            <div className="flex-1 h-1 bg-slate-100 rounded-full"><div className="w-2/3 h-1 bg-teal-500 rounded-full"></div></div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Patient Name</div>
+              <div className="h-10 bg-slate-50 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-700">Priya Sharma</div>
+            </div>
+            <div>
+              <div className="text-xs text-slate-500 mb-1">Age</div>
+              <div className="h-10 bg-slate-50 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-700">34 years</div>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            {['Male', 'Female', 'Other'].map((g, i) => (
+              <div key={g} className={`px-4 py-2 rounded-lg text-xs font-medium ${i === 1 ? 'bg-teal-100 text-teal-700' : 'bg-slate-100 text-slate-500'}`}>{g}</div>
+            ))}
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 mb-1">Symptoms / Chief Complaint</div>
+            <div className="h-20 bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">Fever and headache since 2 days</div>
+          </div>
+          <div className="flex items-start gap-2 p-3 bg-blue-50 rounded-lg">
+            <div className="w-4 h-4 bg-teal-500 rounded flex items-center justify-center text-white text-xs">✓</div>
+            <div className="text-xs text-slate-600">Patient consent obtained for data collection</div>
+          </div>
+          <div className="flex justify-end">
+            <div className="px-6 py-2 bg-teal-600 rounded-lg text-xs text-white font-medium">Next: Vitals →</div>
+          </div>
+        </div>
+      </div>
+    ),
+    'vitals-form': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-teal-600 px-6 py-3">
+          <div className="text-white text-sm font-semibold">🩺 Record Vitals</div>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-2 text-xs text-slate-400 mb-2">
+            <span>Step 3 of 3</span>
+            <div className="flex-1 h-1 bg-slate-100 rounded-full"><div className="w-full h-1 bg-teal-500 rounded-full"></div></div>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            {[
+              { label: 'Blood Pressure', value: '120/80 mmHg', icon: '🫀' },
+              { label: 'Weight', value: '65 kg', icon: '⚖️' },
+              { label: 'Temperature', value: '98.6 °F', icon: '🌡️' },
+              { label: 'Pulse', value: '72 bpm', icon: '💓' },
+            ].map((vital) => (
+              <div key={vital.label} className="bg-slate-50 rounded-lg p-3">
+                <div className="flex items-center gap-2 mb-1">
+                  <span className="text-xs">{vital.icon}</span>
+                  <span className="text-xs text-slate-500">{vital.label}</span>
+                </div>
+                <div className="text-sm font-semibold text-slate-700">{vital.value}</div>
+              </div>
+            ))}
+          </div>
+          <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+            <div className="text-xs text-amber-700">ℹ️ All vitals are optional but recommended</div>
+          </div>
+          <div className="h-12 bg-gradient-to-r from-teal-600 to-emerald-500 rounded-xl flex items-center justify-center text-white font-semibold shadow-md">
+            💾 Save & Generate Token
+          </div>
+        </div>
+      </div>
+    ),
+    'token': (
+      <div className="bg-gradient-to-br from-blue-600 to-teal-500 rounded-xl shadow-lg p-6 text-white max-w-xs mx-auto">
+        <div className="text-center mb-4">
+          <div className="text-xs text-blue-100 mb-1">Token Generated</div>
+          <div className="text-5xl font-black">A-042</div>
+        </div>
+        <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 space-y-2 text-sm">
+          <div className="flex justify-between">
+            <span className="text-blue-100">Patient</span>
+            <span className="font-medium">Priya Sharma</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-blue-100">Age/Gender</span>
+            <span className="font-medium">34/F</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-blue-100">Status</span>
+            <span className="px-2 py-0.5 bg-yellow-400 text-yellow-900 rounded text-xs font-bold">WAITING</span>
+          </div>
+        </div>
+        <div className="mt-4 flex gap-2">
+          <div className="flex-1 h-10 bg-white/20 rounded-lg flex items-center justify-center text-xs font-medium">🖨️ Print</div>
+          <div className="flex-1 h-10 bg-white rounded-lg flex items-center justify-center text-xs font-bold text-blue-600">+ New</div>
+        </div>
+      </div>
+    ),
+    'queue': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-slate-800 px-6 py-3 flex items-center justify-between">
+          <div className="text-white text-sm font-semibold">📊 Live Queue</div>
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
+            <span className="text-xs text-slate-300">Live</span>
+          </div>
+        </div>
+        <div className="p-4 space-y-2">
+          {[
+            { token: 'A-041', name: 'Amit Patel', status: 'Completed', color: 'bg-emerald-100 text-emerald-700' },
+            { token: 'A-042', name: 'Priya Sharma', status: 'Waiting', color: 'bg-amber-100 text-amber-700' },
+            { token: 'A-043', name: 'Rahul Gupta', status: 'In Consultation', color: 'bg-blue-100 text-blue-700' },
+          ].map((patient, i) => (
+            <div key={patient.token} className={`flex items-center gap-3 p-3 rounded-lg ${i === 1 ? 'bg-blue-50 border border-blue-200' : 'bg-slate-50'}`}>
+              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-teal-400 rounded-lg flex items-center justify-center text-white text-xs font-bold">{patient.token}</div>
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-slate-700">{patient.name}</div>
+                <div className="text-xs text-slate-400">34 yrs • Male</div>
+              </div>
+              <div className={`px-2 py-1 rounded-full text-xs font-medium ${patient.color}`}>{patient.status}</div>
+            </div>
+          ))}
+        </div>
+        <div className="px-4 py-2 bg-slate-50 border-t border-slate-200 text-xs text-slate-400 text-center">
+          Auto-refreshes every 5 seconds
+        </div>
+      </div>
+    ),
+    'doctor-dashboard': (
+      <div className="bg-slate-100 rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-white border-b border-slate-200 px-4 py-3 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <div className="w-8 h-8 bg-gradient-to-tr from-blue-600 to-teal-400 rounded-lg flex items-center justify-center text-white text-xs font-bold">CS</div>
+            <span className="text-sm font-semibold text-slate-700">Doctor Dashboard</span>
+          </div>
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-slate-100 rounded-full flex items-center justify-center text-slate-500">🔔</div>
+            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 text-xs font-bold">DR</div>
+          </div>
+        </div>
+        <div className="p-4 space-y-3">
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              { label: 'Waiting', value: '3', color: 'text-amber-600' },
+              { label: 'Completed', value: '12', color: 'text-emerald-600' },
+              { label: 'Total', value: '15', color: 'text-blue-600' },
+            ].map((stat) => (
+              <div key={stat.label} className="bg-white rounded-lg p-3 text-center shadow-sm">
+                <div className={`text-2xl font-black ${stat.color}`}>{stat.value}</div>
+                <div className="text-xs text-slate-500">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+          <div className="bg-white rounded-lg p-3 shadow-sm">
+            <div className="text-xs font-semibold text-slate-700 mb-2">Current Patient</div>
+            <div className="flex items-center gap-3 p-2 bg-blue-50 rounded-lg">
+              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm">PS</div>
+              <div className="flex-1">
+                <div className="text-sm font-semibold text-slate-700">Priya Sharma</div>
+                <div className="text-xs text-slate-500">A-042 • Fever, Headache</div>
+              </div>
+              <div className="px-3 py-1 bg-blue-600 text-white rounded-lg text-xs font-medium">Consult</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    ),
+    'consultation': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-blue-600 px-6 py-3 flex items-center justify-between">
+          <div className="text-white text-sm font-semibold">🩺 Patient Consultation</div>
+          <div className="text-xs text-blue-200">Token: A-042</div>
+        </div>
+        <div className="p-6 space-y-4">
+          <div className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg">
+            <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-bold">PS</div>
+            <div>
+              <div className="font-semibold text-slate-800">Priya Sharma</div>
+              <div className="text-xs text-slate-500">34 yrs • Female • BP: 120/80</div>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="p-3 bg-amber-50 border border-amber-200 rounded-lg">
+              <div className="text-xs text-amber-700 mb-1">Symptoms</div>
+              <div className="text-sm text-slate-700">Fever, Headache</div>
+            </div>
+            <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+              <div className="text-xs text-blue-700 mb-1">Vitals</div>
+              <div className="text-sm text-slate-700">Temp: 98.6°F • Pulse: 72</div>
+            </div>
+          </div>
+          <div>
+            <div className="text-xs text-slate-500 mb-1">Diagnosis & Notes</div>
+            <div className="h-20 bg-slate-50 rounded-lg border border-slate-200 px-3 py-2 text-sm text-slate-700">Viral fever. Prescribed paracetamol and rest.</div>
+          </div>
+          <div className="flex gap-2">
+            <div className="flex-1 h-10 bg-emerald-500 rounded-lg flex items-center justify-center text-white text-sm font-medium shadow-md">✓ Complete</div>
+            <div className="h-10 px-4 bg-slate-100 rounded-lg flex items-center justify-center text-slate-600 text-sm">⏭️ Skip</div>
+          </div>
+        </div>
+      </div>
+    ),
+    'prescription': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-6 max-w-sm mx-auto">
+        <div className="border-b-2 border-blue-600 pb-3 mb-4">
+          <div className="text-center">
+            <div className="text-lg font-bold text-blue-800">Shree Sai Clinic</div>
+            <div className="text-xs text-slate-500">123 Main Road, Mumbai - 400053</div>
+            <div className="text-xs text-slate-500">Dr. Ramesh Kumar • MCI-12345</div>
+          </div>
+        </div>
+        <div className="space-y-3 text-sm">
+          <div className="flex justify-between">
+            <span className="text-slate-500">Patient:</span>
+            <span className="font-medium">Priya Sharma</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-slate-500">Date:</span>
+            <span>07 May 2026</span>
+          </div>
+          <div className="border-t border-slate-200 pt-3">
+            <div className="font-semibold text-slate-700 mb-2">Rx</div>
+            <div className="space-y-1 text-sm">
+              <div>1. Paracetamol 500mg - 1 tab BD × 3 days</div>
+              <div>2. Vitamin C 500mg - 1 tab OD × 5 days</div>
+            </div>
+          </div>
+          <div className="border-t border-slate-200 pt-3 mt-3">
+            <div className="text-xs text-slate-500 italic">Dr. Ramesh Kumar</div>
+            <div className="text-xs text-slate-400">Reg. No: MCI-12345</div>
+          </div>
+        </div>
+        <div className="mt-4 flex gap-2">
+          <div className="flex-1 h-8 bg-slate-100 rounded flex items-center justify-center text-xs text-slate-600">Template: Classic</div>
+          <div className="h-8 px-4 bg-blue-600 rounded flex items-center justify-center text-white text-xs">🖨️ Print</div>
+        </div>
+      </div>
+    ),
+    'settings': (
+      <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
+        <div className="bg-slate-800 px-6 py-3">
+          <div className="text-white text-sm font-semibold">⚙️ Clinic Settings</div>
+        </div>
+        <div className="p-4 space-y-2">
+          {[
+            { icon: '🏥', label: 'Clinic Profile', desc: 'Name, address, contact' },
+            { icon: '⏰', label: 'Timings', desc: 'Operating hours' },
+            { icon: '👥', label: 'Staff', desc: 'Manage receptionists' },
+            { icon: '🎨', label: 'Prescription', desc: 'Choose template' },
+            { icon: '🔐', label: 'Security', desc: 'Change password' },
+          ].map((item) => (
+            <div key={item.label} className="flex items-center gap-3 p-3 hover:bg-slate-50 rounded-lg cursor-pointer">
+              <div className="w-10 h-10 bg-blue-50 rounded-lg flex items-center justify-center text-lg">{item.icon}</div>
+              <div className="flex-1">
+                <div className="text-sm font-medium text-slate-700">{item.label}</div>
+                <div className="text-xs text-slate-400">{item.desc}</div>
+              </div>
+              <div className="text-slate-300">→</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    ),
+  };
+
   return (
-    <div className="bg-slate-100 border-2 border-dashed border-slate-300 rounded-2xl p-8 text-center my-6">
-      <div className="w-16 h-16 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-xl mx-auto mb-4">
-        {step}
+    <div className="my-8">
+      <div className="max-w-lg mx-auto">
+        {mockups[type]}
       </div>
-      <h4 className="font-bold text-slate-800 mb-2">{title}</h4>
-      <p className="text-slate-500 text-sm max-w-md mx-auto">{description}</p>
-      <div className="mt-4 text-xs text-slate-400 font-medium uppercase tracking-wider">
-        📷 Screenshot Placeholder - 1200 x 800px
-      </div>
+      <p className="text-center text-slate-500 text-sm mt-4 max-w-md mx-auto">{description}</p>
     </div>
   );
 }
@@ -112,8 +602,8 @@ export default function GuidePage() {
               The mobile number you enter here will be used for all future logins.
             </p>
             
-            <ScreenshotPlaceholder 
-              step={1}
+            <VisualMockup 
+              type="doctor-form"
               title="Doctor Information Form"
               description="Enter your professional details including name, mobile number (login ID), password, degree, and specialization."
             />
@@ -125,8 +615,8 @@ export default function GuidePage() {
               appear on your printed prescriptions.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={2}
+            <VisualMockup 
+              type="clinic-form"
               title="Clinic Details Form"
               description="Enter clinic name, city, contact number, MCI registration, and full address."
             />
@@ -138,8 +628,8 @@ export default function GuidePage() {
               5 PM - 8 PM (evening).
             </p>
 
-            <ScreenshotPlaceholder 
-              step={3}
+            <VisualMockup 
+              type="timings-form"
               title="Clinic Timings Configuration"
               description="Set morning and evening session timings and select off days for your clinic."
             />
@@ -151,8 +641,8 @@ export default function GuidePage() {
               the Settings page.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={4}
+            <VisualMockup 
+              type="staff-form"
               title="Staff Management"
               description="Add reception staff by mobile number. Staff can log in immediately."
             />
@@ -183,8 +673,8 @@ export default function GuidePage() {
               Use your registered mobile number and password to access your dashboard.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={5}
+            <VisualMockup 
+              type="login"
               title="Login Page"
               description="Enter your 10-digit mobile number and password to sign in to your clinic dashboard."
             />
@@ -229,8 +719,8 @@ export default function GuidePage() {
               retrieved; otherwise, you&apos;ll proceed to new patient registration.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={6}
+            <VisualMockup 
+              type="patient-search"
               title="Patient Mobile Search"
               description="Enter the patient's 10-digit mobile number. Search auto-triggers at 10 digits."
             />
@@ -242,8 +732,8 @@ export default function GuidePage() {
               New patients must provide consent before proceeding.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={7}
+            <VisualMockup 
+              type="patient-form"
               title="Patient Registration Form"
               description="Enter patient details (name, age, gender) and symptoms. Consent checkbox for new patients."
             />
@@ -255,8 +745,8 @@ export default function GuidePage() {
               Click &quot;Save & Generate Token&quot; to complete the check-in.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={8}
+            <VisualMockup 
+              type="vitals-form"
               title="Vitals Entry Form"
               description="Record optional vitals: BP, Weight, Temperature, and Pulse."
             />
@@ -268,8 +758,8 @@ export default function GuidePage() {
               immediately or register a new patient.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={9}
+            <VisualMockup 
+              type="token"
               title="Token Display"
               description="Generated token number with patient details. Options to print prescription or add new patient."
             />
@@ -281,8 +771,8 @@ export default function GuidePage() {
               (Waiting, In Consultation, Completed, Skipped, or Cancelled).
             </p>
 
-            <ScreenshotPlaceholder 
-              step={10}
+            <VisualMockup 
+              type="queue"
               title="Queue Management Panel"
               description="Live queue showing patient tokens, details, and status badges. Auto-refreshes every 5 seconds."
             />
@@ -312,8 +802,8 @@ export default function GuidePage() {
               for Focus Mode to maximize workspace.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={11}
+            <VisualMockup 
+              type="doctor-dashboard"
               title="Doctor Dashboard Overview"
               description="Main dashboard with sidebar navigation, clinic header, and patient queue panel."
             />
@@ -325,8 +815,8 @@ export default function GuidePage() {
               automatically as the queue changes.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={12}
+            <VisualMockup 
+              type="doctor-dashboard"
               title="Dashboard Statistics"
               description="Four stats cards showing: Today's Patients, In Queue, Completed, and Avg. Wait Time."
             />
@@ -338,8 +828,8 @@ export default function GuidePage() {
               The queue auto-refreshes every 5 seconds to keep data current.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={13}
+            <VisualMockup 
+              type="queue"
               title="Patient Queue List"
               description="List of patients with token numbers, names, status badges (Waiting, In Consultation, Completed)."
             />
@@ -368,8 +858,8 @@ export default function GuidePage() {
               and an &quot;Active Visit&quot; badge. This clearly indicates which patient is currently selected.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={14}
+            <VisualMockup 
+              type="consultation"
               title="Consultation Panel Header"
               description="Active consultation view with patient ID, status badge, and instructions."
             />
@@ -381,8 +871,8 @@ export default function GuidePage() {
               for attached images or reports. Click on any visit to view full details in a modal.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={15}
+            <VisualMockup 
+              type="consultation"
               title="Patient History Preview"
               description="List of past visits with date, diagnosis, and indicators for images/reports."
             />
@@ -406,8 +896,8 @@ export default function GuidePage() {
               </li>
             </ul>
 
-            <ScreenshotPlaceholder 
-              step={16}
+            <VisualMockup 
+              type="consultation"
               title="Doctor Action Buttons"
               description="Fixed bottom bar with Done, Skip, and Cancel action buttons."
             />
@@ -437,8 +927,8 @@ export default function GuidePage() {
               Each template features your clinic branding at the top.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={17}
+            <VisualMockup 
+              type="prescription"
               title="Prescription Template Selection"
               description="Grid of 10 prescription templates with live preview. Templates include Classic Blue, Modern Dark, Minimal, etc."
             />
@@ -450,8 +940,8 @@ export default function GuidePage() {
               The template features sections for Vitals, Symptoms, the Rx symbol, and medication space.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={18}
+            <VisualMockup 
+              type="prescription"
               title="Live Prescription Preview"
               description="Real-time preview showing clinic header, vitals section, symptoms, and Rx area."
             />
@@ -488,8 +978,8 @@ export default function GuidePage() {
               and the password you set.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={19}
+            <VisualMockup 
+              type="staff-form"
               title="Add Staff Form"
               description="Form with mobile number (+91 prefix), name input, and password field."
             />
@@ -500,8 +990,8 @@ export default function GuidePage() {
               mobile number, and active status. Staff members are numbered (R1, R2, etc.) for easy reference.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={20}
+            <VisualMockup 
+              type="settings"
               title="Staff List Display"
               description="List of reception staff with avatar, name, mobile number, and active/inactive status."
             />
@@ -530,8 +1020,8 @@ export default function GuidePage() {
               MCI/NMC registration number, and full address. All changes are saved to your clinic profile.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={21}
+            <VisualMockup 
+              type="settings"
               title="Clinic Settings Form"
               description="Editable form with all clinic details: doctor info, clinic name, contact, address."
             />
@@ -543,8 +1033,8 @@ export default function GuidePage() {
               for easy organization.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={22}
+            <VisualMockup 
+              type="settings"
               title="Data Export Section"
               description="Export panel with button to download all patient records in JSON format."
             />
@@ -556,8 +1046,8 @@ export default function GuidePage() {
               This helps with end-of-day reconciliation.
             </p>
 
-            <ScreenshotPlaceholder 
-              step={23}
+            <VisualMockup 
+              type="doctor-dashboard"
               title="Daily Summary View"
               description="Statistics cards for total patients, regular vs new, with detailed patient list below."
             />
