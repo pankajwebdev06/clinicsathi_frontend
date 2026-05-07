@@ -1,6 +1,10 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  // Explicitly use Turbopack (Next.js 16 default)
+  // This silences the webpack/turbopack conflict warning
+  turbopack: {},
+
   // Image optimization for faster loading on 3G
   images: {
     formats: ['image/webp', 'image/avif'],
