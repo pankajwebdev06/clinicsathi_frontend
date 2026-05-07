@@ -95,6 +95,7 @@ export default function DoctorDashboard() {
           city: realClinicData.city || '',
           address: realClinicData.address || '',
           phone: realClinicData.phone || '',
+          mciNumber: realClinicData.mci_number || '',
           morningStart: '09:00',
           morningEnd: '13:00',
           eveningStart: '17:00',
@@ -251,6 +252,26 @@ export default function DoctorDashboard() {
     }
   };
 
+  const handleExport = async () => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const res = await fetch('http://localhost:8000/api/v1/patients/export', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (!res.ok) throw new Error('Export failed');
+      
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `clinicsathi_records_${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      alert("Failed to export records");
+    }
+  };
+
   const stats = [
     { label: "Today's Patients", value: queue.length.toString(), icon: '👥', color: 'bg-blue-50 text-blue-700' },
     { label: 'In Queue', value: queue.filter(p => p.status === 'waiting').length.toString(), icon: '⏳', color: 'bg-amber-50 text-amber-700' },
@@ -359,7 +380,8 @@ export default function DoctorDashboard() {
                     patient_name: p.name,
                     status: p.status,
                     priority: 0
-                  }))} 
+                  }))}
+                  onSelect={(entry) => selectPatient(queue.find(q => q.id === entry.id))}
                 />
               </div>
 
@@ -437,6 +459,7 @@ export default function DoctorDashboard() {
                     { label: 'Clinic Name', key: 'clinicName', placeholder: 'Clinic name' },
                     { label: 'City', key: 'city', placeholder: 'City' },
                     { label: 'Contact Number', key: 'phone', placeholder: '10-digit' },
+                    { label: 'MCI / NMC Reg. No.', key: 'mciNumber', placeholder: 'e.g. MH-12345' },
                   ].map(({ label, key, placeholder }) => (
                     <div key={key} className="space-y-1.5">
                       <label className="text-sm font-semibold text-slate-600">{label}</label>
@@ -494,6 +517,15 @@ export default function DoctorDashboard() {
                 <button onClick={() => setClinic(settingsForm)}
                   className="mt-8 px-8 py-3.5 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors active:scale-[0.98] shadow-md">
                   💾 Save All Changes
+                </button>
+              </div>
+
+              {/* Data Export Section */}
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">📥 Data Export</h3>
+                <p className="text-slate-500 text-sm mb-4">Download all your clinic's patient records in JSON format. This backup can be converted to CSV or PDF later.</p>
+                <button onClick={handleExport} className="px-6 py-3 border-2 border-slate-200 hover:border-blue-500 text-slate-700 hover:text-blue-600 font-bold rounded-xl transition-all active:scale-[0.98] flex items-center gap-2">
+                  <span className="text-xl">⬇️</span> Export Patient Records
                 </button>
               </div>
 
@@ -620,16 +652,6 @@ export default function DoctorDashboard() {
             </div>
           )}
 
-          {/* Stats (Moved to bottom) */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-12 mb-8">
-            {stats.map(stat => (
-              <div key={stat.label} className="bg-white rounded-2xl p-5 border border-slate-100 shadow-sm">
-                <div className={`inline-flex items-center justify-center w-10 h-10 rounded-xl text-xl mb-3 ${stat.color}`}>{stat.icon}</div>
-                <p className="text-3xl font-extrabold text-slate-900">{stat.value}</p>
-                <p className="text-xs font-medium text-slate-500 mt-1">{stat.label}</p>
-              </div>
-            ))}
-          </div>
         </div>
       </main>
     </div>

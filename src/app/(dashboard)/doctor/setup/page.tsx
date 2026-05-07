@@ -27,16 +27,16 @@ export default function ClinicSetup() {
   const [staffInput, setStaffInput] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<ClinicData & { doctorMobile?: string; doctorPassword?: string }>({
+  const [form, setForm] = useState<ClinicData & { doctorMobile?: string; doctorPassword?: string; mciNumber?: string }>({
     id: '', doctorName: '', doctorMobile: '', doctorPassword: '', degree: '', specialization: '', experience: '',
-    clinicName: '', city: '', address: '', phone: '',
+    clinicName: '', city: '', address: '', phone: '', mciNumber: '',
     morningStart: '09:00', morningEnd: '13:00',
     eveningStart: '17:00', eveningEnd: '20:00',
     offDays: ['Sunday'],
     selectedTemplate: 't1',
   });
 
-  const update = (k: keyof ClinicData | 'doctorMobile' | 'doctorPassword', v: string) => setForm(f => ({ ...f, [k]: v }));
+  const update = (k: keyof ClinicData | 'doctorMobile' | 'doctorPassword' | 'mciNumber', v: string) => setForm(f => ({ ...f, [k]: v }));
   const toggleDay = (day: string) => {
     setForm(f => ({
       ...f,
@@ -60,6 +60,7 @@ export default function ClinicSetup() {
         city: form.city,
         address: form.address,
         phone: form.phone,
+        mci_number: form.mciNumber,
       });
 
       // Register Doctor User
@@ -236,6 +237,13 @@ export default function ClinicSetup() {
                   prefixText="+91"
                   placeholder="10-digit"
                 />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-sm font-semibold text-slate-600">MCI / NMC Registration Number <span className="text-slate-400 font-normal">(optional)</span></label>
+                <input type="text" value={form.mciNumber || ''} onChange={e => update('mciNumber', e.target.value)}
+                  className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-900 placeholder:text-slate-400"
+                  placeholder="e.g. MH-12345" />
+                <p className="text-xs text-slate-500">Will appear on printed prescriptions if provided.</p>
               </div>
               <div className="space-y-1.5">
                 <label className="text-sm font-semibold text-slate-600">Full Clinic Address</label>

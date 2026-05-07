@@ -41,6 +41,7 @@ export default function ReceptionDashboard() {
   const [patients, setPatients] = useState<any[]>([]);
   const [error, setError] = useState('');
   const [isAuthChecking, setIsAuthChecking] = useState(true);
+  const [consentGiven, setConsentGiven] = useState(false);
 
   // Authentication check and dynamic clinic fetching
   useEffect(() => {
@@ -157,7 +158,8 @@ export default function ReceptionDashboard() {
           mobile_number: mobileNumber,
           age: parseInt(patientData.age),
           gender: patientData.gender,
-          clinic_id: userInfo.clinic_id
+          clinic_id: userInfo.clinic_id,
+          consent_given: consentGiven
         });
         pId = newPatient.id;
         setPatientData(prev => ({ ...prev, id: pId }));
@@ -251,7 +253,6 @@ export default function ReceptionDashboard() {
           <Breadcrumbs
             items={[
               { label: 'Home', href: '/', icon: '🏠' },
-              { label: 'Doctor Dashboard', href: '/doctor/dashboard' },
               { label: 'Reception', isCurrent: flowState === 'search' },
               ...(flowState !== 'search' && flowState !== 'loading' ? [{
                 label: flowState === 'new_patient' ? 'New Patient'
@@ -350,9 +351,33 @@ export default function ReceptionDashboard() {
                     className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none text-slate-900 placeholder:text-slate-400"
                     placeholder="e.g. Fever, headache since 2 days..." />
                 </div>
+
+                {flowState === 'new_patient' && (
+                  <div className="consent-block bg-green-50 border border-green-500 rounded-xl p-4 mt-4">
+                    <label className="flex items-start gap-3 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        checked={consentGiven}
+                        onChange={(e) => setConsentGiven(e.target.checked)}
+                        className="mt-1 w-5 h-5 accent-teal-600"
+                      />
+                      <span className="text-sm text-green-800">
+                        The patient (or their authorized guardian) has given consent for their health information
+                        to be stored and processed by this clinic using ClinicSathi.{' '}
+                        <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-teal-700 underline font-semibold">
+                          View Privacy Policy
+                        </a>
+                      </span>
+                    </label>
+                  </div>
+                )}
+
                 <div className="flex gap-4 pt-4 border-t border-slate-100">
                   <button type="button" onClick={resetFlow} className="px-6 py-4 rounded-xl font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 transition-colors">Cancel</button>
-                  <button type="submit" className="flex-1 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold shadow-md transition-all active:scale-[0.98]">
+                  <button 
+                    type="submit" 
+                    disabled={flowState === 'new_patient' && !consentGiven}
+                    className="flex-1 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-xl font-semibold shadow-md transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed">
                     Next: Record Vitals →
                   </button>
                 </div>
@@ -443,7 +468,6 @@ export default function ReceptionDashboard() {
             <Breadcrumbs
               items={[
                 { label: 'Home', href: '/', icon: '🏠' },
-                { label: 'Doctor Dashboard', href: '/doctor/dashboard' },
                 { label: 'Queue Management', isCurrent: true },
               ]}
             />

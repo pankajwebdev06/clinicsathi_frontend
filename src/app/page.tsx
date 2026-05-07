@@ -318,7 +318,7 @@ export default function LandingPage() {
           </div>
           <p className="text-slate-400 text-sm font-medium">© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
           <div className="flex gap-5 text-sm font-semibold text-slate-500">
-            <Link href="/privacy" className="hover:text-slate-900 transition-colors">Privacy</Link>
+            <Link href="/privacy-policy" className="hover:text-slate-900 transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-slate-900 transition-colors">Terms</Link>
             <Link href="/contact" className="hover:text-slate-900 transition-colors">Contact</Link>
             <Link href="/blog" className="hover:text-slate-900 transition-colors">Blog</Link>

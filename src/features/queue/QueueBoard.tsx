@@ -13,7 +13,7 @@ interface QueueEntry {
   priority: number
 }
 
-export function QueueBoard({ clinicId, queue }: { clinicId: string, queue: QueueEntry[] }) {
+export function QueueBoard({ clinicId, queue, onSelect }: { clinicId: string, queue: QueueEntry[], onSelect?: (entry: QueueEntry) => void }) {
   // Activate real-time listener
   const { isConnected } = useQueueSocket(clinicId)
 
@@ -67,7 +67,7 @@ export function QueueBoard({ clinicId, queue }: { clinicId: string, queue: Queue
             </div>
 
             {entry.status === 'waiting' && (
-              <Button size="sm" variant="ghost" className="text-teal-600 h-8 px-2">
+              <Button size="sm" className="bg-teal-50 hover:bg-teal-100 text-teal-700 h-8 px-3 rounded-lg border border-teal-200 shadow-sm" onClick={() => onSelect?.(entry)}>
                 Call <ArrowRight size={14} className="ml-1" />
               </Button>
             )}

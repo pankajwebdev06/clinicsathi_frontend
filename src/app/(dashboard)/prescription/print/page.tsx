@@ -55,6 +55,7 @@ function PrescriptionSheet({ tpl, clinic, patient }: { tpl: typeof TEMPLATES[0];
           <div>
             <div style={{ fontSize: '17px', fontWeight: 800, color: tpl.textColor !== 'white' ? tpl.textColor : '#111' }}>{clinic.doctorName}</div>
             <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>{clinic.degree} &nbsp;|&nbsp; {clinic.specialization} &nbsp;|&nbsp; {clinic.experience} years experience</div>
+            <div style={{ fontSize: '11px', color: '#6b7280', marginTop: '2px' }}>Reg. No: {clinic.mciNumber || 'Not provided'}</div>
           </div>
           <div style={{ fontSize: '11px', color: '#6b7280', textAlign: 'right' }}>{new Date().toLocaleDateString('en-IN', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</div>
         </div>
@@ -100,7 +101,9 @@ function PrescriptionSheet({ tpl, clinic, patient }: { tpl: typeof TEMPLATES[0];
       {/* ===== FOOTER ===== */}
       <div style={{ padding: '10px 24px', borderTop: `1.5px solid ${tpl.accent}40`, display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '8px' }}>
         <div style={{ fontSize: '10px', color: '#9ca3af', fontFamily: 'Arial, sans-serif' }}>
-          This prescription is valid for 30 days from the date of issue.
+          This prescription was generated digitally via ClinicSathi. The prescribing doctor is solely responsible for clinical decisions.<br/>
+          Printed: {new Date().toLocaleString('en-IN')}<br/>
+          Valid for 30 days from the date of issue.
         </div>
         <div style={{ fontSize: '10px', color: '#9ca3af', fontFamily: 'Arial, sans-serif', textAlign: 'right' }}>
           <div style={{ marginBottom: '16px' }}>&nbsp;</div>

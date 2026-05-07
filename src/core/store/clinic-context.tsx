@@ -18,6 +18,7 @@ export interface ClinicData {
   eveningEnd: string;
   offDays: string[];
   selectedTemplate: string;
+  mciNumber?: string;
 }
 
 const DEFAULT_CLINIC: ClinicData = {
@@ -36,6 +37,7 @@ const DEFAULT_CLINIC: ClinicData = {
   eveningEnd: '20:00',
   offDays: ['Sunday'],
   selectedTemplate: 't1',
+  mciNumber: 'MH-12345',
 };
 
 interface ClinicContextType {
