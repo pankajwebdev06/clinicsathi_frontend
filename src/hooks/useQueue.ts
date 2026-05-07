@@ -121,7 +121,7 @@ export function useQueueRealtime(clinicId: string) {
 
   // Subscribe to WebSocket updates
   if (typeof window !== 'undefined') {
-    subscribeToQueue(clinicId, (updatedQueue) => {
+    subscribeToQueue(clinicId, (updatedQueue: QueueEntry[]) => {
       queryClient.setQueryData(
         queryKeys.queueList(clinicId),
         updatedQueue
