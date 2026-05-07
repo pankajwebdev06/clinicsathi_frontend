@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import React from 'react';
 
 export const metadata = {
   title: 'Complete Guide to ClinicSathi | Step-by-Step Tutorial',
@@ -13,7 +14,7 @@ interface VisualMockupProps {
 
 // Lightweight CSS-based visual mockups - no images, fast on 3G
 function VisualMockup({ type, title, description }: VisualMockupProps) {
-  const mockups: Record<string, JSX.Element> = {
+  const mockups: Record<string, React.ReactNode> = {
     'doctor-form': (
       <div className="bg-white rounded-xl shadow-lg border border-slate-200 overflow-hidden">
         <div className="bg-gradient-to-r from-blue-600 to-teal-500 px-6 py-4">
