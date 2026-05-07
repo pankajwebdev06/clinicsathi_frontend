@@ -10,19 +10,49 @@ import Link from "next/link";
 export default function LoginPage() {
   const router = useRouter();
   const [mobileNumber, setMobileNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const [otpCode, setOtpCode] = useState("");
   const [error, setError] = useState("");
+  const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false);
+  const [otpSent, setOtpSent] = useState(false);
+  const [demoOtp, setDemoOtp] = useState(""); // For development - shows OTP
 
-  const handleLogin = async (e: React.FormEvent) => {
+  // Send OTP to mobile number
+  const handleSendOTP = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setSuccessMsg("");
+    setLoading(true);
+
+    try {
+      const response = await authApi.sendOTP({
+        mobile_number: mobileNumber,
+      });
+
+      setOtpSent(true);
+      setSuccessMsg(response.message || `OTP sent to ${mobileNumber}`);
+      
+      // For development - show the OTP
+      if (response.demo_otp) {
+        setDemoOtp(response.demo_otp);
+      }
+    } catch (err: any) {
+      setError(err.message || "Failed to send OTP. Please check your mobile number.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Verify OTP and login
+  const handleVerifyOTP = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setLoading(true);
 
     try {
-      const response = await authApi.login({
+      const response = await authApi.verifyOTP({
         mobile_number: mobileNumber,
-        password: password,
+        otp_code: otpCode,
       });
 
       // Save token and user info to localStorage
@@ -39,7 +69,7 @@ export default function LoginPage() {
         router.push("/");
       }
     } catch (err: any) {
-      setError(err.message || "Failed to login. Please check your credentials.");
+      setError(err.message || "Invalid OTP. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -57,15 +87,23 @@ export default function LoginPage() {
         </div>
 
         <h2 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>
-        <p className="text-slate-500 text-sm mb-8">Sign in to your clinic dashboard</p>
+        <p className="text-slate-500 text-sm mb-8">
+          {otpSent ? "Enter the 6-digit OTP sent to your mobile" : "Sign in with OTP - No password needed"}
+        </p>
 
-        <form className="space-y-5" onSubmit={handleLogin}>
-          {error && (
-            <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm text-center border border-red-100">
-              {error}
-            </div>
-          )}
-          <div className="space-y-4">
+        {!otpSent ? (
+          // Step 1: Send OTP
+          <form className="space-y-5" onSubmit={handleSendOTP}>
+            {error && (
+              <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm text-center border border-red-100">
+                {error}
+              </div>
+            )}
+            {successMsg && (
+              <div className="bg-green-50 text-green-600 p-3 rounded-xl text-sm text-center border border-green-100">
+                {successMsg}
+              </div>
+            )}
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">
                 Mobile Number
@@ -73,40 +111,99 @@ export default function LoginPage() {
               <Input
                 type="tel"
                 required
+                maxLength={10}
                 value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
+                onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ""))}
                 placeholder="10-digit mobile number"
+                disabled={loading}
               />
             </div>
+
+            <Button
+              type="submit"
+              className="w-full py-3"
+              disabled={loading || mobileNumber.length !== 10}
+            >
+              {loading ? "Sending..." : "Send OTP →"}
+            </Button>
+
+            <p className="text-center text-sm text-slate-500">
+              New clinic?{" "}
+              <Link href="/doctor/setup" className="font-semibold text-blue-600 hover:text-blue-700">
+                Register here
+              </Link>
+            </p>
+          </form>
+        ) : (
+          // Step 2: Verify OTP
+          <form className="space-y-5" onSubmit={handleVerifyOTP}>
+            {error && (
+              <div className="bg-red-50 text-red-600 p-3 rounded-xl text-sm text-center border border-red-100">
+                {error}
+              </div>
+            )}
+            {successMsg && (
+              <div className="bg-green-50 text-green-600 p-3 rounded-xl text-sm text-center border border-green-100">
+                {successMsg}
+              </div>
+            )}
+            
+            {/* For development - show OTP */}
+            {demoOtp && (
+              <div className="bg-blue-50 text-blue-700 p-3 rounded-xl text-sm text-center border border-blue-100">
+                <strong>Development Mode:</strong> Your OTP is <strong>{demoOtp}</strong>
+              </div>
+            )}
+
             <div>
               <label className="block text-sm font-semibold text-slate-700 mb-1.5">
-                Password
+                Enter 6-digit OTP
               </label>
               <Input
-                type="password"
+                type="text"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Your password"
+                maxLength={6}
+                value={otpCode}
+                onChange={(e) => setOtpCode(e.target.value.replace(/\D/g, ""))}
+                placeholder="000000"
+                className="text-center text-xl tracking-widest"
+                disabled={loading}
+                autoFocus
               />
             </div>
-          </div>
 
-          <Button
-            type="submit"
-            className="w-full py-3"
-            disabled={loading}
-          >
-            {loading ? "Signing in..." : "Sign in →"}
-          </Button>
+            <Button
+              type="submit"
+              className="w-full py-3"
+              disabled={loading || otpCode.length !== 6}
+            >
+              {loading ? "Verifying..." : "Verify & Login →"}
+            </Button>
 
-          <p className="text-center text-sm text-slate-500">
-            New clinic?{" "}
-            <Link href="/doctor/setup" className="font-semibold text-blue-600 hover:text-blue-700">
-              Register here
-            </Link>
-          </p>
-        </form>
+            <div className="flex justify-between text-sm">
+              <button
+                type="button"
+                onClick={() => {
+                  setOtpSent(false);
+                  setOtpCode("");
+                  setDemoOtp("");
+                  setError("");
+                }}
+                className="text-slate-500 hover:text-slate-700"
+              >
+                ← Change number
+              </button>
+              <button
+                type="button"
+                onClick={handleSendOTP}
+                disabled={loading}
+                className="text-blue-600 hover:text-blue-700 font-semibold"
+              >
+                Resend OTP
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </div>
   );

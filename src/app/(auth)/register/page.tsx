@@ -16,7 +16,7 @@ export default function RegisterPage() {
   
   // User State
   const [mobileNumber, setMobileNumber] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(""); // Optional email
   
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,22 +29,18 @@ export default function RegisterPage() {
     setLoading(true);
 
     try {
-      // 1. Create Clinic
-      const clinicResponse = await authApi.registerClinic({
-        name: clinicName,
-        doctor_name: doctorName,
-      });
-
-      // 2. Create User (Doctor)
-      await authApi.registerUser({
+      // Register clinic and doctor (no password needed - OTP based login)
+      await authApi.registerDoctor({
         mobile_number: mobileNumber,
+        email: email || undefined,
         name: doctorName,
-        password: password,
-        role: "doctor",
-        clinic_id: clinicResponse.id,
+        specialization: "", // Will be set later in setup
+        clinic_name: clinicName,
+        city: "",
+        address: "",
       });
 
-      setSuccessMsg("Registration successful! Redirecting to login...");
+      setSuccessMsg("Registration successful! Login with OTP - No password needed.");
       setTimeout(() => {
         router.push("/login");
       }, 2000);
@@ -101,29 +97,32 @@ export default function RegisterPage() {
             <h3 className="text-sm font-semibold text-gray-500 uppercase tracking-wider pt-4">Account Details</h3>
             <div>
               <Input
-                type="text"
+                type="tel"
                 required
+                maxLength={10}
                 value={mobileNumber}
-                onChange={(e) => setMobileNumber(e.target.value)}
-                placeholder="Mobile Number (10 digits)"
+                onChange={(e) => setMobileNumber(e.target.value.replace(/\D/g, ""))}
+                placeholder="Mobile Number (10 digits - for OTP login)"
               />
             </div>
             <div>
               <Input
-                type="password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="Password (min 6 chars)"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="Email (optional - for notifications)"
               />
             </div>
+            <p className="text-xs text-gray-500">
+              No password needed! You'll login using OTP sent to your mobile.
+            </p>
           </div>
 
           <div>
             <Button
               type="submit"
               className="w-full flex justify-center py-2 px-4"
-              disabled={loading}
+              disabled={loading || mobileNumber.length !== 10}
             >
               {loading ? "Creating Account..." : "Register"}
             </Button>

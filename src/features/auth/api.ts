@@ -8,18 +8,18 @@ export const authApi = {
     });
   },
 
-  async registerUser(data: { mobile_number: string; name: string; password: string; role: string; clinic_id: string }) {
+  async registerUser(data: { mobile_number: string; email?: string; name: string; role: string; clinic_id: string }) {
     return apiClient("/auth/register", {
       method: "POST",
       body: JSON.stringify(data),
     });
   },
 
-  // Combined registration: creates clinic, registers doctor as user, and logs them in
+  // Combined registration: creates clinic and registers doctor as user (no password needed)
   async registerDoctor(data: {
     mobile_number: string;
+    email?: string;
     name: string;
-    password: string;
     specialization: string;
     clinic_name: string;
     city: string;
@@ -34,33 +34,40 @@ export const authApi = {
       address: data.address,
     });
 
-    // 2. Register doctor as user
+    // 2. Register doctor as user (no password - OTP based)
     const user = await this.registerUser({
       mobile_number: data.mobile_number,
+      email: data.email,
       name: data.name,
-      password: data.password,
       role: 'doctor',
       clinic_id: clinic.id,
     });
 
-    // 3. Login to get access token
-    const loginResponse = await this.login({
-      mobile_number: data.mobile_number,
-      password: data.password,
-    });
-
     return {
-      access_token: loginResponse.access_token,
-      user: loginResponse.user,
-      clinic: clinic,
+      user,
+      clinic,
     };
   },
 
-  async login(data: { mobile_number: string; password: string }) {
-    return apiClient("/auth/login", {
+  // Send OTP to mobile number
+  async sendOTP(data: { mobile_number: string }) {
+    return apiClient("/auth/send-otp", {
       method: "POST",
       body: JSON.stringify(data),
     });
+  },
+
+  // Verify OTP and get token
+  async verifyOTP(data: { mobile_number: string; otp_code: string }) {
+    return apiClient("/auth/verify-otp", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  },
+
+  // Legacy endpoint - now sends OTP
+  async login(data: { mobile_number: string }) {
+    return this.sendOTP(data);
   },
 
   async getClinic(clinicId: string) {
