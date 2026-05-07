@@ -15,6 +15,47 @@ export const authApi = {
     });
   },
 
+  // Combined registration: creates clinic, registers doctor as user, and logs them in
+  async registerDoctor(data: {
+    mobile_number: string;
+    name: string;
+    password: string;
+    specialization: string;
+    clinic_name: string;
+    city: string;
+    address: string;
+  }) {
+    // 1. Register clinic
+    const clinic = await this.registerClinic({
+      name: data.clinic_name,
+      doctor_name: data.name,
+      specialization: data.specialization,
+      city: data.city,
+      address: data.address,
+    });
+
+    // 2. Register doctor as user
+    const user = await this.registerUser({
+      mobile_number: data.mobile_number,
+      name: data.name,
+      password: data.password,
+      role: 'doctor',
+      clinic_id: clinic.id,
+    });
+
+    // 3. Login to get access token
+    const loginResponse = await this.login({
+      mobile_number: data.mobile_number,
+      password: data.password,
+    });
+
+    return {
+      access_token: loginResponse.access_token,
+      user: loginResponse.user,
+      clinic: clinic,
+    };
+  },
+
   async login(data: { mobile_number: string; password: string }) {
     return apiClient("/auth/login", {
       method: "POST",
