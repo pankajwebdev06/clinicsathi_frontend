@@ -1,20 +1,26 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
-
+// Use system fonts for fastest loading on 3G/low-end devices
+// No external font requests needed
 export const metadata: Metadata = {
   title: "ClinicSathi — Modern Clinic Management",
-  description: "Queue management, digital records, and patient check-in for Indian clinics. Coming soon on clinicsathi.in",
+  description: "Queue management, digital records, and patient check-in for Indian clinics. Built for low-bandwidth connections.",
+  keywords: ["clinic management", "patient queue", "digital records", "India", "healthcare"],
+  authors: [{ name: "ClinicSathi" }],
+  openGraph: {
+    title: "ClinicSathi — Modern Clinic Management",
+    description: "Queue management, digital records, and patient check-in for Indian clinics.",
+    type: "website",
+  },
+};
+
+// Viewport configuration for mobile optimization
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  themeColor: "#2563eb",
 };
 
 import Providers from "./providers";
@@ -27,8 +33,18 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className="h-full antialiased"
+      style={{
+        fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji"',
+      }}
     >
+      <head>
+        {/* Preconnect to common domains for faster loading */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        {/* DNS prefetch for API calls */}
+        <link rel="dns-prefetch" href="https://api.clinicsathi.in" />
+      </head>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>
       </body>
