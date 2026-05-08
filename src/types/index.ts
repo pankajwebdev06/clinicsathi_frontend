@@ -42,7 +42,6 @@ export interface AuthResponse {
 
 export interface LoginCredentials {
   mobile_number: string;
-  password: string;
   clinic_id?: string;
 }
 
@@ -50,7 +49,6 @@ export interface RegisterData {
   mobile_number: string;
   name: string;
   role: UserRole;
-  password: string;
   clinic_id: string;
 }
 

@@ -21,7 +21,6 @@ interface AuthState {
   registerDoctor: (data: {
     mobile_number: string;
     name: string;
-    password: string;
     specialization: string;
     clinic_name: string;
     city: string;
@@ -99,16 +98,14 @@ export const useAuthStore = create<AuthState>()(
           const response = await authApi.registerDoctor(data);
           
           if (typeof window !== 'undefined') {
-            localStorage.setItem('auth_token', response.access_token);
             localStorage.setItem('user_info', JSON.stringify(response.user));
           }
 
           set({
             user: response.user,
             clinic: response.clinic,
-            token: response.access_token,
-            isAuthenticated: true,
             isLoading: false,
+            isAuthenticated: false, // Must verify OTP to be fully authenticated
           });
         } catch (error) {
           set({

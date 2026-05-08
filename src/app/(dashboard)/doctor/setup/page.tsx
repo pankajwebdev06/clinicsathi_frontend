@@ -27,8 +27,8 @@ export default function ClinicSetup() {
   const [staffInput, setStaffInput] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [form, setForm] = useState<ClinicData & { doctorMobile?: string; doctorPassword?: string; mciNumber?: string }>({
-    id: '', doctorName: '', doctorMobile: '', doctorPassword: '', degree: '', specialization: '', experience: '',
+  const [form, setForm] = useState<ClinicData & { doctorMobile?: string; mciNumber?: string }>({
+    id: '', doctorName: '', doctorMobile: '', degree: '', specialization: '', experience: '',
     clinicName: '', city: '', address: '', phone: '', mciNumber: '',
     morningStart: '09:00', morningEnd: '13:00',
     eveningStart: '17:00', eveningEnd: '20:00',
@@ -36,7 +36,7 @@ export default function ClinicSetup() {
     selectedTemplate: 't1',
   });
 
-  const update = (k: keyof ClinicData | 'doctorMobile' | 'doctorPassword' | 'mciNumber', v: string) => setForm(f => ({ ...f, [k]: v }));
+  const update = (k: keyof ClinicData | 'doctorMobile' | 'mciNumber', v: string) => setForm(f => ({ ...f, [k]: v }));
   const toggleDay = (day: string) => {
     setForm(f => ({
       ...f,
@@ -64,22 +64,21 @@ export default function ClinicSetup() {
       });
 
       // Register Doctor User
-      if (form.doctorMobile && form.doctorPassword) {
+      if (form.doctorMobile) {
          await authApi.registerUser({
            name: form.doctorName || 'Doctor',
            mobile_number: form.doctorMobile,
-           password: form.doctorPassword,
            role: 'doctor',
            clinic_id: clinicRes.id
          });
 
-         // Login immediately
-         const loginRes = await authApi.login({
-            mobile_number: form.doctorMobile,
-            password: form.doctorPassword
+         // Login immediately (triggers OTP send)
+         await authApi.login({
+            mobile_number: form.doctorMobile
          });
-         localStorage.setItem("auth_token", loginRes.access_token);
-         localStorage.setItem("user_info", JSON.stringify(loginRes.user));
+         
+         // Note: In a real flow, we'd now show an OTP verification modal.
+         // For now, redirecting to dashboard as the user is already "registered".
       }
 
       setClinic(form as ClinicData);
@@ -168,20 +167,13 @@ export default function ClinicSetup() {
                   onChange={e => update('doctorName', e.target.value)}
                   placeholder="e.g. Dr. Anil Mehra"
                 />
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 gap-4">
                   <Input 
                     label="Mobile Number (Login ID)"
                     maxLength={10}
                     value={form.doctorMobile || ''}
                     onChange={e => update('doctorMobile', e.target.value)}
                     placeholder="10 digit number"
-                  />
-                  <Input 
-                    label="Password"
-                    type="password"
-                    value={form.doctorPassword || ''}
-                    onChange={e => update('doctorPassword', e.target.value)}
-                    placeholder="Min 6 chars"
                   />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
