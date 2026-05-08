@@ -120,7 +120,6 @@ export default function DoctorDashboard() {
   const [staffList, setStaffList] = useState<any[]>([]);
   const [newStaffMobile, setNewStaffMobile] = useState('');
   const [newStaffName, setNewStaffName] = useState('');
-  const [newStaffPassword, setNewStaffPassword] = useState('');
   const [staffError, setStaffError] = useState('');
   const [staffLoading, setStaffLoading] = useState(false);
 
@@ -180,20 +179,17 @@ export default function DoctorDashboard() {
     setStaffError('');
     if (!newStaffMobile || newStaffMobile.length !== 10) { setStaffError('Enter a valid 10-digit mobile number.'); return; }
     if (!newStaffName) { setStaffError('Enter staff name.'); return; }
-    if (!newStaffPassword || newStaffPassword.length < 6) { setStaffError('Password must be at least 6 characters.'); return; }
     setStaffLoading(true);
     try {
       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
       await authApi.registerUser({
         mobile_number: newStaffMobile,
         name: newStaffName,
-        password: newStaffPassword,
         role: 'receptionist',
         clinic_id: userInfo.clinic_id,
       });
       setNewStaffMobile('');
       setNewStaffName('');
-      setNewStaffPassword('');
       await fetchStaff();
     } catch (err: any) {
       setStaffError(err.message || 'Failed to add staff.');
@@ -608,7 +604,7 @@ export default function DoctorDashboard() {
                   <div className="mb-4 p-3 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100">{staffError}</div>
                 )}
 
-                <div className="grid md:grid-cols-3 gap-3 mb-4">
+                <div className="grid md:grid-cols-2 gap-3 mb-4">
                   <div className="relative">
                     <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-sm border-r border-slate-200 pr-3">+91</span>
                     <input type="tel" maxLength={10} value={newStaffMobile}
@@ -619,10 +615,6 @@ export default function DoctorDashboard() {
                   <input type="text" value={newStaffName}
                     onChange={e => setNewStaffName(e.target.value)}
                     placeholder="Full name"
-                    className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
-                  <input type="password" value={newStaffPassword}
-                    onChange={e => setNewStaffPassword(e.target.value)}
-                    placeholder="Password (min 6 chars)"
                     className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-sm" />
                 </div>
                 <button onClick={addStaff} disabled={staffLoading}
