@@ -27,8 +27,6 @@ interface SyncState {
 // ------------------------------------------
 // Network Monitor
 // ------------------------------------------
-let connectionMonitor: EventTarget | null = null;
-
 function initNetworkMonitoring(callback: (online: boolean) => void) {
   if (typeof window === 'undefined') return;
 

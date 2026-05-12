@@ -19,6 +19,14 @@ export interface ClinicData {
   offDays: string[];
   selectedTemplate: string;
   mciNumber?: string;
+  slug?: string;
+  doctorPhoto?: string;
+  clinicPhoto?: string;
+  aboutDoctor?: string;
+  metaTitle?: string;
+  metaDescription?: string;
+  consultationFee?: string;
+  services?: string;
 }
 
 const DEFAULT_CLINIC: ClinicData = {

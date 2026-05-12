@@ -15,7 +15,7 @@ import { ConsultPanel } from '@/features/consultation/ConsultPanel';
 import { QueueBoard } from '@/features/queue/QueueBoard';
 import { authApi } from '@/features/auth/api';
 
-type Tab = 'queue' | 'summary' | 'settings';
+type Tab = 'queue' | 'summary' | 'settings' | 'profile';
 
 interface Patient {
   token: string;
@@ -301,6 +301,7 @@ export default function DoctorDashboard() {
         navItems={[
           { id: 'queue', icon: '🗂️', label: 'Patient Queue', onClick: () => setActiveTab('queue') },
           { id: 'summary', icon: '📊', label: 'Daily Summary', onClick: () => setActiveTab('summary') },
+          { id: 'profile', icon: '👤', label: 'Public Profile', onClick: () => setActiveTab('profile') },
           { id: 'settings', icon: '⚙️', label: 'Settings & Staff', onClick: () => setActiveTab('settings') },
         ]}
         footerContent={
@@ -396,6 +397,218 @@ export default function DoctorDashboard() {
                     <p className="text-slate-400 text-sm mt-1">Start consultation to see details and history.</p>
                   </div>
                 )}
+              </div>
+            </div>
+          )}
+
+          {/* Tab: Public Profile */}
+          {activeTab === 'profile' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+                <h3 className="text-xl font-bold text-slate-900 mb-2">👤 Public Profile Settings</h3>
+                <p className="text-slate-500 text-sm mb-6">Customize your public profile that patients will see. Upload photos and add SEO details for better visibility.</p>
+
+                <div className="grid md:grid-cols-2 gap-6 mb-6">
+                  {/* Doctor Photo Upload */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-600">Doctor Photo</label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            try {
+                              const token = localStorage.getItem('auth_token');
+                              const res = await fetch('http://localhost:8000/api/v1/auth/upload-image', {
+                                method: 'POST',
+                                headers: { Authorization: `Bearer ${token}` },
+                                body: formData
+                              });
+                              const data = await res.json();
+                              setClinic({ ...clinic, doctorPhoto: data.url });
+                            } catch (err) {
+                              alert('Upload failed');
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="doctor-photo-upload"
+                      />
+                      <label
+                        htmlFor="doctor-photo-upload"
+                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"
+                      >
+                        {clinic.doctorPhoto ? (
+                          <img src={clinic.doctorPhoto} alt="Doctor" className="w-full h-full object-cover rounded-2xl" />
+                        ) : (
+                          <div className="text-center">
+                            <span className="text-4xl mb-2 block">👨‍⚕️</span>
+                            <p className="text-sm text-slate-600 font-medium">Upload Doctor Photo</p>
+                            <p className="text-xs text-slate-400 mt-1">JPG, PNG, WebP (max 5MB)</p>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Clinic Photo Upload */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-semibold text-slate-600">Clinic Photo</label>
+                    <div className="relative">
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (file) {
+                            const formData = new FormData();
+                            formData.append('file', file);
+                            try {
+                              const token = localStorage.getItem('auth_token');
+                              const res = await fetch('http://localhost:8000/api/v1/auth/upload-image', {
+                                method: 'POST',
+                                headers: { Authorization: `Bearer ${token}` },
+                                body: formData
+                              });
+                              const data = await res.json();
+                              setClinic({ ...clinic, clinicPhoto: data.url });
+                            } catch (err) {
+                              alert('Upload failed');
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="clinic-photo-upload"
+                      />
+                      <label
+                        htmlFor="clinic-photo-upload"
+                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"
+                      >
+                        {clinic.clinicPhoto ? (
+                          <img src={clinic.clinicPhoto} alt="Clinic" className="w-full h-full object-cover rounded-2xl" />
+                        ) : (
+                          <div className="text-center">
+                            <span className="text-4xl mb-2 block">🏥</span>
+                            <p className="text-sm text-slate-600 font-medium">Upload Clinic Photo</p>
+                            <p className="text-xs text-slate-400 mt-1">JPG, PNG, WebP (max 5MB)</p>
+                          </div>
+                        )}
+                      </label>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Profile Details */}
+                <div className="grid md:grid-cols-2 gap-5 mb-6">
+                  {[
+                    { label: 'Degree(s)', key: 'degree', placeholder: 'MBBS, MD, MS' },
+                    { label: 'Experience (years)', key: 'experience', placeholder: '12' },
+                    { label: 'Consultation Fee (₹)', key: 'consultationFee', placeholder: '500' },
+                    { label: 'Services (comma separated)', key: 'services', placeholder: 'General Checkup, Vaccination, Lab Tests' },
+                  ].map(({ label, key, placeholder }) => (
+                    <div key={key} className="space-y-1.5">
+                      <label className="text-sm font-semibold text-slate-600">{label}</label>
+                      <input
+                        value={settingsForm[key as keyof typeof settingsForm] as string || ''}
+                        onChange={e => setSettingsForm(f => ({ ...f, [key]: e.target.value }))}
+                        className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-900"
+                        placeholder={placeholder}
+                      />
+                    </div>
+                  ))}
+                </div>
+
+                {/* About Doctor */}
+                <div className="mb-6">
+                  <label className="text-sm font-semibold text-slate-600 mb-2 block">About Doctor</label>
+                  <textarea
+                    rows={4}
+                    value={settingsForm.aboutDoctor || ''}
+                    onChange={e => setSettingsForm(f => ({ ...f, aboutDoctor: e.target.value }))}
+                    className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                    placeholder="Write a brief description about yourself, your qualifications, and your approach to patient care..."
+                  />
+                </div>
+
+                {/* SEO Settings */}
+                <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 border border-blue-100 mb-6">
+                  <h4 className="text-lg font-bold text-slate-900 mb-4">🔍 SEO Settings</h4>
+                  <div className="space-y-4">
+                    <div>
+                      <label className="text-sm font-semibold text-slate-600 mb-2 block">Meta Title (SEO)</label>
+                      <input
+                        value={settingsForm.metaTitle || ''}
+                        onChange={e => setSettingsForm(f => ({ ...f, metaTitle: e.target.value }))}
+                        className="w-full p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-900"
+                        placeholder="Dr. Rahul Kumar - Best Cardiologist in Delhi | ClinicSathi"
+                        maxLength={60}
+                      />
+                      <p className="text-xs text-slate-500 mt-1">Recommended: 50-60 characters</p>
+                    </div>
+                    <div>
+                      <label className="text-sm font-semibold text-slate-600 mb-2 block">Meta Description (SEO)</label>
+                      <textarea
+                        rows={3}
+                        value={settingsForm.metaDescription || ''}
+                        onChange={e => setSettingsForm(f => ({ ...f, metaDescription: e.target.value }))}
+                        className="w-full p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none resize-none"
+                        placeholder="Dr. Rahul Kumar is a renowned cardiologist with 15+ years of experience. Specialized in heart care, cardiac rehabilitation, and preventive cardiology. Book appointment at..."
+                        maxLength={160}
+                      />
+                      <p className="text-xs text-slate-500 mt-1">Recommended: 150-160 characters</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Preview Link */}
+                <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 mb-6">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-sm font-bold text-emerald-800">🌐 Your Public Profile</p>
+                      <p className="text-xs text-emerald-600 mt-1">View how patients will see your profile</p>
+                    </div>
+                    <a
+                      href={`/doctor/${clinic.slug || 'your-slug'}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors"
+                    >
+                      Preview Profile
+                    </a>
+                  </div>
+                </div>
+
+                <button
+                  onClick={async () => {
+                    try {
+                      const token = localStorage.getItem('auth_token');
+                      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+                      const res = await fetch(`http://localhost:8000/api/v1/auth/clinics/${userInfo.clinic_id}`, {
+                        method: 'PUT',
+                        headers: {
+                          'Content-Type': 'application/json',
+                          Authorization: `Bearer ${token}`
+                        },
+                        body: JSON.stringify(settingsForm)
+                      });
+                      if (res.ok) {
+                        setClinic({ ...clinic, ...settingsForm });
+                        alert('Profile updated successfully!');
+                      } else {
+                        alert('Failed to update profile');
+                      }
+                    } catch (err) {
+                      alert('Error updating profile');
+                    }
+                  }}
+                  className="px-8 py-3.5 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition-colors active:scale-[0.98] shadow-md"
+                >
+                  💾 Save Profile Changes
+                </button>
               </div>
             </div>
           )}

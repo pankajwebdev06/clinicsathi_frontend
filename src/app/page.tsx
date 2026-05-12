@@ -65,6 +65,7 @@ export default function LandingPage() {
             <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-slate-900 transition-colors">How it Works</a>
             <a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a>
+            <Link href="/doctors" className="hover:text-slate-900 transition-colors">Doctors With Us</Link>
             <Link href="/blog" className="hover:text-slate-900 transition-colors">Blog</Link>
           </nav>
           <div className="flex items-center gap-3">
