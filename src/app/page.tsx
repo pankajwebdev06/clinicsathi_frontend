@@ -68,10 +68,11 @@ export default function LandingPage() {
             <Link href="/doctors" className="hover:text-slate-900 transition-colors">Doctors With Us</Link>
             <Link href="/blog" className="hover:text-slate-900 transition-colors">Blog</Link>
           </nav>
-          <div className="flex items-center gap-3">
-            <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors px-4 py-2">Login</Link>
-            <Link href="/doctor/setup" className="text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-600/20 active:scale-[0.98]">
-              Get Started Free
+          <div className="flex items-center gap-1 md:gap-3">
+            <Link href="/doctors" className="md:hidden text-sm font-bold text-blue-600 hover:text-blue-700 px-2 py-2">Doctors</Link>
+            <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors px-2 md:px-4 py-2">Login</Link>
+            <Link href="/doctor/setup" className="hidden sm:inline-flex text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-600/20 active:scale-[0.98]">
+              Get Started
             </Link>
           </div>
         </div>
