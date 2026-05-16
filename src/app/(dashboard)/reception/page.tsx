@@ -10,6 +10,7 @@ import { ClinicSidebar } from '@/shared/components/ClinicSidebar';
 import { patientsApi } from '@/features/patients/api';
 import { queueApi } from '@/features/queue/api';
 import { DocumentUpload } from '@/features/reception/DocumentUpload';
+import { useQueueSocket } from '@/hooks/useQueueSocket';
 
 type FlowState = 'search' | 'loading' | 'history' | 'new_patient' | 'vitals' | 'token';
 
@@ -39,9 +40,14 @@ export default function ReceptionDashboard() {
   const [token, setToken] = useState('');
   const [queue, setQueue] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
+  const [patientsCache, setPatientsCache] = useState<Record<string, any>>({});
   const [error, setError] = useState('');
   const [isAuthChecking, setIsAuthChecking] = useState(true);
   const [consentGiven, setConsentGiven] = useState(false);
+
+  const { isConnected } = useQueueSocket(clinic?.id, () => {
+    loadQueue();
+  });
 
   // Authentication check and dynamic clinic fetching
   useEffect(() => {
@@ -89,21 +95,70 @@ export default function ReceptionDashboard() {
     checkAuthAndFetchClinic();
   }, []);
 
-  useEffect(() => {
-    const loadQueue = async () => {
-      try {
-        const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-        if (!userInfo.clinic_id) return;
-        const [qData, pData] = await Promise.all([
-          queueApi.getQueue(userInfo.clinic_id),
-          patientsApi.getPatients(userInfo.clinic_id)
-        ]);
-        setQueue(qData);
+  const [editingPatientId, setEditingPatientId] = useState<string | null>(null);
+  const [editForm, setEditForm] = useState({ name: '', age: '', gender: '', mobile_number: '' });
+  const [calledPatient, setCalledPatient] = useState<{token: string, name: string} | null>(null);
+  const prevQueueRef = React.useRef<any[]>([]);
+
+  const playRing = () => {
+    try {
+      const ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+      const playBeep = (freq: number, time: number, duration: number) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        gain.gain.setValueAtTime(0.1, time);
+        osc.frequency.value = freq;
+        osc.start(time);
+        osc.stop(time + duration);
+      };
+      playBeep(880, ctx.currentTime, 0.1);
+      playBeep(1100, ctx.currentTime + 0.15, 0.3);
+    } catch(e) { console.error("Audio failed", e) }
+  };
+
+  const loadQueue = async () => {
+    try {
+      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+      if (!userInfo.clinic_id) return;
+      
+      const qData = await queueApi.getQueue(userInfo.clinic_id);
+      
+      const missingPatientIds = qData
+        .map((q: any) => q.patient_id)
+        .filter((id: string) => !patientsCache[id]);
+        
+      let currentPatientsCache = { ...patientsCache };
+      let currentPatientsList = patients;
+      
+      if (missingPatientIds.length > 0 || Object.keys(currentPatientsCache).length === 0) {
+        const pData = await patientsApi.getPatients(userInfo.clinic_id);
+        const newCache: Record<string, any> = {};
+        pData.forEach((p: any) => { newCache[p.id] = p; });
+        setPatientsCache(newCache);
         setPatients(pData);
-      } catch (err) {
-        console.error(err);
+        currentPatientsCache = newCache;
+        currentPatientsList = pData;
       }
-    };
+      
+      const newInConsultation = qData.find((q: any) => q.status === 'in_consultation');
+      if (newInConsultation) {
+        const prev = prevQueueRef.current.find(q => q.id === newInConsultation.id);
+        if (!prev || prev.status !== 'in_consultation') {
+          const p = currentPatientsCache[newInConsultation.patient_id];
+          setCalledPatient({ token: newInConsultation.token_number, name: p?.name || 'Unknown' });
+          playRing();
+        }
+      }
+      prevQueueRef.current = qData;
+      setQueue(qData);
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  useEffect(() => {
     loadQueue();
     const interval = setInterval(loadQueue, 5000);
     return () => clearInterval(interval);
@@ -395,7 +450,7 @@ export default function ReceptionDashboard() {
                   {[
                     { label: 'Blood Pressure', key: 'bp', placeholder: '120/80 mmHg' },
                     { label: 'Weight (kg)', key: 'weight', placeholder: '70 kg' },
-                    { label: 'Temperature', key: 'temperature', placeholder: '98.6°F' },
+                    { label: 'Temperature', key: 'temperature', placeholder: '37°C' },
                     { label: 'Pulse (bpm)', key: 'pulse', placeholder: '72 bpm' },
                   ].map(({ label, key, placeholder }) => (
                     <div key={key} className="space-y-1.5">
@@ -421,25 +476,22 @@ export default function ReceptionDashboard() {
 
             {/* Step 3: Token */}
             {flowState === 'token' && (
-              <div className="animate-in fade-in zoom-in-95 duration-500">
-                <div className="border-2 border-dashed border-slate-200 rounded-3xl p-8 md:p-12 text-center bg-white">
-                  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 text-emerald-600 mb-6 print:hidden text-3xl">✓</div>
-                  <h4 className="text-slate-500 font-medium uppercase tracking-widest mb-2">Token Number</h4>
-                  <h2 className="text-6xl font-extrabold text-slate-900 tracking-tighter mb-6">{token}</h2>
+              <div className="animate-in fade-in zoom-in-95 duration-500 max-w-md mx-auto mt-4">
+                <div className="border border-slate-200 rounded-2xl p-5 text-center bg-white shadow-sm">
+                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 mb-2 print:hidden text-xl">✓</div>
+                  <h4 className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-0.5">Token</h4>
+                  <h2 className="text-4xl font-extrabold text-slate-900 tracking-tighter mb-3">{token}</h2>
 
-                  <div className="bg-slate-50 p-6 rounded-2xl text-left max-w-sm mx-auto border border-slate-100 space-y-3">
-                    <div>
-                      <p className="text-slate-400 text-xs mb-1 font-semibold uppercase tracking-wider">Patient</p>
-                      <p className="font-bold text-slate-800 text-lg">{patientData.name}</p>
-                      <p className="text-slate-600">{patientData.age} yrs • {patientData.gender === 'M' ? 'Male' : patientData.gender === 'F' ? 'Female' : 'Other'} • +91 {mobileNumber}</p>
-                    </div>
-                    <VitalsGrid vitals={vitals} variant="slate" />
+                  <div className="bg-slate-50 p-3 rounded-xl text-left border border-slate-100">
+                    <p className="text-slate-400 text-[10px] mb-0.5 font-bold uppercase tracking-wider">Patient</p>
+                    <p className="font-bold text-slate-800 text-sm">{patientData.name}</p>
+                    <p className="text-slate-500 text-xs">{patientData.age} yrs • {patientData.gender === 'M' ? 'Male' : patientData.gender === 'F' ? 'Female' : 'Other'} • +91 {mobileNumber}</p>
                   </div>
 
-                  <p className="mt-6 text-sm text-slate-400">{clinic.clinicName} • {clinic.doctorName} • {new Date().toLocaleDateString('en-IN')}</p>
+                  <p className="mt-3 text-[10px] text-slate-400">{clinic.clinicName} • {clinic.doctorName}</p>
                 </div>
 
-                <div className="mt-8 flex flex-col sm:flex-row gap-4 print:hidden">
+                <div className="mt-3 flex gap-2 print:hidden">
                   <button
                     onClick={() => {
                       const params = new URLSearchParams({
@@ -451,10 +503,10 @@ export default function ReceptionDashboard() {
                       });
                       window.open(`/prescription/print?${params.toString()}`, '_blank');
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold shadow-lg shadow-blue-600/20 transition-all active:scale-[0.98]">
-                    🖨️ Print Prescription
+                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-600/20 transition-all active:scale-[0.98]">
+                    🖨️ Print
                   </button>
-                  <button className="px-6 py-4 bg-slate-100 text-slate-700 font-bold rounded-xl transition-all active:scale-[0.98]" onClick={resetFlow}>New Patient</button>
+                  <button className="flex-1 py-2 bg-slate-100 text-slate-700 text-sm font-bold rounded-xl transition-all hover:bg-slate-200 active:scale-[0.98]" onClick={resetFlow}>New Patient</button>
                 </div>
               </div>
             )}
@@ -477,24 +529,65 @@ export default function ReceptionDashboard() {
 
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden p-6 md:p-8">
             <h3 className="text-xl font-bold text-slate-800 mb-6">Today&apos;s Queue</h3>
+            
             <div className="space-y-4">
               {queue.length === 0 ? (
                 <div className="text-center py-10 text-slate-500">No patients in queue yet.</div>
-              ) : queue.map(q => {
+              ) : [...queue].sort((a, b) => {
+                  if (a.status === 'in_consultation' && b.status !== 'in_consultation') return -1;
+                  if (a.status !== 'in_consultation' && b.status === 'in_consultation') return 1;
+                  return new Date(a.created_at).getTime() - new Date(b.created_at).getTime();
+              }).map(q => {
                 const p = patients.find(pat => pat.id === q.patient_id) || { name: 'Unknown', mobile_number: '', gender: '', age: 0 };
+                const isEditing = editingPatientId === q.patient_id;
                 return (
-                  <div key={q.id} className="p-5 bg-slate-50 border border-slate-100 rounded-2xl">
+                  <div key={q.id} className="p-5 bg-slate-50 border border-slate-100 rounded-2xl transition-all">
                     <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-4">
+                      <div className="flex items-center gap-4 flex-1">
                         <span className="font-black text-slate-900 text-xl w-16">{q.token_number}</span>
-                        <div>
-                          <p className="font-bold text-slate-800">{p.name}</p>
-                          <p className="text-sm text-slate-500">{p.age} yrs • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : 'Other'} • +91 {p.mobile_number}</p>
-                        </div>
+                        {isEditing ? (
+                          <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2 pr-4">
+                            <input value={editForm.name} onChange={e => setEditForm(f => ({...f, name: e.target.value}))} className="p-2 text-sm border rounded bg-white" placeholder="Name" />
+                            <input value={editForm.age} onChange={e => setEditForm(f => ({...f, age: e.target.value}))} className="p-2 text-sm border rounded bg-white" placeholder="Age" type="number" />
+                            <select value={editForm.gender} onChange={e => setEditForm(f => ({...f, gender: e.target.value}))} className="p-2 text-sm border rounded bg-white">
+                              <option value="M">M</option><option value="F">F</option><option value="O">O</option>
+                            </select>
+                            <input value={editForm.mobile_number} onChange={e => setEditForm(f => ({...f, mobile_number: e.target.value}))} className="p-2 text-sm border rounded bg-white" placeholder="Mobile" />
+                          </div>
+                        ) : (
+                          <div>
+                            <p className="font-bold text-slate-800">{p.name}</p>
+                            <p className="text-sm text-slate-500">{p.age} yrs • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : 'Other'} • +91 {p.mobile_number}</p>
+                          </div>
+                        )}
                       </div>
-                      <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${statusBadge(q.status)}`}>
-                        {q.status.replace('_', ' ')}
-                      </span>
+                      <div className="flex items-center gap-3">
+                        {isEditing ? (
+                          <div className="flex gap-2">
+                            <button onClick={async () => {
+                              try {
+                                await patientsApi.updatePatient(q.patient_id, {
+                                  name: editForm.name,
+                                  age: parseInt(editForm.age),
+                                  gender: editForm.gender,
+                                  mobile_number: editForm.mobile_number
+                                });
+                                setEditingPatientId(null);
+                                loadQueue();
+                              } catch(e) { alert("Failed to update patient"); }
+                            }} className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700">Save</button>
+                            <button onClick={() => setEditingPatientId(null)} className="px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-300">Cancel</button>
+                          </div>
+                        ) : (
+                          <button onClick={() => {
+                            setEditForm({ name: p.name, age: p.age.toString(), gender: p.gender, mobile_number: p.mobile_number });
+                            setEditingPatientId(q.patient_id);
+                          }} className="text-blue-600 text-xs font-bold px-2 py-1 hover:bg-blue-50 rounded">Edit</button>
+                        )}
+                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${statusBadge(q.status)}`}>
+                          {q.status.replace('_', ' ')}
+                        </span>
+                      </div>
                     </div>
 
                     {q.status === 'completed' && (
@@ -510,6 +603,26 @@ export default function ReceptionDashboard() {
         </div>
 
       </main>
+
+      {/* Doctor Call Popup */}
+      {calledPatient && (
+        <div className="fixed bottom-6 right-6 bg-blue-600 text-white p-5 rounded-2xl shadow-2xl z-50 animate-in slide-in-from-bottom-5 fade-in flex gap-4 items-center max-w-sm">
+          <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center text-2xl animate-pulse">
+            🔔
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-bold text-blue-100 uppercase tracking-widest mb-1">Doctor is Calling</p>
+            <p className="text-xl font-extrabold">{calledPatient.token} - {calledPatient.name}</p>
+          </div>
+          <button 
+            onClick={() => setCalledPatient(null)}
+            className="p-2 hover:bg-white/20 rounded-full transition-colors"
+            title="Dismiss"
+          >
+            ✕
+          </button>
+        </div>
+      )}
     </div>
   );
 }

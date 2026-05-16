@@ -93,7 +93,7 @@ function PrescriptionSheet({ tpl, clinic, patient }: { tpl: typeof TEMPLATES[0];
           <div style={{ flex: 1, height: '1px', background: `${tpl.accent}30` }}></div>
         </div>
         {/* Ruled lines for handwriting */}
-        {Array.from({ length: 18 }).map((_, i) => (
+        {Array.from({ length: 14 }).map((_, i) => (
           <div key={i} style={{ borderBottom: `1px solid ${tpl.accent}20`, height: '32px', marginBottom: '0' }}></div>
         ))}
       </div>
@@ -143,8 +143,27 @@ function PrintPage() {
 
   return (
     <>
+      <style>{`
+        @media print {
+          @page { margin: 0; size: A4 portrait; }
+          body { 
+            -webkit-print-color-adjust: exact !important; 
+            print-color-adjust: exact !important; 
+            margin: 0 !important; 
+            padding: 0 !important;
+            height: 100% !important;
+            overflow: hidden !important;
+          }
+          .print-wrapper {
+            height: 100vh !important;
+            page-break-after: avoid !important;
+            page-break-inside: avoid !important;
+            overflow: hidden !important;
+          }
+        }
+      `}</style>
       {/* Print-only */}
-      <div className="hidden print:block">
+      <div className="hidden print:block print-wrapper">
         <PrescriptionSheet tpl={tpl} clinic={clinic} patient={patient} />
       </div>
 

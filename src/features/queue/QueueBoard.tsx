@@ -2,20 +2,17 @@
 
 import React from 'react'
 import { Card, Badge, Button } from '@/components/ui'
-import { useQueueSocket } from '@/hooks/useQueueSocket'
 import { Users, Clock, ArrowRight, CheckCircle } from 'lucide-react'
 
 interface QueueEntry {
   id: string
   token_number: string
   patient_name: string
-  status: 'waiting' | 'consulting' | 'completed' | 'skipped'
+  status: 'waiting' | 'consulting' | 'completed' | 'skipped' | 'cancelled' | 'in_consultation'
   priority: number
 }
 
-export function QueueBoard({ clinicId, queue, onSelect }: { clinicId: string, queue: QueueEntry[], onSelect?: (entry: QueueEntry) => void }) {
-  // Activate real-time listener
-  const { isConnected } = useQueueSocket(clinicId)
+export function QueueBoard({ clinicId, queue, onSelect, isConnected }: { clinicId: string, queue: QueueEntry[], onSelect?: (entry: QueueEntry) => void, isConnected?: boolean }) {
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -43,36 +40,40 @@ export function QueueBoard({ clinicId, queue, onSelect }: { clinicId: string, qu
         {queue.map((entry) => (
           <div 
             key={entry.id} 
-            className={`flex items-center justify-between p-3 rounded-xl border transition-all ${
+            className={`group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
               entry.status === 'consulting' 
-                ? 'bg-teal-50 border-teal-200 shadow-sm' 
-                : 'bg-white border-gray-100'
+                ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-md transform scale-[1.02]' 
+                : 'bg-white border-slate-100 hover:border-blue-200 hover:shadow-sm'
             }`}
           >
-            <div className="flex items-center gap-3">
-              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${
-                entry.status === 'consulting' ? 'bg-teal-600 text-white' : 'bg-gray-100 text-gray-600'
+            <div className="flex items-center gap-4">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-sm shadow-sm transition-colors duration-300 ${
+                entry.status === 'consulting' ? 'bg-blue-600 text-white shadow-blue-600/30' : 'bg-slate-100 text-slate-700 group-hover:bg-blue-100 group-hover:text-blue-700'
               }`}>
                 {entry.token_number}
               </div>
               <div>
-                <p className="font-semibold text-gray-800 text-sm">{entry.patient_name}</p>
-                <div className="flex items-center gap-2 mt-0.5">
-                  <Badge variant={getStatusColor(entry.status)} className="text-[10px] uppercase">
-                    {entry.status}
+                <p className={`font-bold text-base ${entry.status === 'consulting' ? 'text-blue-900' : 'text-slate-800'}`}>
+                  {entry.patient_name}
+                </p>
+                <div className="flex items-center gap-2 mt-1">
+                  <Badge variant={getStatusColor(entry.status)} className="text-[10px] uppercase font-bold tracking-wider">
+                    {entry.status.replace('_', ' ')}
                   </Badge>
-                  {entry.priority > 0 && <span className="text-[10px] text-red-500 font-bold">Priority</span>}
+                  {entry.priority > 0 && <span className="text-[10px] px-2 py-0.5 rounded-md bg-red-100 text-red-700 font-bold uppercase tracking-wider">Priority</span>}
                 </div>
               </div>
             </div>
 
-            {entry.status === 'waiting' && (
-              <Button size="sm" className="bg-teal-50 hover:bg-teal-100 text-teal-700 h-8 px-3 rounded-lg border border-teal-200 shadow-sm" onClick={() => onSelect?.(entry)}>
-                Call <ArrowRight size={14} className="ml-1" />
+            {entry.status !== 'consulting' && entry.status !== 'in_consultation' && (
+              <Button size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 h-9 px-4 rounded-xl border border-blue-100 font-semibold shadow-sm" onClick={() => onSelect?.(entry)}>
+                {entry.status === 'waiting' ? 'Call' : 'Recall'} <ArrowRight size={14} className="ml-1.5" />
               </Button>
             )}
             {entry.status === 'consulting' && (
-              <CheckCircle size={20} className="text-teal-600 animate-in zoom-in" />
+              <div className="bg-white p-2 rounded-full shadow-sm">
+                <CheckCircle size={24} className="text-blue-600 animate-in zoom-in" />
+              </div>
             )}
           </div>
         ))}

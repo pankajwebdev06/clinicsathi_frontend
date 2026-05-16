@@ -237,7 +237,7 @@ export default function PrescriptionTemplatesPage() {
                 {[
                   { label: 'Blood Pressure', key: 'bp', placeholder: '120/80' },
                   { label: 'Weight (kg)', key: 'weight', placeholder: '70' },
-                  { label: 'Temperature', key: 'temperature', placeholder: '98.6°F' },
+                  { label: 'Temperature', key: 'temperature', placeholder: '37°C' },
                   { label: 'Pulse (bpm)', key: 'pulse', placeholder: '72' },
                 ].map(({ label, key, placeholder }) => (
                   <Input

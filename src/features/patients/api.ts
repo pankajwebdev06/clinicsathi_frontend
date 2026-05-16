@@ -13,4 +13,11 @@ export const patientsApi = {
       method: "GET",
     });
   },
+
+  async updatePatient(patientId: string, data: { name?: string; mobile_number?: string; age?: number; gender?: string }) {
+    return apiClient(`/patients/${patientId}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
 };

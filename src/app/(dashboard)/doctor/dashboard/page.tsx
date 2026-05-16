@@ -13,6 +13,7 @@ import { queueApi } from '@/features/queue/api';
 import { useEffect } from 'react';
 import { ConsultPanel } from '@/features/consultation/ConsultPanel';
 import { QueueBoard } from '@/features/queue/QueueBoard';
+import { useQueueSocket } from '@/hooks/useQueueSocket';
 import { authApi } from '@/features/auth/api';
 
 type Tab = 'queue' | 'summary' | 'settings' | 'profile';
@@ -62,11 +63,16 @@ export default function DoctorDashboard() {
   const { clinic, setClinic } = useClinic();
   const [activeTab, setActiveTab] = useState<Tab>('queue');
   const [queue, setQueue] = useState<any[]>([]);
+  const [patientsCache, setPatientsCache] = useState<Record<string, any>>({});
   const [loading, setLoading] = useState(true);
   const [focusMode, setFocusMode] = useState(false);
   const [selectedPatient, setSelectedPatient] = useState<any | null>(null);
   const [settingsForm, setSettingsForm] = useState(clinic);
   const [isAuthChecking, setIsAuthChecking] = useState(true);
+
+  const { isConnected } = useQueueSocket(clinic?.id, () => {
+    fetchQueue();
+  });
 
   // Authentication check and dynamic clinic fetching
   useEffect(() => {
@@ -86,16 +92,25 @@ export default function DoctorDashboard() {
         
         // Map backend response to frontend ClinicData structure
         const mappedData = {
+          ...clinic,
           id: realClinicData.id,
           clinicName: realClinicData.name,
           doctorName: realClinicData.doctor_name,
-          specialization: realClinicData.specialization || 'General Physician',
-          degree: 'MBBS', // Backend should ideally provide this, using fallback
-          experience: '10',
+          specialization: realClinicData.specialization || '',
+          degree: realClinicData.degree || '',
+          experience: realClinicData.experience || '',
           city: realClinicData.city || '',
           address: realClinicData.address || '',
           phone: realClinicData.phone || '',
           mciNumber: realClinicData.mci_number || '',
+          slug: realClinicData.slug || '',
+          doctorPhoto: realClinicData.doctor_photo || '',
+          clinicPhoto: realClinicData.clinic_photo || '',
+          metaTitle: realClinicData.meta_title || '',
+          metaDescription: realClinicData.meta_description || '',
+          aboutDoctor: realClinicData.about_doctor || '',
+          services: realClinicData.services || '',
+          consultationFee: realClinicData.consultation_fee || '',
           morningStart: '09:00',
           morningEnd: '13:00',
           eveningStart: '17:00',
@@ -128,13 +143,26 @@ export default function DoctorDashboard() {
       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
       if (!userInfo.clinic_id) return;
 
-      const [qData, pData] = await Promise.all([
-        queueApi.getQueue(userInfo.clinic_id),
-        patientsApi.getPatients(userInfo.clinic_id)
-      ]);
+      const qData = await queueApi.getQueue(userInfo.clinic_id);
+      
+      // Determine if we need to fetch new patients
+      const missingPatientIds = qData
+        .map((q: any) => q.patient_id)
+        .filter((id: string) => !patientsCache[id]);
+        
+      let currentPatientsCache = { ...patientsCache };
+      
+      if (missingPatientIds.length > 0 || Object.keys(currentPatientsCache).length === 0) {
+        // Only fetch patients if we are missing some or it's the first load
+        const pData = await patientsApi.getPatients(userInfo.clinic_id);
+        const newCache: Record<string, any> = {};
+        pData.forEach((p: any) => { newCache[p.id] = p; });
+        setPatientsCache(newCache);
+        currentPatientsCache = newCache;
+      }
 
       const merged = qData.map((q: any) => {
-        const p = pData.find((pat: any) => pat.id === q.patient_id) || {};
+        const p = currentPatientsCache[q.patient_id] || {};
         return {
           id: q.id,
           patientId: q.patient_id,
@@ -238,7 +266,7 @@ export default function DoctorDashboard() {
 
   const selectPatient = async (patient: any) => {
     setSelectedPatient(patient);
-    if (patient.status === 'waiting') {
+    if (patient && patient.status !== 'in_consultation') {
        try {
          await queueApi.updateQueueEntry(patient.id, { status: 'in_consultation' });
          fetchQueue(); // Refresh to update status in list
@@ -378,6 +406,7 @@ export default function DoctorDashboard() {
                     status: p.status,
                     priority: 0
                   }))}
+                  isConnected={isConnected}
                   onSelect={(entry) => selectPatient(queue.find(q => q.id === entry.id))}
                 />
               </div>
@@ -386,8 +415,7 @@ export default function DoctorDashboard() {
               <div className="md:col-span-3">
                 {selectedPatient ? (
                   <ConsultPanel 
-                    patientId={selectedPatient.patientId} 
-                    queueId={selectedPatient.id} 
+                    patient={selectedPatient}
                     onActionComplete={() => selectPatient(null)} 
                   />
                 ) : (
@@ -430,6 +458,7 @@ export default function DoctorDashboard() {
                               });
                               const data = await res.json();
                               setClinic({ ...clinic, doctorPhoto: data.url });
+                              setSettingsForm(f => ({ ...f, doctorPhoto: data.url }));
                             } catch (err) {
                               alert('Upload failed');
                             }
@@ -440,15 +469,31 @@ export default function DoctorDashboard() {
                       />
                       <label
                         htmlFor="doctor-photo-upload"
-                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"
+                        className="flex flex-col items-center justify-center w-40 h-40 mx-auto border-2 border-dashed border-slate-300 rounded-full cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all overflow-hidden"
                       >
-                        {clinic.doctorPhoto ? (
-                          <img src={clinic.doctorPhoto} alt="Doctor" className="w-full h-full object-cover rounded-2xl" />
+                        {settingsForm.doctorPhoto ? (
+                          <div className="relative w-full h-full group">
+                            <img src={settingsForm.doctorPhoto} alt="Doctor" className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                setClinic({ ...clinic, doctorPhoto: '' });
+                                setSettingsForm(f => ({ ...f, doctorPhoto: '' }));
+                              }}
+                              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600"
+                              title="Remove Photo"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        ) : clinic.doctorPhoto ? (
+                          <img src={clinic.doctorPhoto} alt="Doctor" className="w-full h-full object-cover" />
                         ) : (
                           <div className="text-center">
-                            <span className="text-4xl mb-2 block">👨‍⚕️</span>
-                            <p className="text-sm text-slate-600 font-medium">Upload Doctor Photo</p>
-                            <p className="text-xs text-slate-400 mt-1">JPG, PNG, WebP (max 5MB)</p>
+                            <span className="text-3xl mb-1 block">👨‍⚕️</span>
+                            <p className="text-xs text-slate-600 font-medium">Upload</p>
                           </div>
                         )}
                       </label>
@@ -475,7 +520,14 @@ export default function DoctorDashboard() {
                                 body: formData
                               });
                               const data = await res.json();
-                              setClinic({ ...clinic, clinicPhoto: data.url });
+                              const currentPhotos = settingsForm.clinicPhoto ? settingsForm.clinicPhoto.split(',') : [];
+                              if (currentPhotos.length >= 5) {
+                                alert('Maximum 5 clinic photos allowed.');
+                                return;
+                              }
+                              const updatedPhotos = [...currentPhotos, data.url].join(',');
+                              setClinic({ ...clinic, clinicPhoto: updatedPhotos });
+                              setSettingsForm(f => ({ ...f, clinicPhoto: updatedPhotos }));
                             } catch (err) {
                               alert('Upload failed');
                             }
@@ -486,19 +538,41 @@ export default function DoctorDashboard() {
                       />
                       <label
                         htmlFor="clinic-photo-upload"
-                        className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all"
+                        className="flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all overflow-hidden"
                       >
-                        {clinic.clinicPhoto ? (
-                          <img src={clinic.clinicPhoto} alt="Clinic" className="w-full h-full object-cover rounded-2xl" />
-                        ) : (
-                          <div className="text-center">
-                            <span className="text-4xl mb-2 block">🏥</span>
-                            <p className="text-sm text-slate-600 font-medium">Upload Clinic Photo</p>
-                            <p className="text-xs text-slate-400 mt-1">JPG, PNG, WebP (max 5MB)</p>
-                          </div>
-                        )}
+                        <div className="text-center">
+                          <span className="text-4xl mb-2 block">🏥</span>
+                          <p className="text-sm text-slate-600 font-medium">Upload Clinic Photos</p>
+                          <p className="text-xs text-slate-400 mt-1">Add up to 5 photos (16:9 Ratio)</p>
+                        </div>
                       </label>
                     </div>
+
+                    {/* Clinic Photos Gallery */}
+                    {(settingsForm.clinicPhoto || clinic.clinicPhoto) && (
+                      <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mt-4">
+                        {(settingsForm.clinicPhoto || clinic.clinicPhoto || '').split(',').map((url, i) => url && (
+                          <div key={i} className="relative aspect-video rounded-xl overflow-hidden group border border-slate-200">
+                            <img src={url} alt={`Clinic ${i+1}`} className="w-full h-full object-cover" />
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                const currentPhotos = (settingsForm.clinicPhoto || '').split(',');
+                                const newPhotos = currentPhotos.filter((_, index) => index !== i).join(',');
+                                setClinic({ ...clinic, clinicPhoto: newPhotos });
+                                setSettingsForm(f => ({ ...f, clinicPhoto: newPhotos }));
+                              }}
+                              className="absolute top-2 right-2 bg-red-500 text-white p-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600 text-xs"
+                              title="Remove Photo"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -572,7 +646,7 @@ export default function DoctorDashboard() {
                       <p className="text-xs text-emerald-600 mt-1">View how patients will see your profile</p>
                     </div>
                     <a
-                      href={`/doctor/${clinic.slug || 'your-slug'}`}
+                      href={`/doctor/${settingsForm.slug || clinic.slug || 'your-slug'}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors"
@@ -587,13 +661,31 @@ export default function DoctorDashboard() {
                     try {
                       const token = localStorage.getItem('auth_token');
                       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+                      const payload = {
+                        name: settingsForm.clinicName,
+                        doctor_name: settingsForm.doctorName,
+                        specialization: settingsForm.specialization,
+                        degree: settingsForm.degree,
+                        experience: settingsForm.experience,
+                        city: settingsForm.city,
+                        address: settingsForm.address,
+                        phone: settingsForm.phone,
+                        doctor_photo: settingsForm.doctorPhoto,
+                        clinic_photo: settingsForm.clinicPhoto,
+                        meta_title: settingsForm.metaTitle,
+                        meta_description: settingsForm.metaDescription,
+                        about_doctor: settingsForm.aboutDoctor,
+                        services: settingsForm.services,
+                        consultation_fee: settingsForm.consultationFee,
+                      };
+
                       const res = await fetch(`http://localhost:8000/api/v1/auth/clinics/${userInfo.clinic_id}`, {
                         method: 'PUT',
                         headers: {
                           'Content-Type': 'application/json',
                           Authorization: `Bearer ${token}`
                         },
-                        body: JSON.stringify(settingsForm)
+                        body: JSON.stringify(payload)
                       });
                       if (res.ok) {
                         setClinic({ ...clinic, ...settingsForm });

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
 interface Doctor {
   id: string;
@@ -188,10 +188,13 @@ export default function DoctorsPage() {
                         </div>
                       )}
                       {doctor.consultation_fee && (
-                        <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '8px 12px', borderRadius: 8, fontSize: 13, fontWeight: 700, display: 'inline-block' }}>
+                        <div style={{ background: '#f0fdf4', color: '#16a34a', padding: '8px 12px', borderRadius: 8, fontSize: 13, fontWeight: 700, display: 'inline-block', marginBottom: 16 }}>
                           ₹{doctor.consultation_fee} consultation
                         </div>
                       )}
+                      <div style={{ width: '100%', textAlign: 'center', padding: '12px 0', background: '#f8fafc', color: '#2563eb', fontWeight: 700, fontSize: 14, borderRadius: 12, border: '1px solid #e2e8f0', transition: 'all 0.2s' }}>
+                        View Full Profile →
+                      </div>
                     </div>
                   </div>
                 </Link>

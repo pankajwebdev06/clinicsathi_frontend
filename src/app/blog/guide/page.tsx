@@ -293,7 +293,7 @@ function VisualMockup({ type, title, description }: VisualMockupProps) {
             {[
               { label: 'Blood Pressure', value: '120/80 mmHg', icon: '🫀' },
               { label: 'Weight', value: '65 kg', icon: '⚖️' },
-              { label: 'Temperature', value: '98.6 °F', icon: '🌡️' },
+              { label: 'Temperature', value: '37 °C', icon: '🌡️' },
               { label: 'Pulse', value: '72 bpm', icon: '💓' },
             ].map((vital) => (
               <div key={vital.label} className="bg-slate-50 rounded-lg p-3">
@@ -430,7 +430,7 @@ function VisualMockup({ type, title, description }: VisualMockupProps) {
             </div>
             <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
               <div className="text-xs text-blue-700 mb-1">Vitals</div>
-              <div className="text-sm text-slate-700">Temp: 98.6°F • Pulse: 72</div>
+              <div className="text-sm text-slate-700">Temp: 37°C • Pulse: 72</div>
             </div>
           </div>
           <div>

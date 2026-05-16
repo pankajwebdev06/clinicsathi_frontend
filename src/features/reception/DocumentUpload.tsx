@@ -14,7 +14,13 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const [reportType, setReportType] = useState('')
+
   const handleUpload = async (type: 'prescription' | 'report', file: File) => {
+    if (type === 'report' && !reportType.trim()) {
+      setError('Please enter the report type before uploading.');
+      return;
+    }
     setUploading(true)
     setError(null)
     setSuccess(false)
@@ -22,12 +28,11 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
     try {
       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
       
-      // Create a consultation record to attach the image to
       const consult = await consultationApi.createConsultation({
         clinic_id: userInfo.clinic_id,
         patient_id: patientId,
         doctor_id: userInfo.id || 'reception_upload',
-        doctor_notes: type === 'prescription' ? "Handwritten Prescription Uploaded" : "Report Uploaded"
+        doctor_notes: type === 'prescription' ? "Handwritten Prescription Uploaded" : `Report Uploaded: ${reportType}`
       });
 
       const formData = new FormData()
@@ -45,6 +50,7 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
       if (!response.ok) throw new Error('Upload failed')
 
       setSuccess(true)
+      setReportType('')
       if (onUploadSuccess) onUploadSuccess()
     } catch (err) {
       setError('Something went wrong. Please try again.')
@@ -58,75 +64,80 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
     if (file) {
       handleUpload(type, file)
     }
+    // reset input
+    e.target.value = '';
   }
 
   return (
-    <div className="space-y-4 max-w-md mx-auto p-4">
-      <h2 className="text-xl font-bold text-gray-800 mb-4">Upload Visit Documents</h2>
-
-      {/* Prescription Upload Card */}
-      <Card className="p-6 border-dashed border-2 border-teal-100 bg-teal-50/30">
-        <div className="flex flex-col items-center text-center gap-3">
-          <div className="bg-teal-100 p-3 rounded-full text-teal-600">
-            <Camera size={24} />
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-800">Handwritten Prescription</h3>
-            <p className="text-xs text-gray-500 mt-1">Upload the paper signed by the doctor</p>
-          </div>
+    <div className="space-y-3 w-full">
+      <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
+        {/* Prescription Upload */}
+        <div className="flex-1 relative w-full">
           <input 
             type="file" 
             accept="image/*" 
             capture="environment" 
-            id="prescription-input"
+            id={`prescription-input-${patientId}`}
             className="hidden" 
             onChange={(e) => onFileChange(e, 'prescription')}
             disabled={uploading}
           />
-          <label htmlFor="prescription-input">
-            <Button variant="default" className="bg-teal-600 hover:bg-teal-700 pointer-events-none" disabled={uploading}>
-              {uploading ? 'Processing...' : 'Capture & Upload'}
-            </Button>
-          </label>
+          <Button 
+            variant="outline" 
+            className="w-full flex items-center justify-center gap-2 border-teal-200 text-teal-700 hover:bg-teal-50"
+            onClick={() => document.getElementById(`prescription-input-${patientId}`)?.click()}
+            disabled={uploading}
+          >
+            <Camera size={16} /> 
+            Upload Prescription
+          </Button>
         </div>
-      </Card>
 
-      {/* Other Reports Upload Card */}
-      <Card className="p-6 border-dashed border-2 border-blue-100 bg-blue-50/30">
-        <div className="flex flex-col items-center text-center gap-3">
-          <div className="bg-blue-100 p-3 rounded-full text-blue-600">
-            <FileImage size={24} />
-          </div>
-          <div>
-            <h3 className="font-bold text-gray-800">Lab Reports / Others</h3>
-            <p className="text-xs text-gray-500 mt-1">Upload Blood test, Ultrasound, etc.</p>
-          </div>
+        {/* Other Report Upload */}
+        <div className="flex-[1.5] w-full flex items-center gap-2">
+          <input
+            type="text"
+            placeholder="Report Type (e.g. Blood, X-Ray)"
+            value={reportType}
+            onChange={e => setReportType(e.target.value)}
+            className="flex-1 border border-blue-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            disabled={uploading}
+          />
           <input 
             type="file" 
-            accept="image/*" 
-            multiple
-            id="reports-input"
+            accept="image/*,application/pdf" 
+            id={`reports-input-${patientId}`}
             className="hidden" 
             onChange={(e) => onFileChange(e, 'report')}
             disabled={uploading}
           />
-          <label htmlFor="reports-input">
-            <Button variant="secondary" className="bg-blue-600 text-white hover:bg-blue-700 pointer-events-none" disabled={uploading}>
-              {uploading ? 'Uploading...' : 'Select Files'}
-            </Button>
-          </label>
+          <Button 
+            variant="outline"
+            className="flex items-center justify-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+            onClick={() => {
+              if (!reportType.trim()) {
+                setError('Please type report name first');
+                return;
+              }
+              document.getElementById(`reports-input-${patientId}`)?.click()
+            }}
+            disabled={uploading}
+          >
+            <Upload size={16} /> 
+            Upload Report
+          </Button>
         </div>
-      </Card>
+      </div>
 
       {/* Status Messages */}
       {success && (
-        <div className="flex items-center gap-2 p-3 bg-green-50 text-green-700 rounded-lg text-sm font-medium">
-          <CheckCircle2 size={16} /> Documents uploaded successfully!
+        <div className="flex items-center gap-2 p-2 bg-green-50 text-green-700 rounded text-xs font-medium">
+          <CheckCircle2 size={14} /> Uploaded successfully!
         </div>
       )}
       {error && (
-        <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-lg text-sm font-medium">
-          <AlertCircle size={16} /> {error}
+        <div className="flex items-center gap-2 p-2 bg-red-50 text-red-700 rounded text-xs font-medium">
+          <AlertCircle size={14} /> {error}
         </div>
       )}
     </div>

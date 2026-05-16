@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Head from 'next/head';
 
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
 interface ClinicProfile {
   id: string;
@@ -148,10 +148,12 @@ export default function DoctorProfilePage() {
 
           {/* Details Section */}
           <div style={{ padding: '40px' }}>
-            {/* Clinic Photo */}
+            {/* Clinic Photos */}
             {profile.clinic_photo && (
-              <div style={{ marginBottom: 40 }}>
-                <img src={profile.clinic_photo} alt={profile.name} style={{ width: '100%', height: 300, objectFit: 'cover', borderRadius: 16 }} />
+              <div style={{ marginBottom: 40, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>
+                {profile.clinic_photo.split(',').map((url, i) => url && (
+                  <img key={i} src={url} alt={`${profile.name} ${i+1}`} style={{ width: '100%', height: 300, objectFit: 'cover', borderRadius: 16 }} />
+                ))}
               </div>
             )}
 
