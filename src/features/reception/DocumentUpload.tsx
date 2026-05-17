@@ -2,9 +2,10 @@
 import React, { useState } from 'react'
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
-import { Card, Button } from '@/components/ui'
-import { Camera, Upload, CheckCircle2, AlertCircle, FileImage } from 'lucide-react'
+import { Button } from '@/components/ui'
+import { Camera, Upload, CheckCircle2, AlertCircle } from 'lucide-react'
 import { consultationApi } from '../consultation/api'
+import { ImageUploadWithPreview, uploadWithProgress } from '@/shared/components/ImageUploadWithPreview'
 
 interface DocumentUploadProps {
   patientId: string
@@ -12,63 +13,43 @@ interface DocumentUploadProps {
 }
 
 export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadProps) {
-  const [uploading, setUploading] = useState(false)
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState<string | null>(null)
-
   const [reportType, setReportType] = useState('')
 
-  const handleUpload = async (type: 'prescription' | 'report', file: File) => {
+  const buildUploader = (type: 'prescription' | 'report') => async (file: File, onProgress: (pct: number) => void) => {
     if (type === 'report' && !reportType.trim()) {
-      setError('Please enter the report type before uploading.');
-      return;
+      throw new Error('Please enter the report type before uploading.')
     }
-    setUploading(true)
     setError(null)
     setSuccess(false)
 
-    try {
-      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-      
-      const consult = await consultationApi.createConsultation({
-        clinic_id: userInfo.clinic_id,
-        patient_id: patientId,
-        doctor_id: userInfo.id || 'reception_upload',
-        doctor_notes: type === 'prescription' ? "Handwritten Prescription Uploaded" : `Report Uploaded: ${reportType}`
-      });
+    const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}')
 
-      const formData = new FormData()
-      formData.append('file', file)
+    const consult = await consultationApi.createConsultation({
+      clinic_id: userInfo.clinic_id,
+      patient_id: patientId,
+      doctor_id: userInfo.id || 'reception_upload',
+      doctor_notes: type === 'prescription' ? 'Handwritten Prescription Uploaded' : `Report Uploaded: ${reportType}`,
+    })
 
-      const endpoint = type === 'prescription' 
-        ? `/api/v1/consultations/${consult.id}/upload-prescription`
-        : `/api/v1/consultations/${consult.id}/upload-report`
+    const formData = new FormData()
+    formData.append('file', file)
 
-      const response = await fetch(`${API_BASE}${endpoint}`, {
-        method: 'POST',
-        body: formData,
-        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token') || ''}` },
-      })
+    const endpoint = type === 'prescription'
+      ? `/api/v1/consultations/${consult.id}/upload-prescription`
+      : `/api/v1/consultations/${consult.id}/upload-report`
 
-      if (!response.ok) throw new Error('Upload failed')
+    await uploadWithProgress(
+      `${API_BASE}${endpoint}`,
+      formData,
+      localStorage.getItem('auth_token') || '',
+      onProgress
+    )
 
-      setSuccess(true)
-      setReportType('')
-      if (onUploadSuccess) onUploadSuccess()
-    } catch (err) {
-      setError('Something went wrong. Please try again.')
-    } finally {
-      setUploading(false)
-    }
-  }
-
-  const onFileChange = (e: React.ChangeEvent<HTMLInputElement>, type: 'prescription' | 'report') => {
-    const file = e.target.files?.[0]
-    if (file) {
-      handleUpload(type, file)
-    }
-    // reset input
-    e.target.value = '';
+    setSuccess(true)
+    if (type === 'report') setReportType('')
+    if (onUploadSuccess) onUploadSuccess()
   }
 
   return (
@@ -76,24 +57,21 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
       <div className="flex flex-col sm:flex-row items-center gap-3 w-full">
         {/* Prescription Upload */}
         <div className="flex-1 relative w-full">
-          <input 
-            type="file" 
-            accept="image/*" 
-            capture="environment" 
+          <ImageUploadWithPreview
             id={`prescription-input-${patientId}`}
-            className="hidden" 
-            onChange={(e) => onFileChange(e, 'prescription')}
-            disabled={uploading}
-          />
-          <Button 
-            variant="outline" 
-            className="w-full flex items-center justify-center gap-2 border-teal-200 text-teal-700 hover:bg-teal-50"
-            onClick={() => document.getElementById(`prescription-input-${patientId}`)?.click()}
-            disabled={uploading}
+            accept="image/*"
+            label="Prescription Preview"
+            onUpload={buildUploader('prescription')}
+            onError={(err) => setError(err.message || 'Something went wrong. Please try again.')}
           >
-            <Camera size={16} /> 
-            Upload Prescription
-          </Button>
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2 border-teal-200 text-teal-700 hover:bg-teal-50 pointer-events-none"
+            >
+              <Camera size={16} />
+              Upload Prescription
+            </Button>
+          </ImageUploadWithPreview>
         </div>
 
         {/* Other Report Upload */}
@@ -104,31 +82,31 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
             value={reportType}
             onChange={e => setReportType(e.target.value)}
             className="w-full border border-blue-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
-            disabled={uploading}
           />
-          <input
-            type="file"
-            accept="image/*,application/pdf"
+          <ImageUploadWithPreview
             id={`reports-input-${patientId}`}
-            className="hidden"
-            onChange={(e) => onFileChange(e, 'report')}
-            disabled={uploading}
-          />
-          <Button
-            variant="outline"
-            className="w-full flex items-center justify-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
-            onClick={() => {
-              if (!reportType.trim()) {
-                setError('Please type report name first');
-                return;
-              }
-              document.getElementById(`reports-input-${patientId}`)?.click()
-            }}
-            disabled={uploading}
+            accept="image/*,application/pdf"
+            label="Report Preview"
+            onUpload={buildUploader('report')}
+            onError={(err) => setError(err.message || 'Something went wrong. Please try again.')}
           >
-            <Upload size={16} />
-            Upload Report
-          </Button>
+            <div
+              onClick={(e) => {
+                if (!reportType.trim()) {
+                  e.stopPropagation()
+                  setError('Please type report name first')
+                }
+              }}
+            >
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50 pointer-events-none"
+              >
+                <Upload size={16} />
+                Upload Report
+              </Button>
+            </div>
+          </ImageUploadWithPreview>
         </div>
       </div>
 

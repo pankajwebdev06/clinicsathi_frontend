@@ -2,6 +2,56 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+export interface TemplateConfig {
+  primaryColor: string;
+  bgColor: string;
+  fontFamily: 'serif' | 'sans';
+  borderStyle: 'none' | 'top' | 'full';
+  letterheadUrl?: string;       // doctor's clinic logo shown in header
+  referenceImageUrl?: string;   // uploaded prescription image for visual reference only
+  header: {
+    showClinicName: boolean;
+    showDoctorName: boolean;
+    showDegree: boolean;
+    showSpecialization: boolean;
+    showMCI: boolean;
+    showPhone: boolean;
+    showAddress: boolean;
+    showTimings: boolean;
+    customLine: string;
+  };
+  footer: {
+    customText: string;
+    showSignature: boolean;
+    followUpText: string;
+    showPoweredBy: boolean;
+  };
+}
+
+export const DEFAULT_TEMPLATE_CONFIG: TemplateConfig = {
+  primaryColor: '#1e40af',
+  bgColor: '#ffffff',
+  fontFamily: 'serif',
+  borderStyle: 'top',
+  header: {
+    showClinicName: true,
+    showDoctorName: true,
+    showDegree: true,
+    showSpecialization: true,
+    showMCI: true,
+    showPhone: true,
+    showAddress: true,
+    showTimings: true,
+    customLine: '',
+  },
+  footer: {
+    customText: '',
+    showSignature: true,
+    followUpText: 'Follow-up as advised',
+    showPoweredBy: true,
+  },
+};
+
 export interface ClinicData {
   id: string;
   doctorName: string;
@@ -18,6 +68,7 @@ export interface ClinicData {
   eveningEnd: string;
   offDays: string[];
   selectedTemplate: string;
+  templateConfig?: TemplateConfig;
   mciNumber?: string;
   slug?: string;
   doctorPhoto?: string;

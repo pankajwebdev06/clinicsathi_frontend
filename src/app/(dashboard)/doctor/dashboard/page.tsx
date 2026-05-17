@@ -15,6 +15,8 @@ import { ConsultPanel } from '@/features/consultation/ConsultPanel';
 import { QueueBoard } from '@/features/queue/QueueBoard';
 import { useQueueSocket } from '@/hooks/useQueueSocket';
 import { authApi } from '@/features/auth/api';
+import { ImageUploadWithPreview, uploadWithProgress } from '@/shared/components/ImageUploadWithPreview';
+import { PrescriptionTemplateEditor } from './PrescriptionTemplateEditor';
 
 type Tab = 'queue' | 'summary' | 'settings' | 'profile';
 
@@ -39,18 +41,6 @@ interface Patient {
 
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 
-const TEMPLATES = [
-  { id: 't1', name: 'Classic Blue', color: '#1d4ed8' },
-  { id: 't2', name: 'Modern Dark', color: '#0f172a' },
-  { id: 't3', name: 'Minimal', color: '#374151' },
-  { id: 't4', name: 'Emerald', color: '#059669' },
-  { id: 't5', name: 'Royal Purple', color: '#7c3aed' },
-  { id: 't6', name: 'Warm Saffron', color: '#d97706' },
-  { id: 't7', name: 'Slate Pro', color: '#475569' },
-  { id: 't8', name: 'Rose Medical', color: '#e11d48' },
-  { id: 't9', name: 'Ocean Teal', color: '#0891b2' },
-  { id: 't10', name: 'Gold Premium', color: '#b45309' },
-];
 
 function formatTime(t: string) {
   if (!t) return '';
@@ -454,62 +444,46 @@ export default function DoctorDashboard() {
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-600">Doctor Photo</label>
                     <div className="relative">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const formData = new FormData();
-                            formData.append('file', file);
-                            try {
-                              const token = localStorage.getItem('auth_token');
-                              const res = await fetch(`${API_BASE}/api/v1/auth/upload-image`, {
-                                method: 'POST',
-                                headers: { Authorization: `Bearer ${token}` },
-                                body: formData
-                              });
-                              const data = await res.json();
-                              setClinic({ ...clinic, doctorPhoto: data.url });
-                              setSettingsForm(f => ({ ...f, doctorPhoto: data.url }));
-                            } catch (err) {
-                              alert('Upload failed');
-                            }
-                          }
-                        }}
-                        className="hidden"
+                      <ImageUploadWithPreview
                         id="doctor-photo-upload"
-                      />
-                      <label
-                        htmlFor="doctor-photo-upload"
-                        className="flex flex-col items-center justify-center w-40 h-40 mx-auto border-2 border-dashed border-slate-300 rounded-full cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all overflow-hidden"
+                        accept="image/*"
+                        label="Doctor Photo Preview"
+                        onUpload={async (file, onProgress) => {
+                          const formData = new FormData();
+                          formData.append('file', file);
+                          const token = localStorage.getItem('auth_token') || '';
+                          const data = await uploadWithProgress(`${API_BASE}/api/v1/auth/upload-image`, formData, token, onProgress);
+                          setClinic({ ...clinic, doctorPhoto: data.url });
+                          setSettingsForm(f => ({ ...f, doctorPhoto: data.url }));
+                        }}
                       >
-                        {settingsForm.doctorPhoto ? (
-                          <div className="relative w-full h-full group">
-                            <img src={settingsForm.doctorPhoto} alt="Doctor" className="w-full h-full object-cover" />
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.preventDefault();
-                                e.stopPropagation();
-                                setClinic({ ...clinic, doctorPhoto: '' });
-                                setSettingsForm(f => ({ ...f, doctorPhoto: '' }));
-                              }}
-                              className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600"
-                              title="Remove Photo"
-                            >
-                              🗑️
-                            </button>
-                          </div>
-                        ) : clinic.doctorPhoto ? (
-                          <img src={clinic.doctorPhoto} alt="Doctor" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="text-center">
-                            <span className="text-3xl mb-1 block">👨‍⚕️</span>
-                            <p className="text-xs text-slate-600 font-medium">Upload</p>
-                          </div>
-                        )}
-                      </label>
+                        <div className="flex flex-col items-center justify-center w-40 h-40 mx-auto border-2 border-dashed border-slate-300 rounded-full hover:border-blue-500 hover:bg-blue-50 transition-all overflow-hidden">
+                          {settingsForm.doctorPhoto ? (
+                            <div className="relative w-full h-full group">
+                              <img src={settingsForm.doctorPhoto} alt="Doctor" className="w-full h-full object-cover" />
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setClinic({ ...clinic, doctorPhoto: '' });
+                                  setSettingsForm(f => ({ ...f, doctorPhoto: '' }));
+                                }}
+                                className="absolute top-2 right-2 bg-red-500 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-opacity shadow-md hover:bg-red-600"
+                                title="Remove Photo"
+                              >
+                                🗑️
+                              </button>
+                            </div>
+                          ) : clinic.doctorPhoto ? (
+                            <img src={clinic.doctorPhoto} alt="Doctor" className="w-full h-full object-cover" />
+                          ) : (
+                            <div className="text-center">
+                              <span className="text-3xl mb-1 block">👨‍⚕️</span>
+                              <p className="text-xs text-slate-600 font-medium">Upload</p>
+                            </div>
+                          )}
+                        </div>
+                      </ImageUploadWithPreview>
                     </div>
                   </div>
 
@@ -517,48 +491,32 @@ export default function DoctorDashboard() {
                   <div className="space-y-2">
                     <label className="text-sm font-semibold text-slate-600">Clinic Photo</label>
                     <div className="relative">
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (file) {
-                            const formData = new FormData();
-                            formData.append('file', file);
-                            try {
-                              const token = localStorage.getItem('auth_token');
-                              const res = await fetch(`${API_BASE}/api/v1/auth/upload-image`, {
-                                method: 'POST',
-                                headers: { Authorization: `Bearer ${token}` },
-                                body: formData
-                              });
-                              const data = await res.json();
-                              const currentPhotos = settingsForm.clinicPhoto ? settingsForm.clinicPhoto.split(',') : [];
-                              if (currentPhotos.length >= 5) {
-                                alert('Maximum 5 clinic photos allowed.');
-                                return;
-                              }
-                              const updatedPhotos = [...currentPhotos, data.url].join(',');
-                              setClinic({ ...clinic, clinicPhoto: updatedPhotos });
-                              setSettingsForm(f => ({ ...f, clinicPhoto: updatedPhotos }));
-                            } catch (err) {
-                              alert('Upload failed');
-                            }
-                          }
-                        }}
-                        className="hidden"
+                      <ImageUploadWithPreview
                         id="clinic-photo-upload"
-                      />
-                      <label
-                        htmlFor="clinic-photo-upload"
-                        className="flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-slate-300 rounded-2xl cursor-pointer hover:border-blue-500 hover:bg-blue-50 transition-all overflow-hidden"
+                        accept="image/*"
+                        label="Clinic Photo Preview"
+                        onUpload={async (file, onProgress) => {
+                          const currentPhotos = settingsForm.clinicPhoto ? settingsForm.clinicPhoto.split(',').filter(Boolean) : [];
+                          if (currentPhotos.length >= 5) {
+                            throw new Error('Maximum 5 clinic photos allowed.');
+                          }
+                          const formData = new FormData();
+                          formData.append('file', file);
+                          const token = localStorage.getItem('auth_token') || '';
+                          const data = await uploadWithProgress(`${API_BASE}/api/v1/auth/upload-image`, formData, token, onProgress);
+                          const updatedPhotos = [...currentPhotos, data.url].join(',');
+                          setClinic({ ...clinic, clinicPhoto: updatedPhotos });
+                          setSettingsForm(f => ({ ...f, clinicPhoto: updatedPhotos }));
+                        }}
                       >
-                        <div className="text-center">
-                          <span className="text-4xl mb-2 block">🏥</span>
-                          <p className="text-sm text-slate-600 font-medium">Upload Clinic Photos</p>
-                          <p className="text-xs text-slate-400 mt-1">Add up to 5 photos (16:9 Ratio)</p>
+                        <div className="flex flex-col items-center justify-center w-full aspect-video border-2 border-dashed border-slate-300 rounded-2xl hover:border-blue-500 hover:bg-blue-50 transition-all overflow-hidden">
+                          <div className="text-center">
+                            <span className="text-4xl mb-2 block">🏥</span>
+                            <p className="text-sm text-slate-600 font-medium">Upload Clinic Photos</p>
+                            <p className="text-xs text-slate-400 mt-1">Add up to 5 photos (16:9 Ratio)</p>
+                          </div>
                         </div>
-                      </label>
+                      </ImageUploadWithPreview>
                     </div>
 
                     {/* Clinic Photos Gallery */}
@@ -676,7 +634,7 @@ export default function DoctorDashboard() {
                     try {
                       const token = localStorage.getItem('auth_token');
                       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
-                      // Auto-generate slug with specialization included
+                      // Always regenerate slug with specialization for better SEO
                       const makeSlug = (name: string, spec: string, city: string) =>
                         `${name}-${spec}-${city}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
                       const autoSlug = makeSlug(
@@ -684,6 +642,10 @@ export default function DoctorDashboard() {
                         settingsForm.specialization || '',
                         settingsForm.city || ''
                       );
+                      // Use the existing slug only if specialization is not set (to preserve old URLs)
+                      const finalSlug = settingsForm.specialization
+                        ? autoSlug
+                        : (settingsForm.slug || autoSlug);
 
                       const payload = {
                         name: settingsForm.clinicName,
@@ -701,7 +663,7 @@ export default function DoctorDashboard() {
                         about_doctor: settingsForm.aboutDoctor,
                         services: settingsForm.services,
                         consultation_fee: settingsForm.consultationFee,
-                        slug: settingsForm.slug || autoSlug,
+                        slug: finalSlug,
                       };
 
                       const res = await fetch(`${API_BASE}/api/v1/auth/clinics/${userInfo.clinic_id}`, {
@@ -713,7 +675,12 @@ export default function DoctorDashboard() {
                         body: JSON.stringify(payload)
                       });
                       if (res.ok) {
-                        setClinic({ ...clinic, ...settingsForm });
+                        const updated = await res.json();
+                        // Read the slug returned by backend — it may have been
+                        // auto-regenerated to include specialization
+                        const newSlug = updated.slug || settingsForm.slug;
+                        setClinic({ ...clinic, ...settingsForm, slug: newSlug });
+                        setSettingsForm(f => ({ ...f, slug: newSlug }));
                         alert('Profile updated successfully!');
                       } else {
                         alert('Failed to update profile');
@@ -855,75 +822,7 @@ export default function DoctorDashboard() {
                 </button>
               </div>
 
-              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
-                <h3 className="text-xl font-bold text-slate-900 mb-1">🖨️ Prescription Template</h3>
-                <p className="text-slate-500 text-sm mb-6">Select the default template. Reception will use this layout when printing prescriptions.</p>
-                
-                <div className="flex flex-col xl:flex-row gap-8">
-                  {/* Left: Template Grid */}
-                  <div className="flex-1">
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                      {TEMPLATES.map(t => (
-                        <button key={t.id}
-                          onClick={() => { setClinic({ ...clinic, selectedTemplate: t.id }); }}
-                          className={`p-4 rounded-2xl border-2 text-left transition-all ${
-                            clinic.selectedTemplate === t.id
-                              ? 'border-blue-500 bg-blue-50 shadow-md'
-                              : 'border-slate-200 bg-slate-50 hover:border-slate-300'
-                          }`}>
-                          <div className="w-8 h-8 rounded-lg mb-2" style={{ background: t.color }}></div>
-                          <p className={`text-xs font-bold ${ clinic.selectedTemplate === t.id ? 'text-blue-700' : 'text-slate-700'}`}>{t.name}</p>
-                          {clinic.selectedTemplate === t.id && <p className="text-[10px] text-blue-500 font-semibold mt-0.5">✓ Active</p>}
-                        </button>
-                      ))}
-                    </div>
-                    <p className="mt-4 text-xs text-slate-400">Template is saved automatically when selected. Reception will always use this template.</p>
-                  </div>
-                  
-                  {/* Right: Live Preview */}
-                  <div className="w-full xl:w-[400px] flex-shrink-0">
-                    <div className="bg-slate-50 rounded-2xl p-5 border border-slate-200">
-                       <p className="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4">Live Preview</p>
-                       <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden transition-all duration-300" 
-                            style={{ borderTop: `8px solid ${TEMPLATES.find(t => t.id === clinic.selectedTemplate)?.color || '#1d4ed8'}` }}>
-                          <div className="p-5 border-b border-slate-100 flex justify-between items-start">
-                             <div>
-                               <h4 className="font-black text-lg leading-tight transition-colors duration-300" style={{ color: TEMPLATES.find(t => t.id === clinic.selectedTemplate)?.color || '#1d4ed8' }}>
-                                  {clinic.clinicName || 'Clinic Name'}
-                               </h4>
-                               <p className="text-xs text-slate-600 font-bold mt-1">{clinic.doctorName || 'Dr. Name'} <span className="text-slate-400 font-normal">| {clinic.degree || 'Degree'}</span></p>
-                               <p className="text-[10px] text-slate-400 mt-0.5">{clinic.specialization || 'Specialization'}</p>
-                             </div>
-                             <div className="text-right">
-                               <p className="text-[10px] text-slate-500 font-medium">Mob: {clinic.phone || '+91 0000000000'}</p>
-                             </div>
-                          </div>
-                          <div className="p-5 flex gap-4 min-h-[180px]">
-                             <div className="w-1/3 border-r border-slate-100 pr-4">
-                                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Vitals</div>
-                                <div className="h-1.5 w-full bg-slate-100 rounded-full mb-2"></div>
-                                <div className="h-1.5 w-full bg-slate-100 rounded-full mb-2"></div>
-                                <div className="h-1.5 w-3/4 bg-slate-100 rounded-full mb-4"></div>
-                                <div className="text-[9px] font-bold text-slate-400 uppercase tracking-widest mb-3">Symptoms</div>
-                                <div className="h-1.5 w-full bg-slate-100 rounded-full mb-2"></div>
-                             </div>
-                             <div className="flex-1 pl-2">
-                                <div className="text-3xl font-serif mb-4 transition-colors duration-300" style={{ color: TEMPLATES.find(t => t.id === clinic.selectedTemplate)?.color || '#1d4ed8' }}>Rx</div>
-                                <div className="h-2 w-full bg-slate-100 rounded-full mb-3"></div>
-                                <div className="h-2 w-5/6 bg-slate-100 rounded-full mb-3"></div>
-                                <div className="h-2 w-1/2 bg-slate-100 rounded-full mb-6"></div>
-                                <div className="h-2 w-full bg-slate-100 rounded-full mb-3"></div>
-                                <div className="h-2 w-2/3 bg-slate-100 rounded-full mb-3"></div>
-                             </div>
-                          </div>
-                          <div className="p-3 border-t border-slate-100 bg-slate-50 text-center">
-                             <p className="text-[9px] text-slate-400">{clinic.address || 'Clinic full address will appear here on the printed prescription'}</p>
-                          </div>
-                       </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <PrescriptionTemplateEditor />
 
               {/* Staff Management */}
               <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">

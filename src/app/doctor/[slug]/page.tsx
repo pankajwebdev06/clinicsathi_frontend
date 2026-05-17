@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Head from 'next/head';
 
@@ -31,16 +31,43 @@ interface ClinicProfile {
 
 export default function DoctorProfilePage() {
   const params = useParams();
+  const router = useRouter();
   const slug = params.slug as string;
   const [profile, setProfile] = useState<ClinicProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [redirecting, setRedirecting] = useState(false);
 
   useEffect(() => {
     async function fetchProfile() {
       try {
         const res = await fetch(`${API_BASE}/api/v1/auth/public/profile/${slug}`);
         if (!res.ok) {
+          // Profile not found by exact slug — try to find new slug via doctors list
+          // This handles old Google-indexed URLs that changed when specialization was added
+          try {
+            const allRes = await fetch(`${API_BASE}/api/v1/auth/public/doctors`);
+            if (allRes.ok) {
+              const doctors: ClinicProfile[] = await allRes.json();
+              // Match doctors whose slug starts with the same prefix (name portion)
+              const slugParts = slug.split('-');
+              const match = doctors.find(d => {
+                const dParts = d.slug.split('-');
+                // Old slug: dr-name-city, New slug: dr-name-spec-city
+                // Compare first 2 parts and last part (city)
+                const firstTwo = slugParts.slice(0, 2).join('-');
+                const lastPart = slugParts[slugParts.length - 1];
+                return d.slug.startsWith(firstTwo) && d.slug.endsWith(lastPart) && d.slug !== slug;
+              });
+              if (match) {
+                setRedirecting(true);
+                router.replace(`/doctor/${match.slug}`);
+                return;
+              }
+            }
+          } catch {
+            // ignore secondary lookup errors
+          }
           throw new Error('Clinic profile not found');
         }
         const data = await res.json();
@@ -56,7 +83,7 @@ export default function DoctorProfilePage() {
     }
   }, [slug]);
 
-  if (loading) {
+  if (loading || redirecting) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
         <Head>
@@ -66,7 +93,7 @@ export default function DoctorProfilePage() {
         <div style={{ textAlign: 'center' }}>
           <div style={{ width: 40, height: 40, border: '3px solid #2563eb', borderTopColor: 'transparent', borderRadius: '50%', animation: 'spin 0.8s linear infinite', margin: '0 auto 16px' }} />
           <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
-          <p style={{ color: '#64748b', fontWeight: 500 }}>Loading profile...</p>
+          <p style={{ color: '#64748b', fontWeight: 500 }}>{redirecting ? 'Redirecting to updated profile...' : 'Loading profile...'}</p>
         </div>
       </div>
     );
@@ -75,13 +102,29 @@ export default function DoctorProfilePage() {
   if (error || !profile) {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', padding: '20px' }}>
-        <div style={{ textAlign: 'center', maxWidth: 400 }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>😕</div>
+        <div style={{ textAlign: 'center', maxWidth: 440 }}>
+          <div style={{ fontSize: 64, marginBottom: 16 }}>🔍</div>
           <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Profile Not Found</h1>
-          <p style={{ color: '#64748b', marginBottom: 24 }}>{error || 'This clinic profile does not exist or has been removed.'}</p>
-          <Link href="/" style={{ display: 'inline-block', background: '#2563eb', color: 'white', padding: '12px 24px', borderRadius: 10, fontWeight: 700, textDecoration: 'none' }}>
-            Go to Homepage
-          </Link>
+          <p style={{ color: '#64748b', marginBottom: 8 }}>
+            This doctor profile may have been updated or moved.
+          </p>
+          <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>
+            The profile URL may have changed. Please search for the doctor in our directory.
+          </p>
+          <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <Link
+              href="/doctors"
+              style={{ display: 'inline-block', background: '#2563eb', color: 'white', padding: '12px 24px', borderRadius: 10, fontWeight: 700, textDecoration: 'none' }}
+            >
+              Browse Doctors →
+            </Link>
+            <Link
+              href="/"
+              style={{ display: 'inline-block', background: 'white', color: '#475569', border: '2px solid #e2e8f0', padding: '12px 24px', borderRadius: 10, fontWeight: 700, textDecoration: 'none' }}
+            >
+              Go to Homepage
+            </Link>
+          </div>
         </div>
       </div>
     );
