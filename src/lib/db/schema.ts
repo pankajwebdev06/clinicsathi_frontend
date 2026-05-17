@@ -32,9 +32,9 @@ export interface LocalPrescription extends Prescription {
 }
 
 // ------------------------------------------
-// ClinicFlow Database Class
+// ClinicSathi Database Class
 // ------------------------------------------
-class ClinicFlowDB extends Dexie {
+class ClinicSathiDB extends Dexie {
   patients!: Table<LocalPatient, string>;
   queue!: Table<LocalQueueEntry, string>;
   consultations!: Table<LocalConsultation, string>;
@@ -43,7 +43,7 @@ class ClinicFlowDB extends Dexie {
   meta!: Table<{ key: string; value: unknown }, string>;
 
   constructor() {
-    super('ClinicFlowDB');
+    super('ClinicSathiDB');
     
     this.version(1).stores({
       // Patients: index by id, clinicId, mobileNumber, and syncStatus
@@ -142,7 +142,7 @@ class ClinicFlowDB extends Dexie {
 // ------------------------------------------
 // Export Database Instance
 // ------------------------------------------
-export const db = new ClinicFlowDB();
+export const db = new ClinicSathiDB();
 
 // ------------------------------------------
 // Helper Functions

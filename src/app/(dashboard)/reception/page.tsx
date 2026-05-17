@@ -300,13 +300,13 @@ export default function ReceptionDashboard() {
       {/* Main */}
       <main className="flex-1 p-4 md:p-8 max-w-4xl mx-auto w-full pb-24 md:pb-8">
 
-        {/* Mobile top bar */}
-        <div className="flex justify-between items-center md:hidden mb-4 print:hidden">
+        {/* Mobile top bar — no back-to-home; receptionists work inside the dashboard */}
+        <div className="flex items-center justify-between md:hidden mb-4 print:hidden">
           <div className="min-w-0 flex-1">
             <h2 className="text-lg font-bold text-slate-800 tracking-tight truncate">{clinic.clinicName}</h2>
             <p className="text-xs text-slate-500">Reception Desk</p>
           </div>
-          <Link href="/" className="ml-3 flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors">← Home</Link>
+          <span className="ml-2 flex-shrink-0 px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-100">● Live</span>
         </div>
 
         {/* Page title */}
@@ -314,7 +314,6 @@ export default function ReceptionDashboard() {
           <div className="hidden md:block">
             <Breadcrumbs
               items={[
-                { label: 'Home', href: '/', icon: '🏠' },
                 { label: 'Reception', isCurrent: flowState === 'search' },
                 ...(flowState !== 'search' && flowState !== 'loading' ? [{
                   label: flowState === 'new_patient' ? 'New Patient'
@@ -328,7 +327,10 @@ export default function ReceptionDashboard() {
           </div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Patient Check-in</h1>
           <p className="text-slate-500 text-sm md:text-base mt-1">Enter mobile number to search <strong>{clinic.clinicName}</strong>.</p>
-          {error && <div className="mt-3 p-3 bg-red-50 text-red-500 rounded-md text-sm">{error}</div>}
+          {error && <div className="mt-3 p-3 bg-red-50 text-red-600 rounded-xl text-sm border border-red-100 flex items-start gap-2">
+            <span className="flex-shrink-0">⚠️</span>
+            <span>{error}</span>
+          </div>}
         </div>
 
         {/* Main card */}

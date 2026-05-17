@@ -4,7 +4,7 @@ const FEATURES = [
   {
     icon: '🗂️',
     title: 'Smart Queue Management',
-    desc: 'Color-coded real-time queue with token numbers. Never lose track of a patient\'s place in line.',
+    desc: 'Color-coded real-time queue with token numbers. WebSocket-powered — every device updates instantly.',
     detail: [['● Waiting', '10 mins'], ['● In Consultation', 'Room 2']],
     color: 'from-blue-500 to-indigo-600',
     bg: 'bg-blue-50',
@@ -32,6 +32,22 @@ const FEATURES = [
     detail: [['● Sync', 'Auto on reconnect'], ['● Storage', 'Local IndexedDB']],
     color: 'from-purple-500 to-violet-600',
     bg: 'bg-purple-50',
+  },
+  {
+    icon: '🖨️',
+    title: 'Custom Prescription Pad',
+    desc: 'Upload your existing letterhead, auto-extract colors, customize every header/footer field. Print-ready A4.',
+    detail: [['● Templates', '5 presets + custom'], ['● Output', 'A4 print-ready']],
+    color: 'from-rose-500 to-pink-600',
+    bg: 'bg-rose-50',
+  },
+  {
+    icon: '🌐',
+    title: 'SEO-Optimized Public Profile',
+    desc: 'Every doctor gets a Google-indexed profile page with photos, services, fees & "Book Appointment" CTA.',
+    detail: [['● URL', 'doctor/dr-name-specialization-city'], ['● SEO', 'Meta + canonical']],
+    color: 'from-indigo-500 to-purple-600',
+    bg: 'bg-indigo-50',
   },
 ];
 
@@ -61,11 +77,12 @@ export default function LandingPage() {
             </div>
             <span className="font-extrabold text-slate-900 text-lg tracking-tight">ClinicSathi</span>
           </div>
-          <nav className="hidden md:flex items-center gap-8 text-sm font-semibold text-slate-500">
+          <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-500">
             <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
             <a href="#how-it-works" className="hover:text-slate-900 transition-colors">How it Works</a>
+            <Link href="/register-guide" className="hover:text-slate-900 transition-colors">Setup Guide</Link>
             <a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a>
-            <Link href="/doctors" className="hover:text-slate-900 transition-colors">Doctors With Us</Link>
+            <Link href="/doctors" className="hover:text-slate-900 transition-colors">Doctors</Link>
             <Link href="/blog" className="hover:text-slate-900 transition-colors">Blog</Link>
           </nav>
           <div className="flex items-center gap-1 md:gap-3">
@@ -223,6 +240,33 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* SETUP GUIDE CTA — bridges Features and How-It-Works */}
+      <section className="py-14 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 border-y border-amber-100">
+        <div className="max-w-5xl mx-auto px-5">
+          <div className="bg-white rounded-3xl border border-amber-100 shadow-sm p-6 md:p-10 flex flex-col md:flex-row items-center gap-6 md:gap-10">
+            <div className="flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-3xl md:text-4xl shadow-lg shadow-orange-200">
+              📖
+            </div>
+            <div className="flex-1 text-center md:text-left">
+              <p className="text-xs font-bold uppercase tracking-wider text-orange-600 mb-2">First time? Start here.</p>
+              <h3 className="text-xl md:text-2xl font-black text-slate-900 mb-2 tracking-tight">
+                Step-by-step setup guide — register your clinic in 10 minutes
+              </h3>
+              <p className="text-sm md:text-base text-slate-600 font-medium leading-relaxed">
+                Visual walkthrough covering doctor signup, clinic details, timings, staff onboarding,
+                patient check-in, token generation, and prescription printing.
+              </p>
+            </div>
+            <Link
+              href="/register-guide"
+              className="flex-shrink-0 px-7 py-4 bg-slate-900 hover:bg-slate-800 text-white rounded-2xl font-bold shadow-lg shadow-slate-900/20 active:scale-[0.98] transition-all whitespace-nowrap"
+            >
+              Open Guide →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* HOW IT WORKS */}
       <section id="how-it-works" className="py-24 bg-slate-900 text-white relative overflow-hidden">
         <div className="absolute inset-0 -z-0">
@@ -303,7 +347,7 @@ export default function LandingPage() {
             Ready to modernize your clinic?
           </h2>
           <p className="text-blue-100 text-lg font-medium mb-10 max-w-xl mx-auto">
-            Join hundreds of doctors across India already using ClinicFlow to run smoother, faster, and smarter clinics.
+            Join hundreds of doctors across India already using ClinicSathi to run smoother, faster, and smarter clinics.
           </p>
           <Link href="/doctor/setup" className="inline-block px-10 py-5 bg-white text-blue-700 rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-[0.98]">
             Register My Clinic — It&apos;s Free
