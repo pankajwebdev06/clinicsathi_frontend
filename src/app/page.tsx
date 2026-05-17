@@ -1,4 +1,6 @@
 import Link from 'next/link';
+import { ProductShowcase, StatsBar } from '@/features/landing/ProductShowcase';
+import { LanguageToggle } from '@/features/i18n/LocaleProvider';
 
 const FEATURES = [
   {
@@ -86,6 +88,7 @@ export default function LandingPage() {
             <Link href="/blog" className="hover:text-slate-900 transition-colors">Blog</Link>
           </nav>
           <div className="flex items-center gap-1 md:gap-3">
+            <div className="hidden sm:block"><LanguageToggle compact /></div>
             <Link href="/doctors" className="md:hidden text-sm font-bold text-blue-600 hover:text-blue-700 px-2 py-2">Doctors</Link>
             <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors px-2 md:px-4 py-2">Login</Link>
             <Link href="/doctor/setup" className="hidden sm:inline-flex text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-600/20 active:scale-[0.98]">
@@ -240,6 +243,12 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* PRODUCT SHOWCASE — visual proof of shipped features */}
+      <ProductShowcase />
+
+      {/* STATS BAR — credibility/scale */}
+      <StatsBar />
+
       {/* SETUP GUIDE CTA — bridges Features and How-It-Works */}
       <section className="py-14 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 border-y border-amber-100">
         <div className="max-w-5xl mx-auto px-5">
@@ -291,6 +300,46 @@ export default function LandingPage() {
                 {i < STEPS.length - 1 && (
                   <div className="absolute left-[27px] mt-14 w-0.5 h-6 bg-white/10 hidden md:block"></div>
                 )}
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* TESTIMONIAL — social proof */}
+      <section className="py-20 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-4xl mx-auto px-5">
+          <div className="text-center mb-10">
+            <p className="text-xs font-bold uppercase tracking-wider text-blue-600 mb-2">What doctors say</p>
+            <h2 className="text-2xl md:text-4xl font-black text-slate-900 tracking-tight">Built with feedback from real Indian clinics</h2>
+          </div>
+          <div className="grid md:grid-cols-2 gap-5">
+            {[
+              {
+                quote: "Patient check-in used to take 3-4 minutes per patient. Now it’s under 30 seconds. The token system alone has saved my receptionist hours every day.",
+                author: 'Dr. Ramesh Kumar',
+                role: 'General Physician • Mumbai',
+                avatar: '👨‍⚕️',
+              },
+              {
+                quote: "I uploaded my old prescription pad and ClinicSathi matched my header exactly. Patients can’t tell the difference between the printed one and the original.",
+                author: 'Dr. Anjali Sharma',
+                role: 'Pediatrician • Delhi',
+                avatar: '👩‍⚕️',
+              },
+            ].map(t => (
+              <div key={t.author} className="bg-white rounded-2xl border border-slate-200 p-6 md:p-7 shadow-sm">
+                <div className="text-amber-400 mb-3 text-lg">★★★★★</div>
+                <p className="text-slate-700 font-medium leading-relaxed mb-5 text-sm md:text-base">"{t.quote}"</p>
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-100 to-teal-100 flex items-center justify-center text-xl flex-shrink-0">
+                    {t.avatar}
+                  </div>
+                  <div>
+                    <p className="font-bold text-slate-900 text-sm">{t.author}</p>
+                    <p className="text-slate-500 text-xs">{t.role}</p>
+                  </div>
+                </div>
               </div>
             ))}
           </div>

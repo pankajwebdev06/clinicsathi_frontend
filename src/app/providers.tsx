@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 import { QueryProvider } from '@/core/query/query-provider'
 import { ClinicProvider } from '@/core/store/clinic-context'
+import { LocaleProvider } from '@/features/i18n/LocaleProvider'
 import { Toaster } from 'sonner'
 import { syncManager } from '@/lib/sync/sync-manager'
 
@@ -17,18 +18,20 @@ export default function Providers({ children }: { children: React.ReactNode }) {
   return (
     <QueryProvider>
       <ClinicProvider>
-        {children}
-        {/* Toast notifications */}
-        <Toaster 
-          position="top-right"
-          richColors
-          closeButton
-          toastOptions={{
-            style: {
-              fontFamily: 'inherit',
-            },
-          }}
-        />
+        <LocaleProvider>
+          {children}
+          {/* Toast notifications */}
+          <Toaster
+            position="top-right"
+            richColors
+            closeButton
+            toastOptions={{
+              style: {
+                fontFamily: 'inherit',
+              },
+            }}
+          />
+        </LocaleProvider>
       </ClinicProvider>
     </QueryProvider>
   )

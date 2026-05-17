@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Head from 'next/head';
+import { useLocale, LanguageToggle } from '@/features/i18n/LocaleProvider';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
@@ -32,6 +33,7 @@ interface ClinicProfile {
 export default function DoctorProfilePage() {
   const params = useParams();
   const router = useRouter();
+  const { t } = useLocale();
   const slug = params.slug as string;
   const [profile, setProfile] = useState<ClinicProfile | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,25 +106,22 @@ export default function DoctorProfilePage() {
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', padding: '20px' }}>
         <div style={{ textAlign: 'center', maxWidth: 440 }}>
           <div style={{ fontSize: 64, marginBottom: 16 }}>🔍</div>
-          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>Profile Not Found</h1>
-          <p style={{ color: '#64748b', marginBottom: 8 }}>
-            This doctor profile may have been updated or moved.
-          </p>
-          <p style={{ color: '#94a3b8', fontSize: 14, marginBottom: 24 }}>
-            The profile URL may have changed. Please search for the doctor in our directory.
+          <h1 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>{t('common.notFound')}</h1>
+          <p style={{ color: '#64748b', marginBottom: 24 }}>
+            {t('profile.moved')}
           </p>
           <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Link
               href="/doctors"
               style={{ display: 'inline-block', background: '#2563eb', color: 'white', padding: '12px 24px', borderRadius: 10, fontWeight: 700, textDecoration: 'none' }}
             >
-              Browse Doctors →
+              {t('profile.browseDoctors')}
             </Link>
             <Link
               href="/"
               style={{ display: 'inline-block', background: 'white', color: '#475569', border: '2px solid #e2e8f0', padding: '12px 24px', borderRadius: 10, fontWeight: 700, textDecoration: 'none' }}
             >
-              Go to Homepage
+              {t('common.backToHome')}
             </Link>
           </div>
         </div>
@@ -156,11 +155,12 @@ export default function DoctorProfilePage() {
             <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 14 }}>ClinicSathi</span>
           </Link>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
-            <Link href="/doctors" style={{ color: '#2563eb', padding: '7px 12px', borderRadius: 10, fontWeight: 700, fontSize: 12, textDecoration: 'none', border: '1.5px solid #2563eb', whiteSpace: 'nowrap', display: 'block' }}>
-              ← Doctors
+            <LanguageToggle compact />
+            <Link href="/doctors" style={{ color: '#2563eb', padding: '10px 14px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none', border: '1.5px solid #2563eb', whiteSpace: 'nowrap', display: 'block', minHeight: 40, lineHeight: 1.2 }}>
+              ← {t('common.doctors')}
             </Link>
-            <Link href="/doctor/setup" style={{ background: '#2563eb', color: 'white', padding: '7px 12px', borderRadius: 10, fontWeight: 700, fontSize: 12, textDecoration: 'none', whiteSpace: 'nowrap' }}>
-              Register
+            <Link href="/doctor/setup" style={{ background: '#2563eb', color: 'white', padding: '10px 14px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none', whiteSpace: 'nowrap', minHeight: 40, lineHeight: 1.2 }}>
+              {t('common.register')}
             </Link>
           </div>
         </div>
@@ -183,7 +183,7 @@ export default function DoctorProfilePage() {
                 <h1 style={{ fontSize: 'clamp(20px, 5vw, 32px)', fontWeight: 900, margin: '0 0 6px', lineHeight: 1.2, wordBreak: 'break-word' }}>{profile.doctor_name}</h1>
                 <p style={{ fontSize: 'clamp(14px, 3vw, 18px)', fontWeight: 600, margin: '0 0 6px', opacity: 0.95 }}>{profile.specialization || 'General Physician'}</p>
                 {profile.degree && <p style={{ fontSize: 14, margin: '0 0 4px', opacity: 0.9 }}>{profile.degree}</p>}
-                {profile.experience && <p style={{ fontSize: 13, margin: 0, opacity: 0.85 }}>{profile.experience}+ years experience</p>}
+                {profile.experience && <p style={{ fontSize: 13, margin: 0, opacity: 0.85 }}>{profile.experience}+ {t('profile.yearsExp')}</p>}
                 <p style={{ fontSize: 14, margin: '6px 0 0', opacity: 0.9 }}>{profile.name}</p>
               </div>
             </div>
@@ -202,26 +202,26 @@ export default function DoctorProfilePage() {
 
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 32, marginBottom: 40 }}>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 8 }}>Location</div>
-                <div style={{ fontSize: 16, fontWeight: 600, color: '#0f172a' }}>{profile.city || 'Not specified'}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 8 }}>{t('profile.location')}</div>
+                <div style={{ fontSize: 16, fontWeight: 600, color: '#0f172a' }}>{profile.city || '—'}</div>
                 {profile.address && <div style={{ fontSize: 14, color: '#64748b', marginTop: 4 }}>{profile.address}</div>}
               </div>
-              
+
               <div>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 8 }}>Contact</div>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 8 }}>{t('profile.contact')}</div>
                 {profile.phone && <div style={{ fontSize: 16, fontWeight: 600, color: '#0f172a' }}>{profile.phone}</div>}
               </div>
 
               {profile.consultation_fee && (
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 8 }}>Consultation Fee</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 8 }}>{t('profile.fee')}</div>
                   <div style={{ fontSize: 16, fontWeight: 600, color: '#0f172a' }}>₹{profile.consultation_fee}</div>
                 </div>
               )}
 
               {profile.mci_number && (
                 <div>
-                  <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 8 }}>MCI Registration</div>
+                  <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 8 }}>{t('profile.mciNumber')}</div>
                   <div style={{ fontSize: 16, fontWeight: 600, color: '#0f172a' }}>{profile.mci_number}</div>
                 </div>
               )}
@@ -230,7 +230,7 @@ export default function DoctorProfilePage() {
             {/* Services */}
             {profile.services && (
               <div style={{ marginBottom: 40 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 12 }}>Services</div>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 12 }}>{t('profile.services')}</div>
                 <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
                   {profile.services.split(',').map((service, idx) => (
                     <span key={idx} style={{ background: '#f1f5f9', color: '#0f172a', padding: '6px 14px', borderRadius: 20, fontSize: 13, fontWeight: 600 }}>
@@ -244,23 +244,23 @@ export default function DoctorProfilePage() {
             {/* About Doctor */}
             {profile.about_doctor && (
               <div style={{ marginBottom: 40 }}>
-                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 12 }}>About Dr. {profile.doctor_name}</div>
+                <div style={{ fontSize: 12, fontWeight: 700, textTransform: 'uppercase', letterSpacing: 0.6, color: '#64748b', marginBottom: 12 }}>{t('profile.aboutDoctor')}: Dr. {profile.doctor_name}</div>
                 <p style={{ fontSize: 15, color: '#475569', lineHeight: 1.7 }}>{profile.about_doctor}</p>
               </div>
             )}
 
             {/* CTA Section */}
             <div style={{ background: 'linear-gradient(135deg, rgba(37,99,235,0.05), rgba(20,184,166,0.05))', borderRadius: 16, padding: '32px', textAlign: 'center', border: '1px solid rgba(37,99,235,0.1)' }}>
-              <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', margin: '0 0 12px' }}>Book an Appointment</h2>
-              <p style={{ fontSize: 16, color: '#64748b', margin: '0 0 24px' }}>Visit {profile.name} and consult with Dr. {profile.doctor_name}</p>
+              <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', margin: '0 0 12px' }}>{t('profile.bookNow')}</h2>
+              <p style={{ fontSize: 16, color: '#64748b', margin: '0 0 24px' }}>{t('profile.bookSub')} — {profile.name}</p>
               <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap' }}>
                 {profile.phone && (
-                  <a href={`tel:${profile.phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#2563eb', color: 'white', padding: '12px 24px', borderRadius: 10, fontWeight: 700, textDecoration: 'none' }}>
-                    📞 Call Now
+                  <a href={`tel:${profile.phone}`} style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: '#2563eb', color: 'white', padding: '14px 28px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', minHeight: 48, fontSize: 15 }}>
+                    📞 {t('common.callNow')}
                   </a>
                 )}
-                <Link href="/doctor/setup" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#2563eb', padding: '12px 24px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', border: '2px solid #2563eb' }}>
-                  Register Your Clinic
+                <Link href="/doctor/setup" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, background: 'white', color: '#2563eb', padding: '14px 28px', borderRadius: 10, fontWeight: 700, textDecoration: 'none', border: '2px solid #2563eb', minHeight: 48, fontSize: 15 }}>
+                  {t('common.register')}
                 </Link>
               </div>
             </div>

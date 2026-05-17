@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
+import { useLocale, LanguageToggle } from '@/features/i18n/LocaleProvider';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
@@ -20,6 +21,7 @@ interface Doctor {
 }
 
 export default function DoctorsPage() {
+  const { t } = useLocale();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [loading, setLoading] = useState(true);
   const [filterCity, setFilterCity] = useState('');
@@ -69,32 +71,32 @@ export default function DoctorsPage() {
             <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg,#2563eb,#14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 11 }}>CS</div>
             <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 15 }}>ClinicSathi</span>
           </Link>
-          <Link href="/doctor/setup" style={{ background: '#2563eb', color: 'white', padding: '8px 14px', borderRadius: 10, fontWeight: 700, fontSize: 12, textDecoration: 'none', whiteSpace: 'nowrap', flexShrink: 0 }}>
-            Register Clinic
-          </Link>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
+            <LanguageToggle compact />
+            <Link href="/doctor/setup" style={{ background: '#2563eb', color: 'white', padding: '10px 14px', borderRadius: 10, fontWeight: 700, fontSize: 12, textDecoration: 'none', whiteSpace: 'nowrap', minHeight: 40, display: 'inline-flex', alignItems: 'center' }}>
+              {t('common.register')}
+            </Link>
+          </div>
         </div>
       </header>
 
       {/* Hero Section */}
-      <div style={{ background: 'linear-gradient(135deg, #2563eb, #14b8a6)', padding: '80px 24px', textAlign: 'center', color: 'white' }}>
-        <h1 style={{ fontSize: 48, fontWeight: 900, margin: '0 0 16px', lineHeight: 1.2 }}>Doctors With Us</h1>
-        <p style={{ fontSize: 20, margin: '0 0 32px', opacity: 0.95, maxWidth: 600, marginLeft: 'auto', marginRight: 'auto' }}>
-          Find qualified doctors across India. Browse our network of healthcare providers and book appointments.
-        </p>
-        <div style={{ display: 'flex', gap: 16, justifyContent: 'center', flexWrap: 'wrap', maxWidth: 500, margin: '0 auto' }}>
+      <div style={{ background: 'linear-gradient(135deg, #2563eb, #14b8a6)', padding: '60px 20px 80px', textAlign: 'center', color: 'white' }}>
+        <h1 style={{ fontSize: 'clamp(28px, 6vw, 48px)', fontWeight: 900, margin: '0 0 16px', lineHeight: 1.2 }}>{t('directory.title')}</h1>
+        <div style={{ display: 'flex', gap: 12, justifyContent: 'center', flexWrap: 'wrap', maxWidth: 500, margin: '24px auto 0' }}>
           <input
             type="text"
-            placeholder="Search by city..."
+            placeholder={t('directory.cityFilter')}
             value={filterCity}
             onChange={e => setFilterCity(e.target.value)}
-            style={{ flex: 1, minWidth: 200, padding: '12px 16px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 500 }}
+            style={{ flex: 1, minWidth: 180, padding: '14px 16px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 500, minHeight: 48 }}
           />
           <input
             type="text"
-            placeholder="Search by specialization..."
+            placeholder={t('directory.specFilter')}
             value={filterSpecialization}
             onChange={e => setFilterSpecialization(e.target.value)}
-            style={{ flex: 1, minWidth: 200, padding: '12px 16px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 500 }}
+            style={{ flex: 1, minWidth: 180, padding: '14px 16px', borderRadius: 10, border: 'none', fontSize: 14, fontWeight: 500, minHeight: 48 }}
           />
         </div>
       </div>
@@ -110,7 +112,7 @@ export default function DoctorsPage() {
         ) : doctors.length === 0 ? (
           <div style={{ textAlign: 'center', padding: '80px 24px' }}>
             <p style={{ fontSize: 64, marginBottom: 16 }}>🔍</p>
-            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>No doctors found</h2>
+            <h2 style={{ fontSize: 24, fontWeight: 800, color: '#0f172a', marginBottom: 8 }}>{t('directory.noResults')}</h2>
             <p style={{ color: '#64748b', marginBottom: 24 }}>Try adjusting your search filters or check back later.</p>
             <button
               onClick={() => { setFilterCity(''); setFilterSpecialization(''); }}

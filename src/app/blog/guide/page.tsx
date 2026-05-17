@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import React from 'react';
+import { ProductShowcase } from '@/features/landing/ProductShowcase';
 
 export const metadata = {
   title: 'Complete Guide to ClinicSathi | Step-by-Step Tutorial',
@@ -35,17 +36,16 @@ function VisualMockup({ type, title, description }: VisualMockupProps) {
             </div>
             <div className="grid grid-cols-2 gap-3">
               <div>
-                <div className="text-xs text-slate-500 mb-1">Mobile Number</div>
+                <div className="text-xs text-slate-500 mb-1">Mobile Number (Login ID)</div>
                 <div className="h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">98765 43210</div>
               </div>
               <div>
-                <div className="text-xs text-slate-500 mb-1">Password</div>
-                <div className="h-10 bg-slate-100 rounded-lg border border-slate-200 px-3 flex items-center text-sm text-slate-600">••••••••</div>
+                <div className="text-xs text-slate-500 mb-1">Specialization</div>
+                <div className="h-10 bg-blue-50 rounded-lg border border-blue-200 px-3 flex items-center text-sm text-blue-700">General Physician</div>
               </div>
             </div>
-            <div>
-              <div className="text-xs text-slate-500 mb-1">Specialization</div>
-              <div className="h-10 bg-blue-50 rounded-lg border border-blue-200 px-3 flex items-center text-sm text-blue-700">General Physician</div>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3 text-xs text-emerald-700 font-semibold">
+              ✓ No password needed — login is OTP-based via your mobile number
             </div>
           </div>
           <div className="flex justify-end gap-2 pt-4 border-t border-slate-100">
@@ -198,24 +198,23 @@ function VisualMockup({ type, title, description }: VisualMockupProps) {
       <div className="bg-white rounded-xl shadow-lg border border-slate-200 p-8 max-w-sm mx-auto">
         <div className="text-center mb-6">
           <div className="w-16 h-16 bg-gradient-to-tr from-blue-600 to-teal-400 rounded-2xl flex items-center justify-center text-white text-2xl font-bold mx-auto mb-4">CS</div>
-          <h3 className="text-xl font-bold text-slate-800">Welcome Back</h3>
-          <p className="text-sm text-slate-500">Sign in to your clinic dashboard</p>
+          <h3 className="text-xl font-bold text-slate-800">OTP Login</h3>
+          <p className="text-sm text-slate-500">No passwords — just your mobile number</p>
         </div>
         <div className="space-y-4">
           <div>
             <div className="text-xs text-slate-500 mb-1">Mobile Number</div>
-            <div className="h-12 bg-slate-50 rounded-xl border border-slate-200 px-4 flex items-center text-sm text-slate-700">98765 43210</div>
+            <div className="h-12 bg-slate-50 rounded-xl border border-slate-200 px-4 flex items-center text-sm text-slate-700">+91 98765 43210</div>
           </div>
           <div>
-            <div className="text-xs text-slate-500 mb-1">Password</div>
-            <div className="h-12 bg-slate-50 rounded-xl border border-slate-200 px-4 flex items-center text-sm text-slate-700">••••••••</div>
+            <div className="text-xs text-slate-500 mb-1">Enter 6-digit OTP (sent via SMS)</div>
+            <div className="h-12 bg-blue-50 rounded-xl border-2 border-blue-300 px-4 flex items-center text-sm text-blue-700 font-mono tracking-[0.4em] justify-center">8 4 2 _ _ _</div>
           </div>
           <div className="h-12 bg-gradient-to-r from-blue-600 to-teal-500 rounded-xl flex items-center justify-center text-white font-semibold shadow-md shadow-blue-500/25">
-            Sign In
+            Verify & Sign In
           </div>
-          <div className="text-center">
-            <span className="text-xs text-slate-400">Don't have an account? </span>
-            <span className="text-xs text-blue-600 font-medium">Register</span>
+          <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-2 text-center">
+            <span className="text-[11px] text-emerald-700 font-semibold">✓ OTP valid for 5 minutes</span>
           </div>
         </div>
       </div>
@@ -527,8 +526,11 @@ export default function GuidePage() {
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CS</div>
             <span className="font-extrabold text-slate-900">ClinicSathi</span>
           </Link>
-          <nav className="flex items-center gap-6 text-sm font-semibold text-slate-500">
-            <Link href="/blog" className="hover:text-slate-900 transition-colors">← Back to Blog</Link>
+          <nav className="flex items-center gap-4 text-sm font-semibold text-slate-500">
+            <Link href="/" className="hover:text-slate-900 transition-colors hidden sm:block">Home</Link>
+            <Link href="/doctor/setup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl transition-colors text-xs sm:text-sm">
+              Register Now →
+            </Link>
           </nav>
         </div>
       </header>
@@ -577,9 +579,12 @@ export default function GuidePage() {
         </div>
       </div>
 
+      {/* Latest Features — re-uses the landing-page ProductShowcase to avoid duplication */}
+      <ProductShowcase />
+
       {/* Main Content */}
       <main className="max-w-4xl mx-auto px-5 py-12">
-        
+
         {/* Section 1: Clinic Registration */}
         <section id="registration" className="mb-16 scroll-mt-24">
           <div className="flex items-center gap-3 mb-6">
@@ -598,9 +603,10 @@ export default function GuidePage() {
 
             <h3 className="text-xl font-bold text-slate-800 mt-8 mb-4">Step 1: Doctor Professional Details</h3>
             <p className="text-slate-600 mb-4">
-              Enter your professional information including your full name (with Dr. prefix), mobile number 
-              (this will be your login ID), password, degrees, years of experience, and specialization. 
-              The mobile number you enter here will be used for all future logins.
+              Enter your professional information: full name (with Dr. prefix), mobile number
+              (this will be your login ID — no password needed, login is OTP-based), degrees,
+              years of experience, and specialization. The mobile number is used for all future logins
+              via a one-time password sent to your phone.
             </p>
             
             <VisualMockup 
@@ -670,14 +676,16 @@ export default function GuidePage() {
 
           <div className="prose prose-slate max-w-none">
             <p className="text-lg text-slate-600 leading-relaxed">
-              The login page is accessible at <code className="bg-slate-100 px-2 py-1 rounded text-sm">/login</code>. 
-              Use your registered mobile number and password to access your dashboard.
+              The login page is accessible at <code className="bg-slate-100 px-2 py-1 rounded text-sm">/login</code>.
+              ClinicSathi uses <strong>OTP-based login</strong> — no passwords to remember.
+              Enter your 10-digit registered mobile number, receive a 6-digit OTP via SMS,
+              and you&apos;re signed in.
             </p>
 
-            <VisualMockup 
+            <VisualMockup
               type="login"
               title="Login Page"
-              description="Enter your 10-digit mobile number and password to sign in to your clinic dashboard."
+              description="Enter your 10-digit mobile number, get an OTP via SMS, verify, and you're in."
             />
 
             <h3 className="text-xl font-bold text-slate-800 mt-8 mb-4">Role-Based Dashboard Access</h3>

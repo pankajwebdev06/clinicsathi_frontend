@@ -10,7 +10,10 @@ import { ClinicSidebar } from '@/shared/components/ClinicSidebar';
 import { patientsApi } from '@/features/patients/api';
 import { queueApi } from '@/features/queue/api';
 import { DocumentUpload } from '@/features/reception/DocumentUpload';
+import { OfflineSyncBanner } from '@/features/reception/OfflineSyncBanner';
 import { useQueueSocket } from '@/hooks/useQueueSocket';
+import { syncManager } from '@/lib/sync/sync-manager';
+import { db } from '@/lib/db/schema';
 import Link from 'next/link';
 
 type FlowState = 'search' | 'loading' | 'history' | 'new_patient' | 'vitals' | 'token';
@@ -174,11 +177,27 @@ export default function ReceptionDashboard() {
           const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
           if (!userInfo.clinic_id) throw new Error('Clinic ID missing');
 
-          const pts = await patientsApi.getPatients(userInfo.clinic_id);
-          const found = pts.find((p: any) => p.mobile_number === mobileNumber);
+          // OFFLINE-FIRST: check the local IndexedDB cache first so this works
+          // even when navigator.onLine is false.
+          const localMatches = await db.searchPatientsByMobile(userInfo.clinic_id, mobileNumber)
+            .catch(() => [] as any[]);
+          let found: any = localMatches[0] || null;
+
+          // If we're online, also reconcile with the server (server may have
+          // patients that haven't been pulled to this device yet).
+          if (navigator.onLine) {
+            try {
+              const pts = await patientsApi.getPatients(userInfo.clinic_id);
+              const serverMatch = pts.find((p: any) => p.mobile_number === mobileNumber);
+              if (serverMatch) found = serverMatch;
+            } catch (netErr) {
+              // Network failed mid-search; fall through to local result
+              console.warn('Online search failed, using local cache:', netErr);
+            }
+          }
 
           if (found) {
-            setPatientData({ id: found.id, name: found.name, age: found.age.toString(), gender: found.gender, symptoms: '' });
+            setPatientData({ id: found.id, name: found.name, age: String(found.age), gender: found.gender, symptoms: '' });
             setFlowState('history');
           } else {
             setFlowState('new_patient');
@@ -208,20 +227,23 @@ export default function ReceptionDashboard() {
       if (!userInfo.clinic_id) throw new Error('Clinic ID missing');
 
       let pId = patientData.id;
+      // OFFLINE-FIRST: route through the SyncManager.
+      // - Online: writes to server + cache simultaneously
+      // - Offline: writes to IndexedDB + sync queue, returns a local id immediately
       if (!pId) {
-        const newPatient = await patientsApi.createPatient({
+        const newPatient = await syncManager.createPatient({
           name: patientData.name,
           mobile_number: mobileNumber,
           age: parseInt(patientData.age),
-          gender: patientData.gender,
+          gender: patientData.gender as any,
           clinic_id: userInfo.clinic_id,
-          consent_given: consentGiven
+          consent_given: consentGiven,
         });
         pId = newPatient.id;
         setPatientData(prev => ({ ...prev, id: pId }));
       }
 
-      const queueEntry = await queueApi.addToQueue({
+      const queueEntry = await syncManager.addToQueue({
         clinic_id: userInfo.clinic_id,
         patient_id: pId,
         priority: 0,
@@ -229,10 +251,12 @@ export default function ReceptionDashboard() {
         bp: vitals.bp,
         weight: vitals.weight,
         temperature: vitals.temperature,
-        pulse: vitals.pulse
+        pulse: vitals.pulse,
       });
 
-      setToken(queueEntry.token_number);
+      // Offline-created queue entries get token_number 'PENDING' — surface that
+      // honestly so the receptionist knows the real token will arrive after sync.
+      setToken(queueEntry.token_number === 'PENDING' ? 'PENDING (offline)' : queueEntry.token_number);
       setFlowState('token');
     } catch (err: any) {
       setError(err.message || 'Failed to generate token');
@@ -332,6 +356,9 @@ export default function ReceptionDashboard() {
             <span>{error}</span>
           </div>}
         </div>
+
+        {/* Offline-first status — visible only when offline OR sync pending */}
+        <OfflineSyncBanner />
 
         {/* Main card */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative">
@@ -488,9 +515,16 @@ export default function ReceptionDashboard() {
             {flowState === 'token' && (
               <div className="animate-in fade-in zoom-in-95 duration-500 max-w-md mx-auto mt-4">
                 <div className="border border-slate-200 rounded-2xl p-5 text-center bg-white shadow-sm">
-                  <div className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-emerald-100 text-emerald-600 mb-2 print:hidden text-xl">✓</div>
+                  <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full ${token.includes('PENDING') ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'} mb-2 print:hidden text-xl`}>
+                    {token.includes('PENDING') ? '⏳' : '✓'}
+                  </div>
                   <h4 className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-0.5">Token</h4>
-                  <h2 className="text-4xl font-extrabold text-slate-900 tracking-tighter mb-3">{token}</h2>
+                  <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tighter mb-3 break-words">{token}</h2>
+                  {token.includes('PENDING') && (
+                    <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2 mb-3 font-semibold">
+                      Saved locally — final token will appear here once the device reconnects.
+                    </p>
+                  )}
 
                   <div className="bg-slate-50 p-3 rounded-xl text-left border border-slate-100">
                     <p className="text-slate-400 text-[10px] mb-0.5 font-bold uppercase tracking-wider">Patient</p>
@@ -513,10 +547,10 @@ export default function ReceptionDashboard() {
                       });
                       window.open(`/prescription/print?${params.toString()}`, '_blank');
                     }}
-                    className="flex-1 flex items-center justify-center gap-1.5 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-600/20 transition-all active:scale-[0.98]">
+                    className="flex-1 flex items-center justify-center gap-1.5 py-3.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-sm font-bold shadow-md shadow-blue-600/20 transition-all active:scale-[0.98]">
                     🖨️ Print
                   </button>
-                  <button className="flex-1 py-2 bg-slate-100 text-slate-700 text-sm font-bold rounded-xl transition-all hover:bg-slate-200 active:scale-[0.98]" onClick={resetFlow}>New Patient</button>
+                  <button className="flex-1 py-3.5 bg-slate-100 text-slate-700 text-sm font-bold rounded-xl transition-all hover:bg-slate-200 active:scale-[0.98]" onClick={resetFlow}>New Patient</button>
                 </div>
               </div>
             )}
@@ -558,7 +592,7 @@ export default function ReceptionDashboard() {
                           <button onClick={() => {
                             setEditForm({ name: p.name, age: p.age.toString(), gender: p.gender, mobile_number: p.mobile_number });
                             setEditingPatientId(q.patient_id);
-                          }} className="text-blue-600 text-xs font-bold px-2 py-1 hover:bg-blue-50 rounded-lg">Edit</button>
+                          }} className="text-blue-600 text-xs font-bold px-3 py-2 hover:bg-blue-50 rounded-lg min-h-[36px]">Edit</button>
                         )}
                         <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusBadge(q.status)}`}>
                           {q.status.replace('_', ' ')}
