@@ -8,26 +8,21 @@ import React from 'react';
 
 function UploadProgressMockup() {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-5 max-w-sm mx-auto">
-      <div className="flex justify-between items-center mb-3">
-        <h4 className="font-bold text-slate-900 text-sm">Doctor Photo Preview</h4>
-        <span className="text-slate-400 text-lg leading-none">×</span>
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl p-4 w-full max-w-[320px] mx-auto overflow-hidden">
+      <div className="flex justify-between items-center mb-3 gap-2">
+        <h4 className="font-bold text-slate-900 text-sm truncate">Doctor Photo Preview</h4>
+        <span className="text-slate-400 text-lg leading-none flex-shrink-0">×</span>
       </div>
-      <div className="rounded-xl bg-gradient-to-br from-blue-100 to-teal-100 h-32 mb-3 flex items-center justify-center text-5xl">
+      <div className="rounded-xl bg-gradient-to-br from-blue-100 to-teal-100 h-28 mb-3 flex items-center justify-center text-5xl">
         👨‍⚕️
       </div>
-      <div className="mb-3">
+      <div className="mb-2">
         <div className="flex justify-between text-xs font-semibold mb-1.5">
           <span className="text-slate-600">Uploading...</span>
           <span className="text-blue-600">68%</span>
         </div>
         <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden">
-          <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full transition-all" style={{ width: '68%' }} />
-        </div>
-        <div className="flex justify-center gap-1 mt-2">
-          {[10, 20, 30, 40, 50, 60, 70, 80, 90, 100].map(p => (
-            <div key={p} className={`w-1.5 h-1.5 rounded-full ${p <= 68 ? 'bg-blue-500' : 'bg-slate-200'}`} />
-          ))}
+          <div className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 rounded-full" style={{ width: '68%' }} />
         </div>
       </div>
     </div>
@@ -36,20 +31,19 @@ function UploadProgressMockup() {
 
 function PrescriptionTemplateMockup() {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden max-w-sm mx-auto">
-      {/* Mini prescription preview */}
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden w-full max-w-[320px] mx-auto">
       <div className="border-t-4 border-emerald-600 bg-emerald-50/30">
-        <div className="bg-emerald-600 text-white p-3">
-          <div className="font-black text-xs">Mehra Health Clinic</div>
-          <div className="text-[10px] opacity-90">📞 9876543210 • Mumbai</div>
+        <div className="bg-emerald-600 text-white p-2.5">
+          <div className="font-black text-xs truncate">Mehra Health Clinic</div>
+          <div className="text-[10px] opacity-90 truncate">📞 9876543210 • Mumbai</div>
         </div>
-        <div className="p-3 border-b border-emerald-200/50">
-          <div className="font-bold text-emerald-700 text-xs">Dr. Anil Mehra</div>
-          <div className="text-[9px] text-slate-500">MBBS, MD • General Physician</div>
+        <div className="p-2.5 border-b border-emerald-200/50">
+          <div className="font-bold text-emerald-700 text-xs truncate">Dr. Anil Mehra</div>
+          <div className="text-[9px] text-slate-500 truncate">MBBS, MD • General Physician</div>
         </div>
-        <div className="p-3 grid grid-cols-4 gap-1 bg-emerald-50/20 text-[8px]">
+        <div className="p-2.5 grid grid-cols-4 gap-1 bg-emerald-50/20 text-[8px]">
           {['BP', 'Wt', 'Temp', 'Pulse'].map(v => (
-            <div key={v} className="bg-emerald-100/50 rounded p-1 text-center">
+            <div key={v} className="bg-emerald-100/50 rounded p-1 text-center min-w-0">
               <div className="text-slate-500">{v}</div>
               <div className="text-emerald-700 font-bold">—</div>
             </div>
@@ -62,10 +56,9 @@ function PrescriptionTemplateMockup() {
           ))}
         </div>
       </div>
-      {/* Theme picker hint */}
-      <div className="bg-slate-50 px-3 py-2 flex items-center justify-between border-t border-slate-100">
-        <span className="text-[10px] font-semibold text-slate-500">5 themes + custom letterhead</span>
-        <div className="flex gap-1">
+      <div className="bg-slate-50 px-3 py-2 flex items-center justify-between border-t border-slate-100 gap-2">
+        <span className="text-[10px] font-semibold text-slate-500 truncate">5 themes + custom</span>
+        <div className="flex gap-1 flex-shrink-0">
           {['#1e40af', '#15803d', '#9f1239', '#0f766e', '#1e293b'].map(c => (
             <div key={c} className="w-3 h-3 rounded-full ring-1 ring-white" style={{ background: c }} />
           ))}
@@ -77,46 +70,40 @@ function PrescriptionTemplateMockup() {
 
 function PublicProfileMockup() {
   return (
-    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden max-w-sm mx-auto">
-      {/* Browser bar */}
+    <div className="bg-white rounded-2xl border border-slate-200 shadow-xl overflow-hidden w-full max-w-[320px] mx-auto">
       <div className="bg-slate-100 px-3 py-2 flex items-center gap-2 border-b border-slate-200">
-        <div className="w-2 h-2 rounded-full bg-red-400" />
-        <div className="w-2 h-2 rounded-full bg-amber-400" />
-        <div className="w-2 h-2 rounded-full bg-emerald-400" />
-        <div className="flex-1 bg-white rounded-md px-2 py-1 text-[9px] text-slate-500 truncate font-mono">
-          clinicsathi.in/doctor/dr-anil-mehra-cardiologist-mumbai
+        <div className="w-2 h-2 rounded-full bg-red-400 flex-shrink-0" />
+        <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
+        <div className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
+        <div className="flex-1 bg-white rounded-md px-2 py-1 text-[9px] text-slate-500 truncate font-mono min-w-0">
+          clinicsathi.in/doctor/dr-…-mumbai
         </div>
       </div>
-      {/* Hero */}
-      <div className="bg-gradient-to-br from-blue-600 to-teal-500 p-4 text-white">
-        <div className="flex gap-3 items-start">
-          <div className="w-12 h-12 rounded-xl bg-white/30 flex items-center justify-center text-2xl flex-shrink-0">👨‍⚕️</div>
-          <div className="min-w-0">
-            <div className="font-black text-sm leading-tight">Dr. Anil Mehra</div>
-            <div className="text-[10px] opacity-90 font-semibold">Cardiologist • Mumbai</div>
-            <div className="text-[9px] opacity-80 mt-0.5">12 years experience</div>
+      <div className="bg-gradient-to-br from-blue-600 to-teal-500 p-3 text-white">
+        <div className="flex gap-2 items-start">
+          <div className="w-10 h-10 rounded-xl bg-white/30 flex items-center justify-center text-xl flex-shrink-0">👨‍⚕️</div>
+          <div className="min-w-0 flex-1">
+            <div className="font-black text-sm leading-tight truncate">Dr. Anil Mehra</div>
+            <div className="text-[10px] opacity-90 font-semibold truncate">Cardiologist • Mumbai</div>
+            <div className="text-[9px] opacity-80 mt-0.5">12 yrs exp</div>
           </div>
         </div>
       </div>
-      {/* Info */}
       <div className="p-3 grid grid-cols-2 gap-2 text-[10px]">
-        <div>
+        <div className="min-w-0">
           <div className="text-[8px] uppercase text-slate-400 font-bold">Fee</div>
           <div className="font-bold text-slate-800">₹500</div>
         </div>
-        <div>
+        <div className="min-w-0">
           <div className="text-[8px] uppercase text-slate-400 font-bold">MCI No.</div>
-          <div className="font-bold text-slate-800">MH-12345</div>
+          <div className="font-bold text-slate-800 truncate">MH-12345</div>
         </div>
       </div>
-      {/* CTA */}
       <div className="px-3 pb-3">
-        <div className="bg-blue-600 rounded-lg py-2 text-center text-white text-[10px] font-bold">
-          📞 Call Now
-        </div>
+        <div className="bg-blue-600 rounded-lg py-2 text-center text-white text-[10px] font-bold">📞 Call Now</div>
       </div>
-      <div className="bg-emerald-50 border-t border-emerald-100 px-3 py-1.5 text-[9px] text-emerald-700 font-semibold text-center">
-        ✓ Indexed by Google • SEO optimized
+      <div className="bg-emerald-50 border-t border-emerald-100 px-3 py-1.5 text-[9px] text-emerald-700 font-semibold text-center truncate">
+        ✓ Google-indexed SEO page
       </div>
     </div>
   );
@@ -124,28 +111,28 @@ function PublicProfileMockup() {
 
 function RealtimeQueueMockup() {
   return (
-    <div className="bg-slate-900 rounded-2xl shadow-xl overflow-hidden max-w-sm mx-auto">
-      <div className="px-4 py-3 border-b border-slate-800 flex items-center justify-between">
-        <div>
-          <h4 className="font-bold text-white text-sm">Live Queue</h4>
-          <div className="text-[10px] text-slate-400">WebSocket • All devices sync</div>
+    <div className="bg-slate-900 rounded-2xl shadow-xl overflow-hidden w-full max-w-[320px] mx-auto">
+      <div className="px-3 py-3 border-b border-slate-800 flex items-center justify-between gap-2">
+        <div className="min-w-0">
+          <h4 className="font-bold text-white text-sm truncate">Live Queue</h4>
+          <div className="text-[10px] text-slate-400 truncate">Real-time sync</div>
         </div>
-        <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-full">
+        <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/20 text-emerald-400 text-[10px] font-bold rounded-full flex-shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
           LIVE
         </div>
       </div>
-      <div className="p-3 space-y-2">
+      <div className="p-2.5 space-y-1.5">
         {[
-          { token: 'M-001', name: 'Rahul Sharma', status: 'in_consultation', color: 'bg-blue-500/20 text-blue-300', label: 'In Room' },
-          { token: 'M-002', name: 'Priya Patel', status: 'waiting', color: 'bg-amber-500/20 text-amber-300', label: 'Waiting' },
-          { token: 'M-003', name: 'Anjali Kumar', status: 'waiting', color: 'bg-amber-500/20 text-amber-300', label: 'Waiting' },
-          { token: 'M-004', name: 'Vikram Singh', status: 'completed', color: 'bg-emerald-500/20 text-emerald-300', label: 'Done' },
+          { token: 'M-001', name: 'Rahul Sharma', color: 'bg-blue-500/20 text-blue-300', label: 'In' },
+          { token: 'M-002', name: 'Priya Patel',  color: 'bg-amber-500/20 text-amber-300', label: 'Wait' },
+          { token: 'M-003', name: 'Anjali Kumar', color: 'bg-amber-500/20 text-amber-300', label: 'Wait' },
+          { token: 'M-004', name: 'Vikram Singh', color: 'bg-emerald-500/20 text-emerald-300', label: 'Done' },
         ].map(p => (
-          <div key={p.token} className="bg-slate-800/50 rounded-lg p-2.5 flex items-center gap-2.5 border border-slate-700/50">
-            <span className="font-black text-white text-xs w-12 flex-shrink-0">{p.token}</span>
-            <span className="flex-1 text-slate-300 text-xs truncate font-medium">{p.name}</span>
-            <span className={`px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider ${p.color}`}>{p.label}</span>
+          <div key={p.token} className="bg-slate-800/50 rounded-lg p-2 flex items-center gap-2 border border-slate-700/50">
+            <span className="font-black text-white text-[11px] w-10 flex-shrink-0">{p.token}</span>
+            <span className="flex-1 text-slate-300 text-[11px] truncate font-medium min-w-0">{p.name}</span>
+            <span className={`px-1.5 py-0.5 rounded-full text-[9px] font-bold uppercase ${p.color} flex-shrink-0`}>{p.label}</span>
           </div>
         ))}
       </div>
@@ -186,37 +173,34 @@ const SHOWCASES = [
 
 export function ProductShowcase() {
   return (
-    <section className="py-20 md:py-28 bg-gradient-to-b from-white via-slate-50/50 to-white">
-      <div className="max-w-6xl mx-auto px-5">
-        <div className="text-center mb-12 md:mb-16">
+    <section className="py-16 md:py-28 bg-gradient-to-b from-white via-slate-50/50 to-white overflow-hidden">
+      <div className="max-w-6xl mx-auto px-4 md:px-5">
+        <div className="text-center mb-10 md:mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-blue-50 border border-blue-100 text-blue-700 text-xs font-bold mb-4">
             ✨ Recently shipped
           </div>
-          <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
-            See what's inside
+          <h2 className="text-2xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
+            See what&apos;s inside
           </h2>
-          <p className="text-slate-500 text-base md:text-lg font-medium max-w-2xl mx-auto">
-            Real screenshots of features your patients and staff use every day.
+          <p className="text-slate-500 text-sm md:text-lg font-medium max-w-2xl mx-auto">
+            A peek at features your staff use every day.
           </p>
         </div>
 
-        <div className="grid md:grid-cols-2 gap-10 md:gap-12">
-          {SHOWCASES.map((s, i) => (
-            <div key={s.title} className="flex flex-col items-center text-center group">
-              {/* Mockup */}
-              <div className="relative w-full mb-6 transition-transform group-hover:-translate-y-1 duration-300">
-                {/* Glow */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-12">
+          {SHOWCASES.map(s => (
+            <div key={s.title} className="flex flex-col items-center text-center min-w-0">
+              <div className="relative w-full mb-5 md:mb-6 min-w-0">
                 <div className="absolute inset-x-0 -bottom-6 h-12 bg-blue-200/40 blur-2xl rounded-full -z-10" />
                 {s.mockup}
               </div>
 
-              {/* Caption */}
-              <div className="max-w-sm">
-                <div className="flex items-center justify-center gap-2 mb-2">
+              <div className="w-full max-w-sm px-2">
+                <div className="flex items-center justify-center flex-wrap gap-2 mb-2">
                   <span className={`px-2 py-0.5 rounded-full text-[10px] font-black tracking-wider ${s.tagColor}`}>
                     {s.tag}
                   </span>
-                  <h3 className="font-bold text-slate-900 text-lg">{s.title}</h3>
+                  <h3 className="font-bold text-slate-900 text-base md:text-lg">{s.title}</h3>
                 </div>
                 <p className="text-slate-500 text-sm font-medium leading-relaxed">{s.sub}</p>
               </div>

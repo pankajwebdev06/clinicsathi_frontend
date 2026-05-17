@@ -1,6 +1,7 @@
 'use client';
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Locale, LOCALES, STRINGS } from './strings';
+import { authApi } from '@/features/auth/api';
 
 interface LocaleContextValue {
   locale: Locale;
@@ -28,15 +29,25 @@ function lookup(path: string, locale: Locale): string {
 export function LocaleProvider({ children }: { children: ReactNode }) {
   const [locale, setLocaleState] = useState<Locale>('en');
 
-  // Read persisted locale on mount + watch browser default as a fallback
+  // Resolution order on mount:
+  //   1. user_info.preferred_language (set after login from backend /me)
+  //   2. localStorage[STORAGE_KEY] (last in-session choice)
+  //   3. navigator.language (browser default)
   useEffect(() => {
     try {
+      const userInfoStr = localStorage.getItem('user_info');
+      if (userInfoStr) {
+        const userInfo = JSON.parse(userInfoStr);
+        if (userInfo?.preferred_language && LOCALES.some(l => l.code === userInfo.preferred_language)) {
+          setLocaleState(userInfo.preferred_language as Locale);
+          return;
+        }
+      }
       const saved = localStorage.getItem(STORAGE_KEY) as Locale | null;
       if (saved && LOCALES.some(l => l.code === saved)) {
         setLocaleState(saved);
         return;
       }
-      // Auto-detect from browser if no saved preference
       if (typeof navigator !== 'undefined') {
         const browser = navigator.language?.toLowerCase() || '';
         if (browser.startsWith('hi')) setLocaleState('hi');
@@ -47,6 +58,13 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
   const setLocale = (l: Locale) => {
     setLocaleState(l);
     try { localStorage.setItem(STORAGE_KEY, l); } catch { /* ignore */ }
+    // Fire-and-forget backend sync — only attempts if the user is authenticated.
+    // Public visitors browsing /doctors or /doctor/[slug] won't hit this.
+    if (typeof window !== 'undefined' && localStorage.getItem('auth_token')) {
+      authApi.updateMyPreferences({ preferred_language: l }).catch(() => {
+        /* silent — locale still applies locally even if backend sync fails */
+      });
+    }
   };
 
   const t = (path: string) => lookup(path, locale);

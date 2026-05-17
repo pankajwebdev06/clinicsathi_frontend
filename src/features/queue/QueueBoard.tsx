@@ -50,16 +50,17 @@ export function QueueBoard({ clinicId, queue, onSelect, isConnected }: { clinicI
               }`}
             >
               <div className="flex items-center gap-3 min-w-0 flex-1">
-                <div className={`w-11 h-11 flex-shrink-0 rounded-xl flex items-center justify-center font-black text-sm shadow-sm transition-colors duration-300 ${
-                  isActive ? 'bg-blue-600 text-white shadow-blue-600/30' : 'bg-slate-100 text-slate-700'
+                <div className={`w-14 h-14 md:w-16 md:h-16 flex-shrink-0 rounded-2xl flex flex-col items-center justify-center shadow-sm transition-colors duration-300 ${
+                  isActive ? 'bg-blue-600 text-white shadow-blue-600/30' : 'bg-slate-100 text-slate-800'
                 }`}>
-                  {entry.token_number}
+                  <span className="text-[9px] font-bold uppercase tracking-wider opacity-70 leading-none">Token</span>
+                  <span className="font-black text-base md:text-lg leading-tight mt-0.5">{entry.token_number || '—'}</span>
                 </div>
-                <div className="min-w-0">
-                  <p className={`font-bold text-sm md:text-base truncate ${isActive ? 'text-blue-900' : 'text-slate-800'}`}>
-                    {entry.patient_name}
+                <div className="min-w-0 flex-1">
+                  <p className={`font-bold text-base md:text-lg truncate leading-tight ${isActive ? 'text-blue-900' : 'text-slate-900'}`}>
+                    {entry.patient_name || 'Loading…'}
                   </p>
-                  <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex items-center gap-2 mt-1 flex-wrap">
                     <Badge variant={getStatusColor(entry.status)} className="text-[10px] uppercase font-bold tracking-wider">
                       {entry.status.replace('_', ' ')}
                     </Badge>

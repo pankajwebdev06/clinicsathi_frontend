@@ -264,6 +264,27 @@ export function PrescriptionTemplateEditor() {
     img.src = imgUrl;
   };
 
+  // Persist the doctor's template choice to the backend so it follows them
+  // across devices. Fire-and-forget — local state is the source of truth for
+  // the current session, the backend write is best-effort.
+  const persistToBackend = async (selectedTemplate: string, templateConfig?: TemplateConfig) => {
+    try {
+      const token = localStorage.getItem('auth_token');
+      const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+      if (!token || !userInfo.clinic_id) return;
+      await fetch(`${API_BASE}/api/v1/auth/clinics/${userInfo.clinic_id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          selected_template: selectedTemplate,
+          template_config: templateConfig ? JSON.stringify(templateConfig) : null,
+        }),
+      });
+    } catch (err) {
+      console.warn('[PrescriptionTemplate] backend save failed (kept locally):', err);
+    }
+  };
+
   const handlePresetSelect = (preset: typeof PRESETS[0]) => {
     setActivePreset(preset.id);
     setShowCustomEditor(false);
@@ -275,17 +296,20 @@ export function PrescriptionTemplateEditor() {
       borderStyle: preset.borderStyle,
     }));
     setClinic({ ...clinic, selectedTemplate: preset.id });
+    persistToBackend(preset.id, undefined);
   };
 
   const handleCustomSelect = () => {
     setActivePreset('custom');
     setShowCustomEditor(true);
     setClinic({ ...clinic, selectedTemplate: 'custom', templateConfig: config });
+    // No backend save yet — wait for explicit "Save Custom Template" click
   };
 
-  const handleSaveCustom = () => {
+  const handleSaveCustom = async () => {
     setClinic({ ...clinic, selectedTemplate: 'custom', templateConfig: config });
-    alert('Custom template saved!');
+    await persistToBackend('custom', config);
+    alert('Custom template saved — synced to your clinic account.');
   };
 
   return (

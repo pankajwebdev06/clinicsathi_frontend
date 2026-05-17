@@ -87,4 +87,13 @@ export const authApi = {
       method: "GET",
     });
   },
+
+  // Persist user's preferred language so it follows them across devices and
+  // future SMS / email templates can be rendered in the right language.
+  async updateMyPreferences(data: { preferred_language?: string }) {
+    return apiClient("/auth/me/preferences", {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  },
 };

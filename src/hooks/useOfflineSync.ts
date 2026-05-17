@@ -12,14 +12,13 @@ interface OfflineSyncState {
 /**
  * Reception-side offline-sync hook.
  *
- * - Tracks navigator online/offline transitions
- * - Polls the sync queue for pending count
- * - Exposes a manual `syncNow()` trigger
- * - Auto-starts the sync manager on mount (idempotent)
+ * Event-driven — NO polling. Refreshes only when:
+ *   - `navigator` fires `online` / `offline`
+ *   - SyncManager notifies (sync started, finished, or new item queued)
  *
- * Used by the reception dashboard (the only surface that needs offline mode).
+ * This keeps the banner accurate without burning a timer in the background.
  */
-export function useOfflineSync(pollIntervalMs = 5_000): OfflineSyncState & { syncNow: () => Promise<void> } {
+export function useOfflineSync(): OfflineSyncState & { syncNow: () => Promise<void> } {
   const [isOnline, setIsOnline] = useState(typeof navigator !== 'undefined' ? navigator.onLine : true);
   const [state, setState] = useState<OfflineSyncState>({
     isOnline: true,
@@ -38,7 +37,7 @@ export function useOfflineSync(pollIntervalMs = 5_000): OfflineSyncState & { syn
         lastSync: status.lastSync,
       });
     } catch {
-      /* IndexedDB may not be available — degrade gracefully */
+      /* IndexedDB unavailable — degrade gracefully */
     }
   }, []);
 
@@ -48,13 +47,13 @@ export function useOfflineSync(pollIntervalMs = 5_000): OfflineSyncState & { syn
       await syncManager.startSync();
     } catch (err) {
       console.warn('[useOfflineSync] manual sync failed:', err);
-    } finally {
-      refresh();
     }
+    // SyncManager notify() fires on its own, but call refresh explicitly so
+    // we don't depend on the subscriber ordering.
+    refresh();
   }, [refresh]);
 
   useEffect(() => {
-    // Kick off auto-sync listeners once
     syncManager.startAutoSync();
 
     const handleOnline = () => { setIsOnline(true); refresh(); };
@@ -62,16 +61,19 @@ export function useOfflineSync(pollIntervalMs = 5_000): OfflineSyncState & { syn
     window.addEventListener('online', handleOnline);
     window.addEventListener('offline', handleOffline);
 
-    // Initial + periodic refresh of sync status
+    // Subscribe to SyncManager state changes — fires when items are queued
+    // or a sync run starts / completes.
+    const unsubscribe = syncManager.onChange(refresh);
+
+    // One initial read so the banner reflects current state on mount
     refresh();
-    const id = setInterval(refresh, pollIntervalMs);
 
     return () => {
       window.removeEventListener('online', handleOnline);
       window.removeEventListener('offline', handleOffline);
-      clearInterval(id);
+      unsubscribe();
     };
-  }, [pollIntervalMs, refresh]);
+  }, [refresh]);
 
   return { ...state, isOnline, syncNow };
 }

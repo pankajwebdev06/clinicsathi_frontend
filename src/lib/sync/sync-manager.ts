@@ -19,6 +19,20 @@ class SyncManager {
   private retryInterval = 30000; // 30 seconds
   private maxRetries = 5;
 
+  // ── Event subscribers — used by useOfflineSync to update the banner
+  // without any polling. We notify whenever the sync queue could have
+  // changed (start/end of sync, an operation queued for later).
+  private listeners = new Set<() => void>();
+
+  onChange(listener: () => void): () => void {
+    this.listeners.add(listener);
+    return () => { this.listeners.delete(listener); };
+  }
+
+  private notify(): void {
+    this.listeners.forEach(l => { try { l(); } catch { /* ignore subscriber errors */ } });
+  }
+
   // ------------------------------------------
   // Public Methods
   // ------------------------------------------
@@ -36,6 +50,7 @@ class SyncManager {
     }
 
     this.syncing = true;
+    this.notify();   // banner can flip to "Syncing…"
     const results: SyncResult = { synced: [], conflicts: [] };
 
     try {
@@ -62,25 +77,44 @@ class SyncManager {
       return results;
     } finally {
       this.syncing = false;
+      this.notify();   // banner can clear or update remaining pending count
     }
   }
 
   /**
-   * Auto-sync when coming back online
+   * Auto-sync ONLY on real network events — no periodic polling.
+   *
+   * Triggers:
+   *   1. App startup, if currently online AND there are pending items
+   *   2. The browser's `online` event (offline → online transition)
+   *
+   * Online-state writes (createPatient / addToQueue) hit the API synchronously
+   * via `await`, so when the receptionist is connected nothing ever lands in
+   * the sync queue in the first place — there's nothing to "wait" for.
+   *
+   * Removed: 30-second periodic interval. It was a no-op when the queue was
+   * empty (the common case) and caused user confusion ("why is it always
+   * trying to sync?"). If a queued item fails its initial API attempt, it'll
+   * be retried the next time the device toggles back online.
    */
+  private autoSyncInitialised = false;
+
   startAutoSync(): void {
-    // Sync when coming online
+    if (this.autoSyncInitialised) return;   // idempotent: safe to call from multiple mount points
+    this.autoSyncInitialised = true;
+
+    // Reconnect handler
     window.addEventListener('online', () => {
-      console.log('[SyncManager] Back online, starting sync...');
+      console.log('[SyncManager] Back online — draining sync queue…');
       this.startSync().catch(console.error);
     });
 
-    // Periodic sync when online
-    setInterval(() => {
-      if (navigator.onLine && !this.syncing) {
-        this.startSync().catch(console.error);
-      }
-    }, this.retryInterval);
+    // Startup sweep — flush anything left over from a previous offline session
+    if (navigator.onLine) {
+      db.getPendingSyncCount()
+        .then(count => { if (count > 0) this.startSync().catch(console.error); })
+        .catch(() => { /* IndexedDB unavailable — nothing to flush */ });
+    }
   }
 
   /**
@@ -98,6 +132,7 @@ class SyncManager {
       timestamp: new Date(),
       retryCount: 0,
     });
+    this.notify();   // a new pending item appeared
   }
 
   /**

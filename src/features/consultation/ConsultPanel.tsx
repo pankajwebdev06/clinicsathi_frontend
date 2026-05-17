@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react'
-import { Card, Button, Badge } from '@/components/ui'
+import { Card, Badge } from '@/components/ui'
 import { HistoryPreview } from './HistoryPreview'
-import { VisitDetailModal } from './VisitDetailModal'
+import { PatientProfileModal } from './PatientProfileModal'
 import { consultationApi } from './api'
 import { queueApi } from '@/features/queue/api'
+import { FileText, ImageIcon, FolderOpen } from 'lucide-react'
 
 export function ConsultPanel({ patient, onActionComplete }: { patient: any, onActionComplete?: () => void }) {
   const patientId = patient?.patientId || '';
   const queueId = patient?.id || '';
-  const [selectedVisitId, setSelectedVisitId] = useState<string | null>(null)
+  const [profileOpen, setProfileOpen] = useState(false)
   const [history, setHistory] = useState<any[]>([])
   const [isProcessing, setIsProcessing] = useState(false)
+
+  // Quick aggregate for the "Open Profile" button label
+  const totalAttachments = history.reduce((acc: number, h: any) => {
+    let n = h.handwritten_prescription_url ? 1 : 0
+    try { n += JSON.parse(h.reports || '[]').length } catch { /* ignore */ }
+    return acc + n
+  }, 0)
 
   useEffect(() => {
     if (patientId) {
@@ -71,18 +79,40 @@ export function ConsultPanel({ patient, onActionComplete }: { patient: any, onAc
         </div>
       </Card>
       
-      {/* 2. History Preview */}
+      {/* 2. Patient Profile — full history button (only when there's something) */}
+      {history.length > 0 && (
+        <button
+          onClick={() => setProfileOpen(true)}
+          className="w-full flex items-center justify-between gap-3 p-4 bg-gradient-to-r from-teal-50 to-blue-50 border-2 border-teal-200 hover:border-teal-400 rounded-2xl transition-all text-left active:scale-[0.99]"
+        >
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="flex-shrink-0 w-11 h-11 rounded-xl bg-teal-600 text-white flex items-center justify-center">
+              <FolderOpen size={20} />
+            </div>
+            <div className="min-w-0">
+              <p className="font-bold text-slate-900 text-sm leading-tight">Open Patient Profile</p>
+              <p className="text-xs text-slate-600 mt-0.5">
+                {history.length} visit{history.length === 1 ? '' : 's'}
+                {totalAttachments > 0 && ` • ${totalAttachments} attachment${totalAttachments === 1 ? '' : 's'}`}
+              </p>
+            </div>
+          </div>
+          <span className="flex-shrink-0 text-teal-700 text-sm font-bold">View →</span>
+        </button>
+      )}
+
+      {/* 3. History Preview strip (kept for quick glance) */}
       <section className="space-y-3">
-        <HistoryPreview 
-          patientId={patientId} 
+        <HistoryPreview
+          patientId={patientId}
           history={history.map(h => ({
             id: h.id,
-            date: new Date(h.created_at).toLocaleDateString(),
+            date: new Date(h.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short' }),
             diagnosis: h.diagnosis || 'Handwritten Prescription',
             hasImages: !!h.handwritten_prescription_url,
-            hasReports: h.reports && JSON.parse(h.reports).length > 0
-          }))} 
-          onSelectVisit={(id) => setSelectedVisitId(id)} 
+            hasReports: !!(h.reports && JSON.parse(h.reports || '[]').length > 0)
+          }))}
+          onSelectVisit={() => setProfileOpen(true)}
         />
       </section>
 
@@ -111,17 +141,17 @@ export function ConsultPanel({ patient, onActionComplete }: { patient: any, onAc
         </button>
       </div>
 
-      {/* Modal for viewing history detail */}
-      <VisitDetailModal 
-        isOpen={!!selectedVisitId} 
-        onClose={() => setSelectedVisitId(null)}
-        visitData={selectedVisitId && history.find(h => h.id === selectedVisitId) ? {
-          id: selectedVisitId,
-          date: new Date(history.find(h => h.id === selectedVisitId)!.created_at).toLocaleDateString(),
-          diagnosis: history.find(h => h.id === selectedVisitId)!.diagnosis || 'Handwritten Prescription',
-          doctorNotes: history.find(h => h.id === selectedVisitId)!.doctor_notes || '',
-          prescriptionUrl: history.find(h => h.id === selectedVisitId)!.handwritten_prescription_url || ''
+      {/* Full patient profile — all visits, all prescriptions, all reports, timeline */}
+      <PatientProfileModal
+        isOpen={profileOpen}
+        onClose={() => setProfileOpen(false)}
+        patient={patient ? {
+          name: patient.name,
+          age: patient.age,
+          gender: patient.gender,
+          mobile: patient.mobile,
         } : null}
+        visits={history}
       />
     </div>
   )

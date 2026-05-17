@@ -83,6 +83,13 @@ export default function DoctorDashboard() {
         const realClinicData = await authApi.getClinic(userInfo.clinic_id);
         
         // Map backend response to frontend ClinicData structure
+        // Includes prescription template fields (selected_template + template_config JSON)
+        // so a doctor's custom prescription pad design persists across devices.
+        let parsedTemplateConfig = undefined;
+        if (realClinicData.template_config) {
+          try { parsedTemplateConfig = JSON.parse(realClinicData.template_config); }
+          catch { parsedTemplateConfig = undefined; }
+        }
         const mappedData = {
           ...clinic,
           id: realClinicData.id,
@@ -108,7 +115,8 @@ export default function DoctorDashboard() {
           eveningStart: '17:00',
           eveningEnd: '20:00',
           offDays: ['Sunday'],
-          selectedTemplate: 't1'
+          selectedTemplate: realClinicData.selected_template || 't1',
+          templateConfig: parsedTemplateConfig,
         };
         
         setClinic(mappedData);
@@ -664,6 +672,10 @@ export default function DoctorDashboard() {
                         services: settingsForm.services,
                         consultation_fee: settingsForm.consultationFee,
                         slug: finalSlug,
+                        // Persist prescription template choice so it survives
+                        // device switches and browser-cache clears.
+                        selected_template: clinic.selectedTemplate,
+                        template_config: clinic.templateConfig ? JSON.stringify(clinic.templateConfig) : null,
                       };
 
                       const res = await fetch(`${API_BASE}/api/v1/auth/clinics/${userInfo.clinic_id}`, {

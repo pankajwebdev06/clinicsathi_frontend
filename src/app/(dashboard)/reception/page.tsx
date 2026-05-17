@@ -258,6 +258,19 @@ export default function ReceptionDashboard() {
       // honestly so the receptionist knows the real token will arrive after sync.
       setToken(queueEntry.token_number === 'PENDING' ? 'PENDING (offline)' : queueEntry.token_number);
       setFlowState('token');
+
+      // Immediately refresh the queue + patient list so the new entry shows up
+      // in the bottom queue panel without waiting for the 5-second poll. Also
+      // force a patient cache rebuild so the row renders with the right name
+      // instead of "Unknown" until the next polling tick.
+      try {
+        const pData = await patientsApi.getPatients(userInfo.clinic_id);
+        const newCache: Record<string, any> = {};
+        pData.forEach((p: any) => { newCache[p.id] = p; });
+        setPatientsCache(newCache);
+        setPatients(pData);
+      } catch { /* offline — local cache still serves the bottom queue */ }
+      loadQueue();
     } catch (err: any) {
       setError(err.message || 'Failed to generate token');
       setFlowState('vitals');
@@ -579,25 +592,43 @@ export default function ReceptionDashboard() {
                 const p = patients.find(pat => pat.id === q.patient_id) || { name: 'Unknown', mobile_number: '', gender: '', age: 0 };
                 const isEditing = editingPatientId === q.patient_id;
                 return (
-                  <div key={q.id} className="p-4 md:p-5 bg-slate-50 border border-slate-100 rounded-2xl transition-all">
-                    {/* Header row */}
+                  <div key={q.id} className={`p-3 md:p-4 rounded-2xl border transition-all ${
+                    q.status === 'in_consultation'
+                      ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-md'
+                      : 'bg-white border-slate-200'
+                  }`}>
+                    {/* Header row — token badge | name+meta | status */}
                     <div className="flex items-center gap-3 min-w-0">
-                      <span className="font-black text-slate-900 text-lg w-14 flex-shrink-0">{q.token_number}</span>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-slate-800 truncate">{p.name}</p>
-                        <p className="text-xs text-slate-500 truncate">{p.age} yrs • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : 'Other'} • +91 {p.mobile_number}</p>
+                      {/* Prominent token badge — same hierarchy as doctor's QueueBoard */}
+                      <div className={`flex-shrink-0 w-14 h-14 md:w-16 md:h-16 rounded-2xl flex flex-col items-center justify-center shadow-sm ${
+                        q.status === 'in_consultation' ? 'bg-blue-600 text-white shadow-blue-600/30'
+                        : q.status === 'completed'      ? 'bg-emerald-100 text-emerald-800'
+                        : q.status === 'cancelled'      ? 'bg-red-100 text-red-700'
+                        : q.status === 'skipped'        ? 'bg-orange-100 text-orange-700'
+                        :                                  'bg-slate-100 text-slate-800'
+                      }`}>
+                        <span className="text-[9px] font-bold uppercase tracking-wider opacity-70 leading-none">Token</span>
+                        <span className="font-black text-base md:text-lg leading-tight mt-0.5">{q.token_number || '—'}</span>
                       </div>
-                      <div className="flex items-center gap-2 flex-shrink-0">
-                        {!isEditing && (
-                          <button onClick={() => {
-                            setEditForm({ name: p.name, age: p.age.toString(), gender: p.gender, mobile_number: p.mobile_number });
-                            setEditingPatientId(q.patient_id);
-                          }} className="text-blue-600 text-xs font-bold px-3 py-2 hover:bg-blue-50 rounded-lg min-h-[36px]">Edit</button>
-                        )}
-                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusBadge(q.status)}`}>
+
+                      <div className="flex-1 min-w-0">
+                        <p className={`font-bold text-base md:text-lg truncate leading-tight ${q.status === 'in_consultation' ? 'text-blue-900' : 'text-slate-900'}`}>
+                          {p.name || 'Loading…'}
+                        </p>
+                        <p className="text-xs md:text-sm text-slate-500 truncate mt-0.5">
+                          {p.age ? `${p.age} yrs` : '—'} • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : p.gender === 'O' ? 'Other' : '—'} • +91 {p.mobile_number || '—'}
+                        </p>
+                        <span className={`inline-block mt-1.5 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusBadge(q.status)}`}>
                           {q.status.replace('_', ' ')}
                         </span>
                       </div>
+
+                      {!isEditing && (
+                        <button onClick={() => {
+                          setEditForm({ name: p.name, age: p.age.toString(), gender: p.gender, mobile_number: p.mobile_number });
+                          setEditingPatientId(q.patient_id);
+                        }} className="flex-shrink-0 text-blue-600 text-xs font-bold px-3 py-2 hover:bg-blue-50 rounded-lg min-h-[36px]">Edit</button>
+                      )}
                     </div>
 
                     {/* Inline edit form — stacks below on all screen sizes */}

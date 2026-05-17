@@ -1,5 +1,6 @@
 import Link from 'next/link';
-import { ProductShowcase, StatsBar } from '@/features/landing/ProductShowcase';
+import { StatsBar } from '@/features/landing/ProductShowcase';
+import { PricingCard } from '@/features/landing/PricingCard';
 import { LanguageToggle } from '@/features/i18n/LocaleProvider';
 
 const FEATURES = [
@@ -243,9 +244,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* PRODUCT SHOWCASE — visual proof of shipped features */}
-      <ProductShowcase />
-
       {/* STATS BAR — credibility/scale */}
       <StatsBar />
 
@@ -347,41 +345,11 @@ export default function LandingPage() {
       </section>
 
       {/* PRICING */}
-      <section id="pricing" className="py-24">
-        <div className="max-w-lg mx-auto px-5 text-center">
-          <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Simple Monthly Plans</h2>
-          <p className="text-slate-500 text-lg font-medium mb-12">No hidden fees. Scale as your clinic grows.</p>
-
-          <div className="bg-white rounded-3xl border-2 border-blue-200 shadow-2xl shadow-blue-100 p-10 relative overflow-hidden">
-            <div className="absolute top-5 right-5 px-3 py-1 bg-blue-600 text-white text-xs font-black rounded-full uppercase tracking-wider">
-              Most Popular
-            </div>
-            <div className="text-6xl font-black text-slate-900 mb-1">
-              <span className="text-2xl font-bold text-slate-500 align-top mt-3 inline-block">₹</span>
-              499
-            </div>
-            <p className="text-slate-500 font-semibold mb-2">/month • Billed monthly</p>
-            <div className="inline-block px-3 py-1 bg-emerald-100 text-emerald-700 text-[10px] font-black rounded-full uppercase tracking-wider mb-8">
-              🎁 2 Month Free Trial (First 100 Doctors)
-            </div>
-            <ul className="space-y-4 text-left mb-10">
-              {[
-                '✅ Unlimited patients per day',
-                '✅ Up to 5 staff accounts',
-                '✅ Offline mode with auto-sync',
-                '✅ Multi-language support',
-                '✅ Token & prescription printing',
-                '✅ Daily summary reports',
-                '✅ Priority support',
-              ].map(item => (
-                <li key={item} className="flex items-center gap-3 text-slate-700 font-medium">{item}</li>
-              ))}
-            </ul>
-            <Link href="/doctor/setup" className="block w-full py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-lg shadow-lg shadow-blue-600/25 transition-all active:scale-[0.98] hover:-translate-y-0.5">
-              Claim My Free Trial →
-            </Link>
-            <p className="text-slate-400 text-sm mt-4 font-medium">No credit card required.</p>
-          </div>
+      <section id="pricing" className="py-20 md:py-24 px-4">
+        <div className="max-w-lg mx-auto text-center">
+          <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">Simple, Honest Pricing</h2>
+          <p className="text-slate-500 text-base md:text-lg font-medium mb-10">Pick monthly or save with yearly billing.</p>
+          <PricingCard />
         </div>
       </section>
 
