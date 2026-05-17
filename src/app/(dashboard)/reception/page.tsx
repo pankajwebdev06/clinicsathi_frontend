@@ -273,11 +273,16 @@ export default function ReceptionDashboard() {
         doctorName={clinic.doctorName}
         specialization={clinic.specialization}
         navItems={[
-          { id: 'entry', icon: '➕', label: 'Dashboard', onClick: () => {} },
+          { id: 'entry', icon: '🏥', label: 'Dashboard', onClick: () => {} },
         ]}
         activeId={'entry'}
+        onLogout={() => {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_info');
+          router.push('/login');
+        }}
         footerContent={
-          <button 
+          <button
             onClick={() => {
               localStorage.removeItem('auth_token');
               localStorage.removeItem('user_info');
@@ -292,35 +297,37 @@ export default function ReceptionDashboard() {
       />
 
       {/* Main */}
-      <main className="flex-1 p-4 md:p-8 max-w-4xl mx-auto w-full">
+      <main className="flex-1 p-4 md:p-8 max-w-4xl mx-auto w-full pb-24 md:pb-8">
 
         {/* Mobile top bar */}
-        <div className="flex justify-between items-center md:hidden mb-6 print:hidden">
-          <div>
-            <h2 className="text-xl font-bold text-slate-800 tracking-tight">{clinic.clinicName}</h2>
+        <div className="flex justify-between items-center md:hidden mb-4 print:hidden">
+          <div className="min-w-0 flex-1">
+            <h2 className="text-lg font-bold text-slate-800 tracking-tight truncate">{clinic.clinicName}</h2>
             <p className="text-xs text-slate-500">Reception Desk</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600">R</div>
+          <div className="ml-3 flex-shrink-0 w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-sm">R</div>
         </div>
 
         {/* Page title */}
-        <div className="mb-8 print:hidden">
-          <Breadcrumbs
-            items={[
-              { label: 'Home', href: '/', icon: '🏠' },
-              { label: 'Reception', isCurrent: flowState === 'search' },
-              ...(flowState !== 'search' && flowState !== 'loading' ? [{
-                label: flowState === 'new_patient' ? 'New Patient'
-                  : flowState === 'history' ? 'Existing Patient'
-                  : flowState === 'vitals' ? 'Vitals'
-                  : 'Token Generated',
-                isCurrent: true
-              }] : [])
-            ]}
-          />
-          <h1 className="text-3xl font-bold text-slate-900">Patient Check-in</h1>
-          <p className="text-slate-500 mt-2">Enter mobile number to search <strong>{clinic.clinicName}</strong> patient database.</p>
-          {error && <div className="mt-4 p-3 bg-red-50 text-red-500 rounded-md text-sm">{error}</div>}
+        <div className="mb-5 md:mb-8 print:hidden">
+          <div className="hidden md:block">
+            <Breadcrumbs
+              items={[
+                { label: 'Home', href: '/', icon: '🏠' },
+                { label: 'Reception', isCurrent: flowState === 'search' },
+                ...(flowState !== 'search' && flowState !== 'loading' ? [{
+                  label: flowState === 'new_patient' ? 'New Patient'
+                    : flowState === 'history' ? 'Existing Patient'
+                    : flowState === 'vitals' ? 'Vitals'
+                    : 'Token Generated',
+                  isCurrent: true
+                }] : [])
+              ]}
+            />
+          </div>
+          <h1 className="text-2xl md:text-3xl font-bold text-slate-900">Patient Check-in</h1>
+          <p className="text-slate-500 text-sm md:text-base mt-1">Enter mobile number to search <strong>{clinic.clinicName}</strong>.</p>
+          {error && <div className="mt-3 p-3 bg-red-50 text-red-500 rounded-md text-sm">{error}</div>}
         </div>
 
         {/* Main card */}
@@ -515,16 +522,10 @@ export default function ReceptionDashboard() {
         </div>
 
         {/* Queue Management Section */}
-        <div className="mt-10">
-          <div className="mb-6 print:hidden">
-            <Breadcrumbs
-              items={[
-                { label: 'Home', href: '/', icon: '🏠' },
-                { label: 'Queue Management', isCurrent: true },
-              ]}
-            />
-            <h1 className="text-3xl font-bold text-slate-900 mt-2">Queue Management</h1>
-            <p className="text-slate-500 mt-2">Live patient queue for <strong>{clinic.clinicName}</strong>.</p>
+        <div className="mt-8">
+          <div className="mb-4 print:hidden">
+            <h2 className="text-xl md:text-2xl font-bold text-slate-900">Queue Management</h2>
+            <p className="text-slate-500 text-sm mt-1">Live patient queue for <strong>{clinic.clinicName}</strong>.</p>
           </div>
 
           <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden p-6 md:p-8">
@@ -541,30 +542,63 @@ export default function ReceptionDashboard() {
                 const p = patients.find(pat => pat.id === q.patient_id) || { name: 'Unknown', mobile_number: '', gender: '', age: 0 };
                 const isEditing = editingPatientId === q.patient_id;
                 return (
-                  <div key={q.id} className="p-5 bg-slate-50 border border-slate-100 rounded-2xl transition-all">
-                    <div className="flex justify-between items-center">
-                      <div className="flex items-center gap-4 flex-1">
-                        <span className="font-black text-slate-900 text-xl w-16">{q.token_number}</span>
-                        {isEditing ? (
-                          <div className="flex-1 grid grid-cols-2 md:grid-cols-4 gap-2 pr-4">
-                            <input value={editForm.name} onChange={e => setEditForm(f => ({...f, name: e.target.value}))} className="p-2 text-sm border rounded bg-white" placeholder="Name" />
-                            <input value={editForm.age} onChange={e => setEditForm(f => ({...f, age: e.target.value}))} className="p-2 text-sm border rounded bg-white" placeholder="Age" type="number" />
-                            <select value={editForm.gender} onChange={e => setEditForm(f => ({...f, gender: e.target.value}))} className="p-2 text-sm border rounded bg-white">
-                              <option value="M">M</option><option value="F">F</option><option value="O">O</option>
-                            </select>
-                            <input value={editForm.mobile_number} onChange={e => setEditForm(f => ({...f, mobile_number: e.target.value}))} className="p-2 text-sm border rounded bg-white" placeholder="Mobile" />
-                          </div>
-                        ) : (
-                          <div>
-                            <p className="font-bold text-slate-800">{p.name}</p>
-                            <p className="text-sm text-slate-500">{p.age} yrs • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : 'Other'} • +91 {p.mobile_number}</p>
-                          </div>
-                        )}
+                  <div key={q.id} className="p-4 md:p-5 bg-slate-50 border border-slate-100 rounded-2xl transition-all">
+                    {/* Header row */}
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="font-black text-slate-900 text-lg w-14 flex-shrink-0">{q.token_number}</span>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-slate-800 truncate">{p.name}</p>
+                        <p className="text-xs text-slate-500 truncate">{p.age} yrs • {p.gender === 'M' ? 'Male' : p.gender === 'F' ? 'Female' : 'Other'} • +91 {p.mobile_number}</p>
                       </div>
-                      <div className="flex items-center gap-3">
-                        {isEditing ? (
-                          <div className="flex gap-2">
-                            <button onClick={async () => {
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {!isEditing && (
+                          <button onClick={() => {
+                            setEditForm({ name: p.name, age: p.age.toString(), gender: p.gender, mobile_number: p.mobile_number });
+                            setEditingPatientId(q.patient_id);
+                          }} className="text-blue-600 text-xs font-bold px-2 py-1 hover:bg-blue-50 rounded-lg">Edit</button>
+                        )}
+                        <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${statusBadge(q.status)}`}>
+                          {q.status.replace('_', ' ')}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Inline edit form — stacks below on all screen sizes */}
+                    {isEditing && (
+                      <div className="mt-3 pt-3 border-t border-slate-200">
+                        <div className="grid grid-cols-2 gap-2 mb-3">
+                          <input
+                            value={editForm.name}
+                            onChange={e => setEditForm(f => ({...f, name: e.target.value}))}
+                            className="col-span-2 p-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            placeholder="Full Name"
+                          />
+                          <input
+                            value={editForm.age}
+                            onChange={e => setEditForm(f => ({...f, age: e.target.value}))}
+                            className="p-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            placeholder="Age"
+                            type="number"
+                          />
+                          <select
+                            value={editForm.gender}
+                            onChange={e => setEditForm(f => ({...f, gender: e.target.value}))}
+                            className="p-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                          >
+                            <option value="M">Male</option>
+                            <option value="F">Female</option>
+                            <option value="O">Other</option>
+                          </select>
+                          <input
+                            value={editForm.mobile_number}
+                            onChange={e => setEditForm(f => ({...f, mobile_number: e.target.value}))}
+                            className="col-span-2 p-2.5 text-sm border border-slate-200 rounded-xl bg-white focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                            placeholder="Mobile Number"
+                          />
+                        </div>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={async () => {
                               try {
                                 await patientsApi.updatePatient(q.patient_id, {
                                   name: editForm.name,
@@ -575,23 +609,23 @@ export default function ReceptionDashboard() {
                                 setEditingPatientId(null);
                                 loadQueue();
                               } catch(e) { alert("Failed to update patient"); }
-                            }} className="px-3 py-1 bg-blue-600 text-white text-xs font-bold rounded-lg hover:bg-blue-700">Save</button>
-                            <button onClick={() => setEditingPatientId(null)} className="px-3 py-1 bg-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-300">Cancel</button>
-                          </div>
-                        ) : (
-                          <button onClick={() => {
-                            setEditForm({ name: p.name, age: p.age.toString(), gender: p.gender, mobile_number: p.mobile_number });
-                            setEditingPatientId(q.patient_id);
-                          }} className="text-blue-600 text-xs font-bold px-2 py-1 hover:bg-blue-50 rounded">Edit</button>
-                        )}
-                        <span className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ${statusBadge(q.status)}`}>
-                          {q.status.replace('_', ' ')}
-                        </span>
+                            }}
+                            className="flex-1 py-2.5 bg-blue-600 text-white text-sm font-bold rounded-xl hover:bg-blue-700 transition-colors"
+                          >
+                            Save Changes
+                          </button>
+                          <button
+                            onClick={() => setEditingPatientId(null)}
+                            className="px-4 py-2.5 bg-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-300 transition-colors"
+                          >
+                            Cancel
+                          </button>
+                        </div>
                       </div>
-                    </div>
+                    )}
 
                     {q.status === 'completed' && (
-                      <div className="mt-4 pt-4 border-t border-slate-100">
+                      <div className="mt-3 pt-3 border-t border-slate-100">
                         <DocumentUpload patientId={q.patient_id} />
                       </div>
                     )}

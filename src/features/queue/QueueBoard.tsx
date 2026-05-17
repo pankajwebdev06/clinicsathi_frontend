@@ -36,47 +36,55 @@ export function QueueBoard({ clinicId, queue, onSelect, isConnected }: { clinicI
         <Badge variant="outline">{queue.length} Total</Badge>
       </div>
 
-      <div className="space-y-2 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
-        {queue.map((entry) => (
-          <div 
-            key={entry.id} 
-            className={`group relative flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 ${
-              entry.status === 'consulting' 
-                ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-md transform scale-[1.02]' 
-                : 'bg-white border-slate-100 hover:border-blue-200 hover:shadow-sm'
-            }`}
-          >
-            <div className="flex items-center gap-4">
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center font-black text-sm shadow-sm transition-colors duration-300 ${
-                entry.status === 'consulting' ? 'bg-blue-600 text-white shadow-blue-600/30' : 'bg-slate-100 text-slate-700 group-hover:bg-blue-100 group-hover:text-blue-700'
-              }`}>
-                {entry.token_number}
-              </div>
-              <div>
-                <p className={`font-bold text-base ${entry.status === 'consulting' ? 'text-blue-900' : 'text-slate-800'}`}>
-                  {entry.patient_name}
-                </p>
-                <div className="flex items-center gap-2 mt-1">
-                  <Badge variant={getStatusColor(entry.status)} className="text-[10px] uppercase font-bold tracking-wider">
-                    {entry.status.replace('_', ' ')}
-                  </Badge>
-                  {entry.priority > 0 && <span className="text-[10px] px-2 py-0.5 rounded-md bg-red-100 text-red-700 font-bold uppercase tracking-wider">Priority</span>}
+      <div className="space-y-2 max-h-[50vh] md:max-h-[500px] overflow-y-auto pr-1 md:pr-2">
+        {queue.map((entry) => {
+          const isActive = entry.status === 'consulting' || entry.status === 'in_consultation';
+          return (
+            <div
+              key={entry.id}
+              onClick={() => !isActive && onSelect?.(entry)}
+              className={`relative flex items-center justify-between p-3 md:p-4 rounded-2xl border transition-all duration-300 ${
+                isActive
+                  ? 'bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 shadow-md'
+                  : 'bg-white border-slate-100 active:bg-slate-50 cursor-pointer hover:border-blue-200 hover:shadow-sm'
+              }`}
+            >
+              <div className="flex items-center gap-3 min-w-0 flex-1">
+                <div className={`w-11 h-11 flex-shrink-0 rounded-xl flex items-center justify-center font-black text-sm shadow-sm transition-colors duration-300 ${
+                  isActive ? 'bg-blue-600 text-white shadow-blue-600/30' : 'bg-slate-100 text-slate-700'
+                }`}>
+                  {entry.token_number}
+                </div>
+                <div className="min-w-0">
+                  <p className={`font-bold text-sm md:text-base truncate ${isActive ? 'text-blue-900' : 'text-slate-800'}`}>
+                    {entry.patient_name}
+                  </p>
+                  <div className="flex items-center gap-2 mt-0.5">
+                    <Badge variant={getStatusColor(entry.status)} className="text-[10px] uppercase font-bold tracking-wider">
+                      {entry.status.replace('_', ' ')}
+                    </Badge>
+                    {entry.priority > 0 && <span className="text-[10px] px-1.5 py-0.5 rounded-md bg-red-100 text-red-700 font-bold uppercase tracking-wider">Priority</span>}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {entry.status !== 'consulting' && entry.status !== 'in_consultation' && (
-              <Button size="sm" className="opacity-0 group-hover:opacity-100 transition-opacity bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 h-9 px-4 rounded-xl border border-blue-100 font-semibold shadow-sm" onClick={() => onSelect?.(entry)}>
-                {entry.status === 'waiting' ? 'Call' : 'Recall'} <ArrowRight size={14} className="ml-1.5" />
-              </Button>
-            )}
-            {entry.status === 'consulting' && (
-              <div className="bg-white p-2 rounded-full shadow-sm">
-                <CheckCircle size={24} className="text-blue-600 animate-in zoom-in" />
-              </div>
-            )}
-          </div>
-        ))}
+              {!isActive && (
+                <Button
+                  size="sm"
+                  className="flex-shrink-0 ml-2 bg-blue-50 hover:bg-blue-600 hover:text-white text-blue-600 h-9 px-3 rounded-xl border border-blue-100 font-semibold shadow-sm transition-all"
+                  onClick={(e) => { e.stopPropagation(); onSelect?.(entry); }}
+                >
+                  {entry.status === 'waiting' ? 'Call' : 'Recall'} <ArrowRight size={13} className="ml-1" />
+                </Button>
+              )}
+              {isActive && (
+                <div className="flex-shrink-0 bg-white p-1.5 rounded-full shadow-sm ml-2">
+                  <CheckCircle size={22} className="text-blue-600" />
+                </div>
+              )}
+            </div>
+          );
+        })}
 
         {queue.length === 0 && (
           <div className="text-center py-8 text-gray-400">

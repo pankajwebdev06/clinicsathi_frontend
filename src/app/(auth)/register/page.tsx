@@ -90,8 +90,8 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full p-8 bg-white rounded-2xl shadow-lg border border-slate-100">
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 py-8 px-4">
+      <div className="max-w-md w-full p-6 sm:p-8 bg-white rounded-2xl shadow-lg border border-slate-100">
         <div className="text-center mb-8">
           <div className="w-12 h-12 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xl shadow-md mx-auto mb-4">
             CS

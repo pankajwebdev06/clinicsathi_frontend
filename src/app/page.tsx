@@ -93,7 +93,7 @@ export default function LandingPage() {
             Designed for Indian Clinics
           </div>
 
-          <h1 className="text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] tracking-tight mb-6">
+          <h1 className="text-3xl sm:text-4xl md:text-6xl font-black text-slate-900 leading-[1.1] tracking-tight mb-5 md:mb-6">
             Your Clinic&apos;s{' '}
             <span className="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-teal-500">
               Digital Saathi.
@@ -101,15 +101,15 @@ export default function LandingPage() {
             Effortless Flow.
           </h1>
 
-          <p className="text-lg md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto mb-10 font-medium">
-            Modern queue management, digital records, and seamless patient check-in — designed for high-paced clinical environments across the Indian subcontinent.
+          <p className="text-base md:text-xl text-slate-500 leading-relaxed max-w-2xl mx-auto mb-8 md:mb-10 font-medium">
+            Modern queue management, digital records, and seamless patient check-in — designed for Indian clinics.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <Link href="/doctor/setup" className="px-8 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-lg shadow-xl shadow-blue-600/25 transition-all active:scale-[0.98] hover:-translate-y-0.5">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center px-2 sm:px-0">
+            <Link href="/doctor/setup" className="px-7 py-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold text-base md:text-lg shadow-xl shadow-blue-600/25 transition-all active:scale-[0.98] hover:-translate-y-0.5 text-center">
               Register My Clinic →
             </Link>
-            <Link href="/login" className="px-8 py-4 bg-white hover:bg-slate-50 text-slate-800 rounded-2xl font-bold text-lg border-2 border-slate-200 transition-all active:scale-[0.98] hover:-translate-y-0.5">
+            <Link href="/login" className="px-7 py-4 bg-white hover:bg-slate-50 text-slate-800 rounded-2xl font-bold text-base md:text-lg border-2 border-slate-200 transition-all active:scale-[0.98] hover:-translate-y-0.5 text-center">
               Login to Dashboard
             </Link>
           </div>
@@ -120,11 +120,11 @@ export default function LandingPage() {
               <div className="bg-slate-900 rounded-2xl overflow-hidden">
                 {/* Mock Browser Bar */}
                 <div className="flex items-center gap-2 px-4 py-3 border-b border-slate-700/50">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80"></div>
-                  <div className="w-3 h-3 rounded-full bg-emerald-500/80"></div>
-                  <div className="flex-1 ml-3 bg-slate-700/50 rounded-md h-5 flex items-center px-3">
-                    <span className="text-slate-400 text-xs font-mono">app.clinicsathi.in/reception</span>
+                  <div className="hidden sm:block w-3 h-3 rounded-full bg-red-500/80 flex-shrink-0"></div>
+                  <div className="hidden sm:block w-3 h-3 rounded-full bg-yellow-500/80 flex-shrink-0"></div>
+                  <div className="hidden sm:block w-3 h-3 rounded-full bg-emerald-500/80 flex-shrink-0"></div>
+                  <div className="flex-1 sm:ml-3 bg-slate-700/50 rounded-md h-5 flex items-center px-3 overflow-hidden">
+                    <span className="text-slate-400 text-xs font-mono truncate">app.clinicsathi.in/reception</span>
                   </div>
                 </div>
                 {/* Mock Dashboard UI */}
@@ -313,13 +313,13 @@ export default function LandingPage() {
 
       {/* FOOTER */}
       <footer className="py-10 border-t border-slate-100 bg-white">
-        <div className="max-w-6xl mx-auto px-5 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="max-w-6xl mx-auto px-5 flex flex-col md:flex-row justify-between items-center gap-5">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CS</div>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs flex-shrink-0">CS</div>
             <span className="font-extrabold text-slate-900">ClinicSathi</span>
           </div>
-          <p className="text-slate-400 text-sm font-medium">© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
-          <div className="flex gap-5 text-sm font-semibold text-slate-500">
+          <p className="text-slate-400 text-sm font-medium text-center">© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
+          <div className="flex flex-wrap justify-center gap-4 md:gap-5 text-sm font-semibold text-slate-500">
             <Link href="/privacy-policy" className="hover:text-slate-900 transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-slate-900 transition-colors">Terms</Link>
             <Link href="/contact" className="hover:text-slate-900 transition-colors">Contact</Link>

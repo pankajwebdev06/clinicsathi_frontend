@@ -318,7 +318,7 @@ export default function DoctorDashboard() {
     <div className="min-h-screen bg-slate-50 flex">
 
       {/* Sidebar */}
-      <ClinicSidebar 
+      <ClinicSidebar
         clinicName={clinic.clinicName}
         subtitle={`${clinic.doctorName} • ${clinic.specialization}`}
         doctorName={clinic.doctorName}
@@ -332,8 +332,13 @@ export default function DoctorDashboard() {
           { id: 'profile', icon: '👤', label: 'Public Profile', onClick: () => setActiveTab('profile') },
           { id: 'settings', icon: '⚙️', label: 'Settings & Staff', onClick: () => setActiveTab('settings') },
         ]}
+        onLogout={() => {
+          localStorage.removeItem('auth_token');
+          localStorage.removeItem('user_info');
+          router.push('/login');
+        }}
         footerContent={
-          <button 
+          <button
             onClick={() => {
               localStorage.removeItem('auth_token');
               localStorage.removeItem('user_info');
@@ -348,35 +353,33 @@ export default function DoctorDashboard() {
       />
 
       {/* Main */}
-      <main className="flex-1 overflow-y-auto">
+      <main className="flex-1 overflow-y-auto pb-20 md:pb-0">
 
         {/* Mobile Top Bar */}
-        <div className="md:hidden bg-white border-b border-slate-100 px-5 py-4 flex justify-between items-center sticky top-0 z-10 shadow-sm">
-          <div>
-            <h2 className="font-bold text-slate-900 text-base leading-tight">{clinic.clinicName}</h2>
-            <p className="text-xs text-slate-500">{clinic.doctorName}</p>
+        <div className="md:hidden bg-white border-b border-slate-100 px-4 py-3 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+          <div className="min-w-0 flex-1">
+            <h2 className="font-bold text-slate-900 text-base leading-tight truncate">{clinic.clinicName}</h2>
+            <p className="text-xs text-slate-500 truncate">{clinic.doctorName}</p>
           </div>
-          <div className="flex gap-2 text-xl">
-            <button onClick={() => setActiveTab('settings')} title="Settings">⚙️</button>
-          </div>
+          <span className="ml-3 flex-shrink-0 px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-100">● Open</span>
         </div>
 
-        {/* Page Header with Breadcrumb */}
-        <div className="px-5 md:px-8 pt-5 pb-4 border-b border-slate-100 bg-white">
-          <Breadcrumbs 
+        {/* Page Header with Breadcrumb — desktop only details */}
+        <div className="hidden md:block px-5 md:px-8 pt-5 pb-4 border-b border-slate-100 bg-white">
+          <Breadcrumbs
             items={[
               { label: 'Home', href: '/', icon: '🏠' },
               { label: 'Doctor Dashboard', isCurrent: activeTab === 'queue' },
               ...(activeTab !== 'queue' ? [{
-                label: activeTab === 'summary' ? 'Daily Summary' : 'Settings & Staff',
+                label: activeTab === 'summary' ? 'Daily Summary' : activeTab === 'profile' ? 'Public Profile' : 'Settings & Staff',
                 isCurrent: true
               }] : [])
             ]}
           />
           <div className="flex items-start justify-between">
-            <div>
-              <h1 className="text-2xl font-black text-slate-900 tracking-tight">{clinic.clinicName}</h1>
-              <p className="text-slate-500 font-medium mt-0.5">
+            <div className="min-w-0 flex-1">
+              <h1 className="text-2xl font-black text-slate-900 tracking-tight truncate">{clinic.clinicName}</h1>
+              <p className="text-slate-500 font-medium mt-0.5 truncate">
                 {clinic.doctorName} • {clinic.degree} • {clinic.experience} yrs exp.
               </p>
               <p className="text-slate-400 text-sm mt-0.5">
@@ -384,8 +387,15 @@ export default function DoctorDashboard() {
                 {clinic.offDays.length > 0 && ` • Off: ${clinic.offDays.join(', ')}`}
               </p>
             </div>
-            <span className="hidden md:block px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100">● Clinic Open</span>
+            <span className="ml-4 flex-shrink-0 px-3 py-1.5 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-full border border-emerald-100">● Clinic Open</span>
           </div>
+        </div>
+
+        {/* Mobile current tab label */}
+        <div className="md:hidden px-4 pt-3 pb-1">
+          <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
+            {activeTab === 'queue' ? 'Patient Queue' : activeTab === 'summary' ? 'Daily Summary' : activeTab === 'profile' ? 'Public Profile' : 'Settings & Staff'}
+          </p>
         </div>
 
         <div className="p-5 md:p-8">
@@ -394,11 +404,11 @@ export default function DoctorDashboard() {
 
           {/* Tab: Queue */}
           {activeTab === 'queue' && (
-            <div className="flex flex-col-reverse md:grid md:grid-cols-5 gap-6">
-              {/* Queue List (Now using the modular QueueBoard) */}
+            <div className="flex flex-col md:grid md:grid-cols-5 gap-6">
+              {/* Queue List */}
               <div className="md:col-span-2">
-                <QueueBoard 
-                  clinicId={clinic.id} 
+                <QueueBoard
+                  clinicId={clinic.id}
                   queue={queue.map(p => ({
                     id: p.id,
                     token_number: p.token,
@@ -411,15 +421,15 @@ export default function DoctorDashboard() {
                 />
               </div>
 
-              {/* Consultation Panel (Now using the modular ConsultPanel) */}
+              {/* Consultation Panel */}
               <div className="md:col-span-3">
                 {selectedPatient ? (
-                  <ConsultPanel 
+                  <ConsultPanel
                     patient={selectedPatient}
-                    onActionComplete={() => selectPatient(null)} 
+                    onActionComplete={() => selectPatient(null)}
                   />
                 ) : (
-                  <div className="bg-white rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center p-16 text-center h-full">
+                  <div className="hidden md:flex bg-white rounded-3xl border border-slate-100 shadow-sm flex-col items-center justify-center p-10 text-center h-full">
                     <p className="text-5xl mb-4">🩺</p>
                     <p className="font-bold text-slate-700 text-lg">Select a patient from the queue</p>
                     <p className="text-slate-400 text-sm mt-1">Start consultation to see details and history.</p>
@@ -432,7 +442,7 @@ export default function DoctorDashboard() {
           {/* Tab: Public Profile */}
           {activeTab === 'profile' && (
             <div className="space-y-6 animate-in fade-in duration-300">
-              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 md:p-8">
                 <h3 className="text-xl font-bold text-slate-900 mb-2">👤 Public Profile Settings</h3>
                 <p className="text-slate-500 text-sm mb-6">Customize your public profile that patients will see. Upload photos and add SEO details for better visibility.</p>
 
@@ -707,7 +717,7 @@ export default function DoctorDashboard() {
 
           {/* Tab: Daily Summary */}
           {activeTab === 'summary' && (
-            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8 animate-in fade-in duration-300">
+            <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-5 md:p-8 animate-in fade-in duration-300">
               <h3 className="text-xl font-bold text-slate-900 mb-6">📊 Daily Summary — {new Date().toLocaleDateString('en-IN', { weekday: 'long', day: 'numeric', month: 'long' })}</h3>
               <div className="grid md:grid-cols-3 gap-6 mb-8">
                 {[

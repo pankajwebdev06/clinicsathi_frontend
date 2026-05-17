@@ -34,6 +34,10 @@ input, select, textarea {
   font-size: 16px; /* Prevent zoom on iOS Safari */
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   background: var(--background);
   color: var(--foreground);
@@ -42,10 +46,30 @@ body {
   text-rendering: optimizeSpeed;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
 }
 
 /* Content visibility for below-fold content */
 .content-visibility-auto {
   content-visibility: auto;
   contain-intrinsic-size: 0 500px;
+}
+
+/* ── Mobile App Feel ── */
+
+/* Smooth scroll */
+* {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Remove tap highlight on mobile */
+a, button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevent text from breaking out of containers */
+p, h1, h2, h3, h4, h5, h6, span, li {
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
