@@ -11,6 +11,19 @@ export default function LoginPage() {
   const router = useRouter();
   const [mobileNumber, setMobileNumber] = useState("");
   const [otpCode, setOtpCode] = useState("");
+
+  // If already logged in, redirect to correct dashboard
+  if (typeof window !== 'undefined') {
+    const token = localStorage.getItem('auth_token');
+    const userInfo = localStorage.getItem('user_info');
+    if (token && userInfo) {
+      try {
+        const user = JSON.parse(userInfo);
+        if (user.role === 'doctor') { router.replace('/doctor/dashboard'); }
+        else if (user.role === 'receptionist') { router.replace('/reception'); }
+      } catch {}
+    }
+  }
   const [error, setError] = useState("");
   const [successMsg, setSuccessMsg] = useState("");
   const [loading, setLoading] = useState(false);

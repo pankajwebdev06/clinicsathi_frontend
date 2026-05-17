@@ -107,47 +107,47 @@ export default function DoctorProfilePage() {
 
       {/* Header */}
       <header style={{ background: 'white', borderBottom: '1px solid #f1f5f9', position: 'sticky', top: 0, zIndex: 50 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px 24px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
-            <div style={{ width: 34, height: 34, borderRadius: 10, background: 'linear-gradient(135deg,#2563eb,#14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 12 }}>CS</div>
-            <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 16 }}>ClinicSathi</span>
+        <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
+          <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', flexShrink: 0 }}>
+            <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg,#2563eb,#14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 11 }}>CS</div>
+            <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 14 }}>ClinicSathi</span>
           </Link>
-          <div style={{ display: 'flex', gap: 12 }}>
-            <Link href="/doctors" style={{ background: 'transparent', color: '#2563eb', padding: '9px 20px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none', border: '2px solid #2563eb' }}>
-              Doctors With Us
+          <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
+            <Link href="/doctors" style={{ color: '#2563eb', padding: '7px 12px', borderRadius: 10, fontWeight: 700, fontSize: 12, textDecoration: 'none', border: '1.5px solid #2563eb', whiteSpace: 'nowrap', display: 'block' }}>
+              ← Doctors
             </Link>
-            <Link href="/doctor/setup" style={{ background: '#2563eb', color: 'white', padding: '9px 20px', borderRadius: 10, fontWeight: 700, fontSize: 13, textDecoration: 'none' }}>
-              Register Your Clinic
+            <Link href="/doctor/setup" style={{ background: '#2563eb', color: 'white', padding: '7px 12px', borderRadius: 10, fontWeight: 700, fontSize: 12, textDecoration: 'none', whiteSpace: 'nowrap' }}>
+              Register
             </Link>
           </div>
         </div>
       </header>
 
       {/* Profile Content */}
-      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '64px 24px' }}>
+      <main style={{ maxWidth: 1100, margin: '0 auto', padding: '24px 16px' }}>
         <div style={{ background: 'white', borderRadius: 24, border: '1px solid #f1f5f9', overflow: 'hidden' }}>
           {/* Hero Section */}
-          <div style={{ background: 'linear-gradient(135deg, #2563eb, #14b8a6)', padding: '48px 40px', color: 'white' }}>
-            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 24, flexWrap: 'wrap' }}>
-              <div style={{ width: 140, height: 140, borderRadius: 20, background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ background: 'linear-gradient(135deg, #2563eb, #14b8a6)', padding: '32px 20px', color: 'white' }}>
+            <div style={{ display: 'flex', alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+              <div style={{ width: 100, height: 100, borderRadius: 16, background: 'rgba(255,255,255,0.2)', backdropFilter: 'blur(10px)', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                 {profile.doctor_photo ? (
                   <img src={profile.doctor_photo} alt={profile.doctor_name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                 ) : (
-                  <span style={{ fontSize: 48 }}>👨‍⚕️</span>
+                  <span style={{ fontSize: 36 }}>👨‍⚕️</span>
                 )}
               </div>
-              <div style={{ flex: 1, minWidth: 280 }}>
-                <h1 style={{ fontSize: 32, fontWeight: 900, margin: '0 0 8px', lineHeight: 1.2 }}>{profile.doctor_name}</h1>
-                <p style={{ fontSize: 18, fontWeight: 600, margin: '0 0 8px', opacity: 0.95 }}>{profile.specialization || 'General Physician'}</p>
-                {profile.degree && <p style={{ fontSize: 15, margin: '0 0 8px', opacity: 0.9 }}>{profile.degree}</p>}
-                {profile.experience && <p style={{ fontSize: 14, margin: 0, opacity: 0.85 }}>{profile.experience}+ years experience</p>}
-                <p style={{ fontSize: 15, margin: '8px 0 0', opacity: 0.9 }}>{profile.name}</p>
+              <div style={{ flex: 1, minWidth: 0 }}>
+                <h1 style={{ fontSize: 'clamp(20px, 5vw, 32px)', fontWeight: 900, margin: '0 0 6px', lineHeight: 1.2, wordBreak: 'break-word' }}>{profile.doctor_name}</h1>
+                <p style={{ fontSize: 'clamp(14px, 3vw, 18px)', fontWeight: 600, margin: '0 0 6px', opacity: 0.95 }}>{profile.specialization || 'General Physician'}</p>
+                {profile.degree && <p style={{ fontSize: 14, margin: '0 0 4px', opacity: 0.9 }}>{profile.degree}</p>}
+                {profile.experience && <p style={{ fontSize: 13, margin: 0, opacity: 0.85 }}>{profile.experience}+ years experience</p>}
+                <p style={{ fontSize: 14, margin: '6px 0 0', opacity: 0.9 }}>{profile.name}</p>
               </div>
             </div>
           </div>
 
           {/* Details Section */}
-          <div style={{ padding: '40px' }}>
+          <div style={{ padding: '24px 16px' }}>
             {/* Clinic Photos */}
             {profile.clinic_photo && (
               <div style={{ marginBottom: 40, display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 16 }}>

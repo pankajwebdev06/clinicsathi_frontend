@@ -18,6 +18,8 @@ import { authApi } from '@/features/auth/api';
 
 type Tab = 'queue' | 'summary' | 'settings' | 'profile';
 
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1').replace(/\/api\/v1\/?$/, '');
+
 interface Patient {
   token: string;
   name: string;
@@ -81,7 +83,7 @@ export default function DoctorDashboard() {
       const userInfoStr = localStorage.getItem('user_info');
       
       if (!token || !userInfoStr) {
-        router.push('/login');
+        router.replace('/login');
         return;
       }
 
@@ -279,7 +281,7 @@ export default function DoctorDashboard() {
   const handleExport = async () => {
     try {
       const token = localStorage.getItem('auth_token');
-      const res = await fetch('http://localhost:8000/api/v1/patients/export', {
+      const res = await fetch(`${API_BASE}/api/v1/patients/export`, {
         headers: { Authorization: `Bearer ${token}` }
       });
       if (!res.ok) throw new Error('Export failed');
@@ -357,11 +359,12 @@ export default function DoctorDashboard() {
 
         {/* Mobile Top Bar */}
         <div className="md:hidden bg-white border-b border-slate-100 px-4 py-3 flex justify-between items-center sticky top-0 z-10 shadow-sm">
+          <Link href="/" className="flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors mr-3">← Home</Link>
           <div className="min-w-0 flex-1">
-            <h2 className="font-bold text-slate-900 text-base leading-tight truncate">{clinic.clinicName}</h2>
+            <h2 className="font-bold text-slate-900 text-sm leading-tight truncate">{clinic.clinicName}</h2>
             <p className="text-xs text-slate-500 truncate">{clinic.doctorName}</p>
           </div>
-          <span className="ml-3 flex-shrink-0 px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-100">● Open</span>
+          <span className="ml-2 flex-shrink-0 px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-100">● Open</span>
         </div>
 
         {/* Page Header with Breadcrumb — desktop only details */}
@@ -461,7 +464,7 @@ export default function DoctorDashboard() {
                             formData.append('file', file);
                             try {
                               const token = localStorage.getItem('auth_token');
-                              const res = await fetch('http://localhost:8000/api/v1/auth/upload-image', {
+                              const res = await fetch(`${API_BASE}/api/v1/auth/upload-image`, {
                                 method: 'POST',
                                 headers: { Authorization: `Bearer ${token}` },
                                 body: formData
@@ -524,7 +527,7 @@ export default function DoctorDashboard() {
                             formData.append('file', file);
                             try {
                               const token = localStorage.getItem('auth_token');
-                              const res = await fetch('http://localhost:8000/api/v1/auth/upload-image', {
+                              const res = await fetch(`${API_BASE}/api/v1/auth/upload-image`, {
                                 method: 'POST',
                                 headers: { Authorization: `Bearer ${token}` },
                                 body: formData
@@ -650,18 +653,20 @@ export default function DoctorDashboard() {
 
                 {/* Preview Link */}
                 <div className="bg-emerald-50 rounded-2xl p-4 border border-emerald-100 mb-6">
-                  <div className="flex items-center justify-between">
-                    <div>
+                  <div className="flex flex-col sm:flex-row sm:items-center gap-3">
+                    <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-emerald-800">🌐 Your Public Profile</p>
-                      <p className="text-xs text-emerald-600 mt-1">View how patients will see your profile</p>
+                      <p className="text-xs text-emerald-600 mt-0.5 truncate">
+                        clinicsathi.in/doctor/<span className="font-mono">{settingsForm.slug || clinic.slug || '—'}</span>
+                      </p>
                     </div>
                     <a
                       href={`/doctor/${settingsForm.slug || clinic.slug || 'your-slug'}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-4 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors"
+                      className="flex-shrink-0 px-4 py-2 bg-emerald-600 text-white rounded-xl font-bold text-sm hover:bg-emerald-700 transition-colors text-center"
                     >
-                      Preview Profile
+                      Preview →
                     </a>
                   </div>
                 </div>
@@ -671,6 +676,15 @@ export default function DoctorDashboard() {
                     try {
                       const token = localStorage.getItem('auth_token');
                       const userInfo = JSON.parse(localStorage.getItem('user_info') || '{}');
+                      // Auto-generate slug with specialization included
+                      const makeSlug = (name: string, spec: string, city: string) =>
+                        `${name}-${spec}-${city}`.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+                      const autoSlug = makeSlug(
+                        settingsForm.doctorName || '',
+                        settingsForm.specialization || '',
+                        settingsForm.city || ''
+                      );
+
                       const payload = {
                         name: settingsForm.clinicName,
                         doctor_name: settingsForm.doctorName,
@@ -687,9 +701,10 @@ export default function DoctorDashboard() {
                         about_doctor: settingsForm.aboutDoctor,
                         services: settingsForm.services,
                         consultation_fee: settingsForm.consultationFee,
+                        slug: settingsForm.slug || autoSlug,
                       };
 
-                      const res = await fetch(`http://localhost:8000/api/v1/auth/clinics/${userInfo.clinic_id}`, {
+                      const res = await fetch(`${API_BASE}/api/v1/auth/clinics/${userInfo.clinic_id}`, {
                         method: 'PUT',
                         headers: {
                           'Content-Type': 'application/json',

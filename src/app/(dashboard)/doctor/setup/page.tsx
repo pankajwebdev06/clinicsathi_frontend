@@ -27,6 +27,7 @@ export default function ClinicSetup() {
   const [staffInput, setStaffInput] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [specDropdown, setSpecDropdown] = useState('');
   const [form, setForm] = useState<ClinicData & { doctorMobile?: string; mciNumber?: string }>({
     id: '', doctorName: '', doctorMobile: '', degree: '', specialization: '', experience: '',
     clinicName: '', city: '', address: '', phone: '', mciNumber: '',
@@ -193,11 +194,26 @@ export default function ClinicSetup() {
                 </div>
                 <div className="space-y-1.5">
                   <label className="text-sm font-semibold text-slate-600">Specialization</label>
-                  <select value={form.specialization} onChange={e => update('specialization', e.target.value)}
+                  <select value={specDropdown} onChange={e => {
+                    const val = e.target.value;
+                    setSpecDropdown(val);
+                    if (val !== 'Other') update('specialization', val);
+                    else update('specialization', '');
+                  }}
                     className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-800">
                     <option value="">Select Specialization</option>
                     {SPECIALIZATIONS.map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
+                  {specDropdown === 'Other' && (
+                    <input
+                      type="text"
+                      required
+                      value={form.specialization}
+                      onChange={e => update('specialization', e.target.value)}
+                      placeholder="Enter your specialization (e.g. Sports Medicine)"
+                      className="w-full p-4 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-900 placeholder:text-slate-400 mt-2"
+                    />
+                  )}
                 </div>
               </div>
             </div>

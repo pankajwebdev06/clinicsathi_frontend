@@ -11,6 +11,7 @@ import { patientsApi } from '@/features/patients/api';
 import { queueApi } from '@/features/queue/api';
 import { DocumentUpload } from '@/features/reception/DocumentUpload';
 import { useQueueSocket } from '@/hooks/useQueueSocket';
+import Link from 'next/link';
 
 type FlowState = 'search' | 'loading' | 'history' | 'new_patient' | 'vitals' | 'token';
 
@@ -56,7 +57,7 @@ export default function ReceptionDashboard() {
       const userInfoStr = localStorage.getItem('user_info');
       
       if (!token || !userInfoStr) {
-        router.push('/login');
+        router.replace('/login');
         return;
       }
 
@@ -305,7 +306,7 @@ export default function ReceptionDashboard() {
             <h2 className="text-lg font-bold text-slate-800 tracking-tight truncate">{clinic.clinicName}</h2>
             <p className="text-xs text-slate-500">Reception Desk</p>
           </div>
-          <div className="ml-3 flex-shrink-0 w-9 h-9 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-sm">R</div>
+          <Link href="/" className="ml-3 flex-shrink-0 px-3 py-1.5 rounded-xl bg-slate-100 text-slate-600 text-xs font-bold hover:bg-slate-200 transition-colors">← Home</Link>
         </div>
 
         {/* Page title */}

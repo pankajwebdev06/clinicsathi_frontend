@@ -1,5 +1,7 @@
 'use client'
 import React, { useState } from 'react'
+
+const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 import { Card, Button } from '@/components/ui'
 import { Camera, Upload, CheckCircle2, AlertCircle, FileImage } from 'lucide-react'
 import { consultationApi } from '../consultation/api'
@@ -42,9 +44,10 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
         ? `/api/v1/consultations/${consult.id}/upload-prescription`
         : `/api/v1/consultations/${consult.id}/upload-report`
 
-      const response = await fetch(process.env.NEXT_PUBLIC_API_URL + endpoint.replace('/api/v1', ''), {
+      const response = await fetch(`${API_BASE}${endpoint}`, {
         method: 'POST',
         body: formData,
+        headers: { Authorization: `Bearer ${localStorage.getItem('auth_token') || ''}` },
       })
 
       if (!response.ok) throw new Error('Upload failed')
@@ -94,26 +97,26 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
         </div>
 
         {/* Other Report Upload */}
-        <div className="flex-[1.5] w-full flex items-center gap-2">
+        <div className="flex-[1.5] w-full flex flex-col gap-2">
           <input
             type="text"
-            placeholder="Report Type (e.g. Blood, X-Ray)"
+            placeholder="Report type (e.g. Blood Test, X-Ray)"
             value={reportType}
             onChange={e => setReportType(e.target.value)}
-            className="flex-1 border border-blue-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="w-full border border-blue-200 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
             disabled={uploading}
           />
-          <input 
-            type="file" 
-            accept="image/*,application/pdf" 
+          <input
+            type="file"
+            accept="image/*,application/pdf"
             id={`reports-input-${patientId}`}
-            className="hidden" 
+            className="hidden"
             onChange={(e) => onFileChange(e, 'report')}
             disabled={uploading}
           />
-          <Button 
+          <Button
             variant="outline"
-            className="flex items-center justify-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+            className="w-full flex items-center justify-center gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
             onClick={() => {
               if (!reportType.trim()) {
                 setError('Please type report name first');
@@ -123,7 +126,7 @@ export function DocumentUpload({ patientId, onUploadSuccess }: DocumentUploadPro
             }}
             disabled={uploading}
           >
-            <Upload size={16} /> 
+            <Upload size={16} />
             Upload Report
           </Button>
         </div>
