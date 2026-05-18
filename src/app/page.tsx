@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import { StatsBar } from '@/features/landing/ProductShowcase';
 import { PricingCard } from '@/features/landing/PricingCard';
-import { LanguageToggle } from '@/features/i18n/LocaleProvider';
+import { NavBar } from './NavBar';
 
 const FEATURES = [
   {
@@ -72,32 +72,7 @@ export default function LandingPage() {
     <div className="min-h-screen bg-white text-slate-800 font-sans overflow-x-hidden">
 
       {/* NAV */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-100 shadow-sm">
-        <div className="max-w-6xl mx-auto px-5 py-4 flex justify-between items-center">
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/20">
-              CS
-            </div>
-            <span className="font-extrabold text-slate-900 text-lg tracking-tight">ClinicSathi</span>
-          </div>
-          <nav className="hidden md:flex items-center gap-7 text-sm font-semibold text-slate-500">
-            <a href="#features" className="hover:text-slate-900 transition-colors">Features</a>
-            <a href="#how-it-works" className="hover:text-slate-900 transition-colors">How it Works</a>
-            <Link href="/register-guide" className="hover:text-slate-900 transition-colors">Setup Guide</Link>
-            <a href="#pricing" className="hover:text-slate-900 transition-colors">Pricing</a>
-            <Link href="/doctors" className="hover:text-slate-900 transition-colors">Doctors</Link>
-            <Link href="/blog" className="hover:text-slate-900 transition-colors">Blog</Link>
-          </nav>
-          <div className="flex items-center gap-1 md:gap-3">
-            <div className="hidden sm:block"><LanguageToggle compact /></div>
-            <Link href="/doctors" className="md:hidden text-sm font-bold text-blue-600 hover:text-blue-700 px-2 py-2">Doctors</Link>
-            <Link href="/login" className="text-sm font-semibold text-slate-600 hover:text-slate-900 transition-colors px-2 md:px-4 py-2">Login</Link>
-            <Link href="/doctor/setup" className="hidden sm:inline-flex text-sm font-bold bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl transition-all shadow-md shadow-blue-600/20 active:scale-[0.98]">
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </header>
+      <NavBar />
 
       {/* HERO */}
       <section className="relative overflow-hidden pt-16 pb-24 md:pt-24 md:pb-36">

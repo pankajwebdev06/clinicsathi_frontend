@@ -37,7 +37,7 @@ export function ClinicSidebar({
   return (
     <>
       {/* ── DESKTOP SIDEBAR ── */}
-      <aside className={`bg-slate-900 text-white hidden md:flex flex-col sticky top-0 h-screen transition-all duration-300 ${focusMode ? 'w-16' : 'w-64'} overflow-y-auto print:hidden`}>
+      <aside className={`bg-slate-900 text-white hidden md:flex flex-col sticky top-0 h-screen transition-all duration-300 ${focusMode ? 'w-16' : 'w-64'} overflow-hidden print:hidden`}>
         <div className={`p-5 border-b border-slate-800 ${focusMode ? 'flex justify-center' : ''}`}>
           {!focusMode ? (
             <>

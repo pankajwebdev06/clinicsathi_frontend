@@ -18,7 +18,7 @@ import { authApi } from '@/features/auth/api';
 import { ImageUploadWithPreview, uploadWithProgress } from '@/shared/components/ImageUploadWithPreview';
 import { PrescriptionTemplateEditor } from './PrescriptionTemplateEditor';
 
-type Tab = 'queue' | 'summary' | 'settings' | 'profile';
+type Tab = 'queue' | 'summary' | 'settings' | 'profile' | 'templates';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000/api/v1').replace(/\/api\/v1\/?$/, '');
 
@@ -330,6 +330,7 @@ export default function DoctorDashboard() {
           { id: 'queue', icon: '🗂️', label: 'Patient Queue', onClick: () => setActiveTab('queue') },
           { id: 'summary', icon: '📊', label: 'Daily Summary', onClick: () => setActiveTab('summary') },
           { id: 'profile', icon: '👤', label: 'Public Profile', onClick: () => setActiveTab('profile') },
+          { id: 'templates', icon: '📋', label: 'Prescription Templates', onClick: () => setActiveTab('templates') },
           { id: 'settings', icon: '⚙️', label: 'Settings & Staff', onClick: () => setActiveTab('settings') },
         ]}
         onLogout={() => {
@@ -372,7 +373,7 @@ export default function DoctorDashboard() {
               { label: 'Home', href: '/', icon: '🏠' },
               { label: 'Doctor Dashboard', isCurrent: activeTab === 'queue' },
               ...(activeTab !== 'queue' ? [{
-                label: activeTab === 'summary' ? 'Daily Summary' : activeTab === 'profile' ? 'Public Profile' : 'Settings & Staff',
+                label: activeTab === 'summary' ? 'Daily Summary' : activeTab === 'profile' ? 'Public Profile' : activeTab === 'templates' ? 'Prescription Templates' : 'Settings & Staff',
                 isCurrent: true
               }] : [])
             ]}
@@ -395,7 +396,7 @@ export default function DoctorDashboard() {
         {/* Mobile current tab label */}
         <div className="md:hidden px-4 pt-3 pb-1">
           <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">
-            {activeTab === 'queue' ? 'Patient Queue' : activeTab === 'summary' ? 'Daily Summary' : activeTab === 'profile' ? 'Public Profile' : 'Settings & Staff'}
+            {activeTab === 'queue' ? 'Patient Queue' : activeTab === 'summary' ? 'Daily Summary' : activeTab === 'profile' ? 'Public Profile' : activeTab === 'templates' ? 'Prescription Templates' : 'Settings & Staff'}
           </p>
         </div>
 
@@ -405,9 +406,9 @@ export default function DoctorDashboard() {
 
           {/* Tab: Queue */}
           {activeTab === 'queue' && (
-            <div className="flex flex-col md:grid md:grid-cols-5 gap-6">
-              {/* Queue List */}
-              <div className="md:col-span-2">
+            <div className="flex flex-col lg:grid lg:grid-cols-5 gap-6">
+              {/* Queue List — below consultation on tablet (md:order-2), left column on desktop */}
+              <div className="md:order-2 lg:order-1 lg:col-span-2">
                 <QueueBoard
                   clinicId={clinic.id}
                   queue={queue.map(p => ({
@@ -422,8 +423,8 @@ export default function DoctorDashboard() {
                 />
               </div>
 
-              {/* Consultation Panel */}
-              <div className="md:col-span-3">
+              {/* Consultation Panel — on top on tablet (md:order-1), right column on desktop */}
+              <div className="md:order-1 lg:order-2 lg:col-span-3">
                 {selectedPatient ? (
                   <ConsultPanel
                     patient={selectedPatient}
@@ -750,6 +751,13 @@ export default function DoctorDashboard() {
             </div>
           )}
 
+          {/* Tab: Prescription Templates */}
+          {activeTab === 'templates' && (
+            <div className="space-y-6 animate-in fade-in duration-300">
+              <PrescriptionTemplateEditor />
+            </div>
+          )}
+
           {/* Tab: Settings */}
           {activeTab === 'settings' && (
             <div className="space-y-6 animate-in fade-in duration-300">
@@ -825,19 +833,9 @@ export default function DoctorDashboard() {
                 </button>
               </div>
 
-              {/* Data Export Section */}
-              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
-                <h3 className="text-xl font-bold text-slate-900 mb-2">📥 Data Export</h3>
-                <p className="text-slate-500 text-sm mb-4">Download all your clinic's patient records in JSON format. This backup can be converted to CSV or PDF later.</p>
-                <button onClick={handleExport} className="px-6 py-3 border-2 border-slate-200 hover:border-blue-500 text-slate-700 hover:text-blue-600 font-bold rounded-xl transition-all active:scale-[0.98] flex items-center gap-2">
-                  <span className="text-xl">⬇️</span> Export Patient Records
-                </button>
-              </div>
-
-              <PrescriptionTemplateEditor />
 
               {/* Staff Management */}
-              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8">
+              <div className="bg-white rounded-3xl border border-slate-100 shadow-sm p-8" id="staff-section">
                 <h3 className="text-xl font-bold text-slate-900 mb-2">👥 Staff Management</h3>
                 <p className="text-slate-500 text-sm mb-6">Add reception staff by mobile number. They can log in immediately.</p>
 
@@ -882,6 +880,23 @@ export default function DoctorDashboard() {
                   ))}
                 </div>
               </div>
+
+              {/* Data Export — tucked away, collapsed by default */}
+              <details className="rounded-2xl border border-slate-200 bg-white overflow-hidden group">
+                <summary className="px-6 py-4 text-sm font-semibold text-slate-400 cursor-pointer select-none list-none flex items-center gap-2 hover:text-slate-600 hover:bg-slate-50 transition-colors">
+                  <span className="text-xs group-open:rotate-90 transition-transform inline-block">▶</span>
+                  Advanced
+                </summary>
+                <div className="px-6 pb-5 border-t border-slate-100">
+                  <p className="text-xs text-slate-400 mt-4 mb-3">Download all patient records as a JSON backup. Can be converted to CSV or PDF later.</p>
+                  <button
+                    onClick={handleExport}
+                    className="text-xs px-4 py-2.5 border border-slate-200 text-slate-500 hover:text-blue-600 hover:border-blue-300 rounded-lg transition-colors flex items-center gap-1.5"
+                  >
+                    ⬇️ Export Patient Records
+                  </button>
+                </div>
+              </details>
             </div>
           )}
 
