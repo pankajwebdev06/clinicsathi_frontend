@@ -302,6 +302,24 @@ class SyncManager {
         syncStatus: 'synced',
       });
 
+      // Fix stale local patient IDs in pending queue sync items and db.queue.
+      // When offline, queue entries are saved with patient_id = local_xxx. After
+      // the patient syncs and gets a real server ID, any pending queue CREATE
+      // operations must be updated to use the server ID or the backend will
+      // reject them with a foreign key constraint violation.
+      const pendingSyncItems = await db.syncQueue.toArray();
+      for (const item of pendingSyncItems) {
+        if (item.entity === 'queue' && item.id != null) {
+          const qData = item.data as QueueEntry;
+          if (qData.patient_id === data.id) {
+            await db.syncQueue.update(item.id, {
+              data: { ...qData, patient_id: response.id },
+            });
+          }
+        }
+      }
+      await db.queue.where('patient_id').equals(data.id).modify({ patient_id: response.id });
+
       return { localId: data.id, serverId: response.id, status: 'created' };
     }
 

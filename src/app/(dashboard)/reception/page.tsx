@@ -9,6 +9,7 @@ import { VitalsGrid } from '@/shared/components/VitalsGrid';
 import { ClinicSidebar } from '@/shared/components/ClinicSidebar';
 import { patientsApi } from '@/features/patients/api';
 import { queueApi } from '@/features/queue/api';
+import { NetworkError } from '@/core/api/apiClient';
 import { DocumentUpload } from '@/features/reception/DocumentUpload';
 import { ConnectionDot } from '@/features/reception/ConnectionDot';
 import { useQueueSocket } from '@/hooks/useQueueSocket';
@@ -229,30 +230,61 @@ export default function ReceptionDashboard() {
       let pId = patientData.id;
 
       if (navigator.onLine) {
-        // ONLINE: save directly to server — zero intermediary, instant response
-        if (!pId) {
-          const newPatient = await patientsApi.createPatient({
-            name: patientData.name,
-            mobile_number: mobileNumber,
-            age: parseInt(patientData.age),
-            gender: patientData.gender as any,
+        // ONLINE: save directly to server — zero intermediary, instant response.
+        // If the backend is unreachable (Render cold start, transient failure)
+        // we catch NetworkError and fall through to the offline syncManager path
+        // so the receptionist is never blocked.
+        try {
+          if (!pId) {
+            const newPatient = await patientsApi.createPatient({
+              name: patientData.name,
+              mobile_number: mobileNumber,
+              age: parseInt(patientData.age),
+              gender: patientData.gender as any,
+              clinic_id: userInfo.clinic_id,
+              consent_given: consentGiven,
+            });
+            pId = newPatient.id;
+            setPatientData(prev => ({ ...prev, id: pId }));
+          }
+          const queueEntry = await queueApi.addToQueue({
             clinic_id: userInfo.clinic_id,
-            consent_given: consentGiven,
+            patient_id: pId,
+            priority: 0,
+            symptoms: patientData.symptoms,
+            bp: vitals.bp,
+            weight: vitals.weight,
+            temperature: vitals.temperature,
+            pulse: vitals.pulse,
           });
-          pId = newPatient.id;
-          setPatientData(prev => ({ ...prev, id: pId }));
+          setToken(queueEntry.token_number);
+        } catch (netErr) {
+          if (!(netErr instanceof NetworkError)) throw netErr;
+          // Backend unreachable — fall back to offline queue so work isn't lost
+          if (!pId) {
+            const newPatient = await syncManager.createPatient({
+              name: patientData.name,
+              mobile_number: mobileNumber,
+              age: parseInt(patientData.age),
+              gender: patientData.gender as any,
+              clinic_id: userInfo.clinic_id,
+              consent_given: consentGiven,
+            });
+            pId = newPatient.id;
+            setPatientData(prev => ({ ...prev, id: pId }));
+          }
+          const queueEntry = await syncManager.addToQueue({
+            clinic_id: userInfo.clinic_id,
+            patient_id: pId,
+            priority: 0,
+            symptoms: patientData.symptoms,
+            bp: vitals.bp,
+            weight: vitals.weight,
+            temperature: vitals.temperature,
+            pulse: vitals.pulse,
+          });
+          setToken(queueEntry.token_number === 'PENDING' ? 'PENDING (offline)' : queueEntry.token_number);
         }
-        const queueEntry = await queueApi.addToQueue({
-          clinic_id: userInfo.clinic_id,
-          patient_id: pId,
-          priority: 0,
-          symptoms: patientData.symptoms,
-          bp: vitals.bp,
-          weight: vitals.weight,
-          temperature: vitals.temperature,
-          pulse: vitals.pulse,
-        });
-        setToken(queueEntry.token_number);
       } else {
         // OFFLINE: write to IndexedDB immediately, background-sync on reconnect
         if (!pId) {
