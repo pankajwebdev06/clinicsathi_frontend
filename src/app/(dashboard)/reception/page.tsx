@@ -9,7 +9,6 @@ import { VitalsGrid } from '@/shared/components/VitalsGrid';
 import { ClinicSidebar } from '@/shared/components/ClinicSidebar';
 import { patientsApi } from '@/features/patients/api';
 import { queueApi } from '@/features/queue/api';
-import { NetworkError } from '@/core/api/apiClient';
 import { DocumentUpload } from '@/features/reception/DocumentUpload';
 import { ConnectionDot } from '@/features/reception/ConnectionDot';
 import { useQueueSocket } from '@/hooks/useQueueSocket';
@@ -43,6 +42,7 @@ export default function ReceptionDashboard() {
   const [patientData, setPatientData] = useState({ id: '', name: '', age: '', gender: '', symptoms: '' });
   const [vitals, setVitals] = useState<PatientVitals>({ bp: '', weight: '', temperature: '', pulse: '' });
   const [token, setToken] = useState('');
+  const [isOfflineToken, setIsOfflineToken] = useState(false);
   const [queue, setQueue] = useState<any[]>([]);
   const [patients, setPatients] = useState<any[]>([]);
   const [patientsCache, setPatientsCache] = useState<Record<string, any>>({});
@@ -67,7 +67,8 @@ export default function ReceptionDashboard() {
 
       try {
         const userInfo = JSON.parse(userInfoStr);
-        // Fetch real clinic data from backend
+        // Fetch real clinic data from backend — this call also warms up the
+        // Render instance so subsequent patient/queue API calls are fast.
         const realClinicData = await authApi.getClinic(userInfo.clinic_id);
         
         // Map backend response to frontend ClinicData structure
@@ -230,63 +231,36 @@ export default function ReceptionDashboard() {
       let pId = patientData.id;
 
       if (navigator.onLine) {
-        // ONLINE: save directly to server — zero intermediary, instant response.
-        // If the backend is unreachable (Render cold start, transient failure)
-        // we catch NetworkError and fall through to the offline syncManager path
-        // so the receptionist is never blocked.
-        try {
-          if (!pId) {
-            const newPatient = await patientsApi.createPatient({
-              name: patientData.name,
-              mobile_number: mobileNumber,
-              age: parseInt(patientData.age),
-              gender: patientData.gender as any,
-              clinic_id: userInfo.clinic_id,
-              consent_given: consentGiven,
-            });
-            pId = newPatient.id;
-            setPatientData(prev => ({ ...prev, id: pId }));
-          }
-          const queueEntry = await queueApi.addToQueue({
+        // ONLINE: talk directly to server — no local storage involved.
+        // The backend is already warm because checkAuthAndFetchClinic called it
+        // on page load, so this round-trip should complete in < 2 seconds.
+        if (!pId) {
+          const newPatient = await patientsApi.createPatient({
+            name: patientData.name,
+            mobile_number: mobileNumber,
+            age: parseInt(patientData.age),
+            gender: patientData.gender as any,
             clinic_id: userInfo.clinic_id,
-            patient_id: pId,
-            priority: 0,
-            symptoms: patientData.symptoms,
-            bp: vitals.bp,
-            weight: vitals.weight,
-            temperature: vitals.temperature,
-            pulse: vitals.pulse,
+            consent_given: consentGiven,
           });
-          setToken(queueEntry.token_number);
-        } catch (netErr) {
-          if (!(netErr instanceof NetworkError)) throw netErr;
-          // Backend unreachable — fall back to offline queue so work isn't lost
-          if (!pId) {
-            const newPatient = await syncManager.createPatient({
-              name: patientData.name,
-              mobile_number: mobileNumber,
-              age: parseInt(patientData.age),
-              gender: patientData.gender as any,
-              clinic_id: userInfo.clinic_id,
-              consent_given: consentGiven,
-            });
-            pId = newPatient.id;
-            setPatientData(prev => ({ ...prev, id: pId }));
-          }
-          const queueEntry = await syncManager.addToQueue({
-            clinic_id: userInfo.clinic_id,
-            patient_id: pId,
-            priority: 0,
-            symptoms: patientData.symptoms,
-            bp: vitals.bp,
-            weight: vitals.weight,
-            temperature: vitals.temperature,
-            pulse: vitals.pulse,
-          });
-          setToken(queueEntry.token_number === 'PENDING' ? 'PENDING (offline)' : queueEntry.token_number);
+          pId = newPatient.id;
+          setPatientData(prev => ({ ...prev, id: pId }));
         }
+        const queueEntry = await queueApi.addToQueue({
+          clinic_id: userInfo.clinic_id,
+          patient_id: pId,
+          priority: 0,
+          symptoms: patientData.symptoms,
+          bp: vitals.bp,
+          weight: vitals.weight,
+          temperature: vitals.temperature,
+          pulse: vitals.pulse,
+        });
+        setIsOfflineToken(false);
+        setToken(queueEntry.token_number);
       } else {
-        // OFFLINE: write to IndexedDB immediately, background-sync on reconnect
+        // OFFLINE: IndexedDB is the server — generate a real local token immediately,
+        // everything syncs silently the moment connectivity returns.
         if (!pId) {
           const newPatient = await syncManager.createPatient({
             name: patientData.name,
@@ -309,7 +283,8 @@ export default function ReceptionDashboard() {
           temperature: vitals.temperature,
           pulse: vitals.pulse,
         });
-        setToken(queueEntry.token_number === 'PENDING' ? 'PENDING (offline)' : queueEntry.token_number);
+        setIsOfflineToken(true);
+        setToken(queueEntry.token_number);
       }
 
       setFlowState('token');
@@ -334,6 +309,8 @@ export default function ReceptionDashboard() {
     setPatientData({ id: '', name: '', age: '', gender: '', symptoms: '' });
     setVitals({ bp: '', weight: '', temperature: '', pulse: '' });
     setToken('');
+    setIsOfflineToken(false);
+    setConsentGiven(false);
     setFlowState('search');
   };
 
@@ -582,14 +559,14 @@ export default function ReceptionDashboard() {
             {flowState === 'token' && (
               <div className="animate-in fade-in zoom-in-95 duration-500 max-w-md mx-auto mt-4">
                 <div className="border border-slate-200 rounded-2xl p-5 text-center bg-white shadow-sm">
-                  <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full ${token.includes('PENDING') ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'} mb-2 print:hidden text-xl`}>
-                    {token.includes('PENDING') ? '⏳' : '✓'}
+                  <div className={`inline-flex items-center justify-center w-10 h-10 rounded-full ${isOfflineToken ? 'bg-amber-100 text-amber-600' : 'bg-emerald-100 text-emerald-600'} mb-2 print:hidden text-xl`}>
+                    {isOfflineToken ? '⏳' : '✓'}
                   </div>
                   <h4 className="text-slate-400 text-xs font-bold uppercase tracking-widest mb-0.5">Token</h4>
                   <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tighter mb-3 break-words">{token}</h2>
-                  {token.includes('PENDING') && (
+                  {isOfflineToken && (
                     <p className="text-xs text-amber-700 bg-amber-50 border border-amber-200 rounded-lg p-2 mb-3 font-semibold">
-                      Saved locally — final token will appear here once the device reconnects.
+                      Saved locally — will sync to doctor's queue when internet returns.
                     </p>
                   )}
 
