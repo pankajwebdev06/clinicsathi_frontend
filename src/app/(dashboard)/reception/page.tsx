@@ -10,7 +10,7 @@ import { ClinicSidebar } from '@/shared/components/ClinicSidebar';
 import { patientsApi } from '@/features/patients/api';
 import { queueApi } from '@/features/queue/api';
 import { DocumentUpload } from '@/features/reception/DocumentUpload';
-import { OfflineSyncBanner } from '@/features/reception/OfflineSyncBanner';
+import { ConnectionDot } from '@/features/reception/ConnectionDot';
 import { useQueueSocket } from '@/hooks/useQueueSocket';
 import { syncManager } from '@/lib/sync/sync-manager';
 import { db } from '@/lib/db/schema';
@@ -227,49 +227,69 @@ export default function ReceptionDashboard() {
       if (!userInfo.clinic_id) throw new Error('Clinic ID missing');
 
       let pId = patientData.id;
-      // OFFLINE-FIRST: route through the SyncManager.
-      // - Online: writes to server + cache simultaneously
-      // - Offline: writes to IndexedDB + sync queue, returns a local id immediately
-      if (!pId) {
-        const newPatient = await syncManager.createPatient({
-          name: patientData.name,
-          mobile_number: mobileNumber,
-          age: parseInt(patientData.age),
-          gender: patientData.gender as any,
+
+      if (navigator.onLine) {
+        // ONLINE: save directly to server — zero intermediary, instant response
+        if (!pId) {
+          const newPatient = await patientsApi.createPatient({
+            name: patientData.name,
+            mobile_number: mobileNumber,
+            age: parseInt(patientData.age),
+            gender: patientData.gender as any,
+            clinic_id: userInfo.clinic_id,
+            consent_given: consentGiven,
+          });
+          pId = newPatient.id;
+          setPatientData(prev => ({ ...prev, id: pId }));
+        }
+        const queueEntry = await queueApi.addToQueue({
           clinic_id: userInfo.clinic_id,
-          consent_given: consentGiven,
+          patient_id: pId,
+          priority: 0,
+          symptoms: patientData.symptoms,
+          bp: vitals.bp,
+          weight: vitals.weight,
+          temperature: vitals.temperature,
+          pulse: vitals.pulse,
         });
-        pId = newPatient.id;
-        setPatientData(prev => ({ ...prev, id: pId }));
+        setToken(queueEntry.token_number);
+      } else {
+        // OFFLINE: write to IndexedDB immediately, background-sync on reconnect
+        if (!pId) {
+          const newPatient = await syncManager.createPatient({
+            name: patientData.name,
+            mobile_number: mobileNumber,
+            age: parseInt(patientData.age),
+            gender: patientData.gender as any,
+            clinic_id: userInfo.clinic_id,
+            consent_given: consentGiven,
+          });
+          pId = newPatient.id;
+          setPatientData(prev => ({ ...prev, id: pId }));
+        }
+        const queueEntry = await syncManager.addToQueue({
+          clinic_id: userInfo.clinic_id,
+          patient_id: pId,
+          priority: 0,
+          symptoms: patientData.symptoms,
+          bp: vitals.bp,
+          weight: vitals.weight,
+          temperature: vitals.temperature,
+          pulse: vitals.pulse,
+        });
+        setToken(queueEntry.token_number === 'PENDING' ? 'PENDING (offline)' : queueEntry.token_number);
       }
 
-      const queueEntry = await syncManager.addToQueue({
-        clinic_id: userInfo.clinic_id,
-        patient_id: pId,
-        priority: 0,
-        symptoms: patientData.symptoms,
-        bp: vitals.bp,
-        weight: vitals.weight,
-        temperature: vitals.temperature,
-        pulse: vitals.pulse,
-      });
-
-      // Offline-created queue entries get token_number 'PENDING' — surface that
-      // honestly so the receptionist knows the real token will arrive after sync.
-      setToken(queueEntry.token_number === 'PENDING' ? 'PENDING (offline)' : queueEntry.token_number);
       setFlowState('token');
 
-      // Immediately refresh the queue + patient list so the new entry shows up
-      // in the bottom queue panel without waiting for the 5-second poll. Also
-      // force a patient cache rebuild so the row renders with the right name
-      // instead of "Unknown" until the next polling tick.
+      // Refresh queue panel immediately without waiting for the polling tick
       try {
         const pData = await patientsApi.getPatients(userInfo.clinic_id);
         const newCache: Record<string, any> = {};
         pData.forEach((p: any) => { newCache[p.id] = p; });
         setPatientsCache(newCache);
         setPatients(pData);
-      } catch { /* offline — local cache still serves the bottom queue */ }
+      } catch { /* offline — local cache still serves */ }
       loadQueue();
     } catch (err: any) {
       setError(err.message || 'Failed to generate token');
@@ -343,7 +363,7 @@ export default function ReceptionDashboard() {
             <h2 className="text-lg font-bold text-slate-800 tracking-tight truncate">{clinic.clinicName}</h2>
             <p className="text-xs text-slate-500">Reception Desk</p>
           </div>
-          <span className="ml-2 flex-shrink-0 px-2 py-1 bg-emerald-50 text-emerald-700 text-[10px] font-bold rounded-full border border-emerald-100">● Live</span>
+          <ConnectionDot className="ml-2" />
         </div>
 
         {/* Page title */}
@@ -370,8 +390,10 @@ export default function ReceptionDashboard() {
           </div>}
         </div>
 
-        {/* Offline-first status — visible only when offline OR sync pending */}
-        <OfflineSyncBanner />
+        {/* Connection status — desktop only (mobile top bar has its own dot) */}
+        <div className="hidden md:flex justify-end mb-2 print:hidden">
+          <ConnectionDot />
+        </div>
 
         {/* Main card */}
         <div className="bg-white rounded-3xl shadow-sm border border-slate-200 overflow-hidden relative">
