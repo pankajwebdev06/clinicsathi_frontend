@@ -3,6 +3,90 @@ import { StatsBar } from '@/features/landing/ProductShowcase';
 import { PricingCard } from '@/features/landing/PricingCard';
 import { NavBar } from './NavBar';
 
+const BENEFITS = [
+  {
+    icon: '⏱️',
+    stat: '2–3 hrs',
+    statLabel: 'saved per day',
+    title: 'Your receptionist goes home on time',
+    desc: 'Patient check-in drops from 3–4 minutes to under 30 seconds. No more manual registers, no more lost slips.',
+    color: 'border-blue-200 bg-blue-50',
+    statColor: 'text-blue-600',
+  },
+  {
+    icon: '📂',
+    stat: '0',
+    statLabel: 'records ever lost',
+    title: 'Every patient visit, always on record',
+    desc: 'Search any patient by mobile number — full history, vitals, prescriptions, and reports appear instantly.',
+    color: 'border-teal-200 bg-teal-50',
+    statColor: 'text-teal-600',
+  },
+  {
+    icon: '🌐',
+    stat: '₹0',
+    statLabel: 'marketing cost',
+    title: 'Google finds your clinic for free',
+    desc: 'Your SEO-optimised profile page ranks for "doctor near me" searches — no ads, no agency fees needed.',
+    color: 'border-purple-200 bg-purple-50',
+    statColor: 'text-purple-600',
+  },
+  {
+    icon: '📵',
+    stat: '100%',
+    statLabel: 'uptime even offline',
+    title: 'Powercut? Poor signal? Still works.',
+    desc: 'Reception keeps running on any network — even 2G or no internet. Data syncs automatically when back online.',
+    color: 'border-orange-200 bg-orange-50',
+    statColor: 'text-orange-600',
+  },
+  {
+    icon: '🖨️',
+    stat: '5 min',
+    statLabel: 'to set up your pad',
+    title: 'Prescriptions that look like yours',
+    desc: 'Upload your existing letterhead once. ClinicSathi matches your header, colors, and layout. Patients notice no difference.',
+    color: 'border-rose-200 bg-rose-50',
+    statColor: 'text-rose-600',
+  },
+  {
+    icon: '🧑‍💻',
+    stat: 'Zero',
+    statLabel: 'IT team needed',
+    title: 'Works on any phone, out of the box',
+    desc: 'No installation, no training manual. Your receptionist is ready in under 10 minutes on any Android or iPhone.',
+    color: 'border-emerald-200 bg-emerald-50',
+    statColor: 'text-emerald-600',
+  },
+];
+
+const UPCOMING = [
+  {
+    icon: '💬',
+    title: 'WhatsApp Reminders',
+    desc: 'Auto-send appointment confirmations and follow-up reminders directly to patients on WhatsApp.',
+    tag: 'Coming Soon',
+    tagColor: 'bg-green-100 text-green-700 border-green-200',
+    iconBg: 'bg-green-500',
+  },
+  {
+    icon: '🏥',
+    title: 'ABHA / Digital Health ID',
+    desc: 'Link patients to their Ayushman Bharat Health Account at check-in — auto-fill their profile with one OTP.',
+    tag: 'Coming Soon',
+    tagColor: 'bg-blue-100 text-blue-700 border-blue-200',
+    iconBg: 'bg-blue-500',
+  },
+  {
+    icon: '💳',
+    title: 'Billing & Invoicing',
+    desc: 'OPD invoice generation, UPI/cash/card tracking, and payment history — all inside ClinicSathi.',
+    tag: 'Premium Feature',
+    tagColor: 'bg-amber-100 text-amber-700 border-amber-200',
+    iconBg: 'bg-amber-500',
+  },
+];
+
 const FEATURES = [
   {
     icon: '🗂️',
@@ -219,8 +303,79 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* WHY DOCTORS CHOOSE CLINICSATHI */}
+      <section className="py-20 md:py-28 bg-white">
+        <div className="max-w-6xl mx-auto px-5">
+          <div className="text-center mb-14">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-100 text-teal-700 text-xs font-bold mb-4 uppercase tracking-wider">
+              For Doctors & Clinic Owners
+            </div>
+            <h2 className="text-3xl md:text-5xl font-black text-slate-900 mb-4 tracking-tight">
+              Real results, from day one
+            </h2>
+            <p className="text-slate-500 text-base md:text-lg font-medium max-w-xl mx-auto">
+              ClinicSathi is built around one goal — give doctors more time with patients, and less time with paperwork.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
+            {BENEFITS.map(b => (
+              <div key={b.title} className={`rounded-3xl border p-6 ${b.color} flex flex-col gap-4`}>
+                <div className="flex items-start justify-between gap-3">
+                  <span className="text-3xl">{b.icon}</span>
+                  <div className="text-right">
+                    <div className={`text-2xl md:text-3xl font-black ${b.statColor}`}>{b.stat}</div>
+                    <div className="text-slate-500 text-xs font-semibold">{b.statLabel}</div>
+                  </div>
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base mb-1.5">{b.title}</h3>
+                  <p className="text-slate-600 text-sm font-medium leading-relaxed">{b.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* STATS BAR — credibility/scale */}
       <StatsBar />
+
+      {/* UPCOMING FEATURES */}
+      <section className="py-16 md:py-20 bg-slate-50 border-y border-slate-100">
+        <div className="max-w-5xl mx-auto px-5">
+          <div className="text-center mb-10">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900 text-white text-xs font-bold mb-4 uppercase tracking-wider">
+              🛣️ What&apos;s coming next
+            </div>
+            <h2 className="text-2xl md:text-4xl font-black text-slate-900 mb-3 tracking-tight">
+              We&apos;re just getting started
+            </h2>
+            <p className="text-slate-500 text-sm md:text-base font-medium max-w-lg mx-auto">
+              These features are in active development — built based on feedback from real clinics.
+            </p>
+          </div>
+          <div className="grid sm:grid-cols-3 gap-5">
+            {UPCOMING.map(u => (
+              <div key={u.title} className="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col gap-4 relative overflow-hidden">
+                {/* Subtle top accent */}
+                <div className={`absolute top-0 left-0 right-0 h-1 ${u.iconBg} opacity-60`}></div>
+                <div className="flex items-center gap-3">
+                  <div className={`w-11 h-11 rounded-xl ${u.iconBg} flex items-center justify-center text-xl text-white shadow-sm flex-shrink-0`}>
+                    {u.icon}
+                  </div>
+                  <span className={`px-2.5 py-1 rounded-full text-[11px] font-black border ${u.tagColor} uppercase tracking-wider`}>
+                    {u.tag}
+                  </span>
+                </div>
+                <div>
+                  <h3 className="font-bold text-slate-900 text-base mb-1.5">{u.title}</h3>
+                  <p className="text-slate-500 text-sm font-medium leading-relaxed">{u.desc}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* SETUP GUIDE CTA — bridges Features and How-It-Works */}
       <section className="py-14 bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 border-y border-amber-100">
