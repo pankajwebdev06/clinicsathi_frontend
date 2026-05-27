@@ -115,7 +115,7 @@ export default function ClinicSetup() {
       <div className="w-full max-w-xl z-10 relative">
         {/* Logo */}
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 text-white shadow-lg shadow-blue-500/30 mb-4 font-black text-lg">CS</div>
+          <div className="inline-flex items-center justify-center w-14 h-14 rounded-2xl bg-gradient-to-tr from-blue-600 to-teal-400 text-white shadow-lg shadow-blue-500/30 mb-4 font-black text-lg">DK</div>
           <h1 className="text-2xl font-extrabold text-slate-900">Setup Your Clinic</h1>
           <p className="text-slate-500 mt-1 text-sm">Complete {stepConfig.length} quick steps on DoctorKaDost</p>
           <Breadcrumbs 

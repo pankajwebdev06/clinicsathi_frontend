@@ -506,7 +506,7 @@ export default function LandingPage() {
       <footer className="py-10 border-t border-slate-100 bg-white">
         <div className="max-w-6xl mx-auto px-5 flex flex-col md:flex-row justify-between items-center gap-5">
           <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs flex-shrink-0">CS</div>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs flex-shrink-0">DK</div>
             <span className="font-extrabold text-slate-900">DoctorKaDost</span>
           </div>
           <p className="text-slate-400 text-sm font-medium text-center">© 2026 DoctorKaDost. Built for the Indian Subcontinent.</p>

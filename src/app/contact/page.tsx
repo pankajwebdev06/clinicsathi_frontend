@@ -6,7 +6,7 @@ export default function ContactPage() {
       <header className="bg-white border-b border-slate-100 shadow-sm sticky top-0 z-50">
         <div className="max-w-4xl mx-auto px-5 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CS</div>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">DK</div>
             <span className="font-extrabold text-slate-900">DoctorKaDost</span>
           </Link>
           <Link href="/" className="text-sm font-bold text-blue-600">Back to Home</Link>

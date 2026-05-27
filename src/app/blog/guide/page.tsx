@@ -70,7 +70,7 @@ export default function GuidePage() {
       <header className="bg-white border-b border-slate-100 sticky top-0 z-50">
         <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
           <Link href="/" className="flex items-center gap-2 min-w-0">
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs flex-shrink-0">CS</div>
+            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs flex-shrink-0">DK</div>
             <span className="font-extrabold text-slate-900 truncate">DoctorKaDost</span>
           </Link>
           <Link href="/doctor/setup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap min-h-[40px] flex items-center">
@@ -191,7 +191,7 @@ export default function GuidePage() {
       <footer className="py-8 border-t border-slate-100 bg-white px-4">
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-500">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CS</div>
+            <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">DK</div>
             <span className="font-bold text-slate-700">DoctorKaDost</span>
           </Link>
           <div className="flex flex-wrap justify-center gap-3 md:gap-5">
