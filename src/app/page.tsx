@@ -1,4 +1,4 @@
-﻿import Link from 'next/link';
+import Link from 'next/link';
 import { StatsBar } from '@/features/landing/ProductShowcase';
 import { PricingCard } from '@/features/landing/PricingCard';
 import { NavBar } from './NavBar';

@@ -1,4 +1,4 @@
-﻿import { create } from 'zustand';
+import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, Clinic, AuthResponse, LoginCredentials } from '@/types';
 import { authApi } from '@/features/auth/api';

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React, { useState, useRef, useCallback } from 'react';
 import { useClinic, TemplateConfig, DEFAULT_TEMPLATE_CONFIG } from '@/core/store/clinic-context';
 import { ImageUploadWithPreview, uploadWithProgress } from '@/shared/components/ImageUploadWithPreview';

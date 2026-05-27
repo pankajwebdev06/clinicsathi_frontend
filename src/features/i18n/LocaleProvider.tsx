@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Locale, LOCALES, STRINGS } from './strings';
 import { authApi } from '@/features/auth/api';

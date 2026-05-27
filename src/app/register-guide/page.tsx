@@ -1,4 +1,4 @@
-﻿// Standalone "How to Register Your Clinic" page.
+// Standalone "How to Register Your Clinic" page.
 // Re-uses the existing visual guide from /blog/guide so we follow the
 // component-first rule (no content duplication) — only the route + metadata
 // change for nav discoverability and SEO.

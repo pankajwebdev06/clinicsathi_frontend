@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import React from 'react';
 
 // Visual showcases of new features — pure CSS mockups, no images, fast on 3G.
