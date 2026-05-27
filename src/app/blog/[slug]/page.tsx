@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { LogoIcon } from '@/shared/components/LogoIcon';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
@@ -45,7 +46,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       <header style={{ background:'white', borderBottom:'1px solid #f1f5f9', position:'sticky', top:0, zIndex:50 }}>
         <div style={{ maxWidth:800, margin:'0 auto', padding:'16px 24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none' }}>
-            <div style={{ width:32, height:32, borderRadius:9, background:'linear-gradient(135deg,#2563eb,#14b8a6)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontWeight:900, fontSize:11 }}>DK</div>
+            <LogoIcon size={32} />
             <span style={{ fontWeight:800, color:'#0f172a', fontSize:15 }}>DoctorKaDost</span>
           </Link>
           <Link href="/blog" style={{ color:'#64748b', fontWeight:600, fontSize:13, textDecoration:'none' }}>← Back to Blog</Link>

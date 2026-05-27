@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Head from 'next/head';
 import { useLocale, LanguageToggle } from '@/features/i18n/LocaleProvider';
+import { LogoIcon } from '@/shared/components/LogoIcon';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
@@ -68,7 +69,7 @@ export default function DoctorsPage() {
       <header style={{ background: 'white', borderBottom: '1px solid #f1f5f9', position: 'sticky', top: 0, zIndex: 50 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', flexShrink: 0 }}>
-            <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg,#2563eb,#14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 11 }}>DK</div>
+            <LogoIcon size={32} />
             <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 15 }}>DoctorKaDost</span>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>

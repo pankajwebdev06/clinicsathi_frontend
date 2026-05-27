@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useEffect, useState, MouseEvent } from 'react';
+import { LogoIcon } from '@/shared/components/LogoIcon';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
 
@@ -47,7 +48,7 @@ export default function BlogPage() {
       <header style={{ background:'white', borderBottom:'1px solid #f1f5f9', position:'sticky', top:0, zIndex:50 }}>
         <div style={{ maxWidth:1100, margin:'0 auto', padding:'16px 24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none' }}>
-            <div style={{ width:34, height:34, borderRadius:10, background:'linear-gradient(135deg,#2563eb,#14b8a6)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontWeight:900, fontSize:12 }}>DK</div>
+            <LogoIcon size={34} />
             <span style={{ fontWeight:800, color:'#0f172a', fontSize:16 }}>DoctorKaDost</span>
           </Link>
           <nav style={{ display:'flex', gap:28 }}>

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { LanguageToggle } from '@/features/i18n/LocaleProvider';
+import { LogoIcon } from '@/shared/components/LogoIcon';
 
 export function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -13,9 +14,7 @@ export function NavBar() {
 
         {/* Logo */}
         <div className="flex items-center gap-2.5 flex-shrink-0">
-          <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/20">
-            CS
-          </div>
+          <LogoIcon size={36} className="shadow-md shadow-blue-500/20" />
           <span className="font-extrabold text-slate-900 text-lg tracking-tight">DoctorKaDost</span>
         </div>
 
