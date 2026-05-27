@@ -27,7 +27,7 @@ export const STRINGS = {
   landing: {
     heroTagline:    { en: 'Designed for Indian Clinics', hi: 'भारतीय क्लीनिक्स के लिए बनाया गया' },
     heroTitleA:     { en: "Your Clinic's",            hi: 'आपके क्लीनिक का' },
-    heroTitleAccent:{ en: 'Digital Saathi.',          hi: 'डिजिटल साथी।' },
+    heroTitleAccent:{ en: 'Digital Dost.',             hi: 'डिजिटल दोस्त।' },
     heroTitleB:     { en: 'Effortless Flow.',         hi: 'आसान काम।' },
     heroSub:        { en: 'Modern queue management, digital records, and seamless patient check-in — designed for Indian clinics.',
                        hi: 'आधुनिक क्यू मैनेजमेंट, डिजिटल रिकॉर्ड्स, और निर्बाध मरीज़ चेक-इन — भारतीय क्लीनिक्स के लिए।' },
