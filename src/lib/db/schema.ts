@@ -1,4 +1,4 @@
-import Dexie, { Table } from 'dexie';
+﻿import Dexie, { Table } from 'dexie';
 import type { 
   Patient, 
   QueueEntry, 
@@ -32,9 +32,9 @@ export interface LocalPrescription extends Prescription {
 }
 
 // ------------------------------------------
-// ClinicSathi Database Class
+// DoctorKaDost Database Class
 // ------------------------------------------
-class ClinicSathiDB extends Dexie {
+class DoctorKaDostDB extends Dexie {
   patients!: Table<LocalPatient, string>;
   queue!: Table<LocalQueueEntry, string>;
   consultations!: Table<LocalConsultation, string>;
@@ -43,7 +43,7 @@ class ClinicSathiDB extends Dexie {
   meta!: Table<{ key: string; value: unknown }, string>;
 
   constructor() {
-    super('ClinicSathiDB');
+    super('DoctorKaDostDB');
     
     this.version(1).stores({
       // Patients: index by id, clinicId, mobileNumber, and syncStatus
@@ -142,7 +142,7 @@ class ClinicSathiDB extends Dexie {
 // ------------------------------------------
 // Export Database Instance
 // ------------------------------------------
-export const db = new ClinicSathiDB();
+export const db = new DoctorKaDostDB();
 
 // ------------------------------------------
 // Helper Functions

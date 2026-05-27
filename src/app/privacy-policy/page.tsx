@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import Link from 'next/link';
 
 export default function PrivacyPolicy() {
@@ -6,19 +6,19 @@ export default function PrivacyPolicy() {
     <div className="min-h-screen bg-white text-slate-800 font-sans">
       <header className="border-b border-slate-100 py-4 px-6 sticky top-0 bg-white z-10">
         <div className="max-w-4xl mx-auto flex items-center gap-2">
-          <Link href="/" className="font-extrabold text-xl tracking-tight text-blue-600">ClinicSathi</Link>
+          <Link href="/" className="font-extrabold text-xl tracking-tight text-blue-600">DoctorKaDost</Link>
           <span className="text-slate-400 font-medium ml-4">Legal</span>
         </div>
       </header>
       
       <main className="max-w-3xl mx-auto px-6 py-12 prose prose-slate">
-        <h1 className="text-3xl font-black mb-2">PRIVACY POLICY — CLINICSATHI</h1>
+        <h1 className="text-3xl font-black mb-2">PRIVACY POLICY — DOCTORKADOST</h1>
         <p className="text-slate-500 font-medium mb-8"><strong>Effective Date:</strong> {new Date().toLocaleDateString('en-IN')} <br/>
-        <strong>Company:</strong> ClinicSathi Private Limited <br/>
-        <strong>Contact Email:</strong> privacy@clinicsathi.com</p>
+        <strong>Company:</strong> DoctorKaDost Private Limited <br/>
+        <strong>Contact Email:</strong> privacy@doctorkadost.com</p>
 
         <h3 className="text-xl font-bold mt-8 mb-4">1. Introduction</h3>
-        <p className="mb-4">ClinicSathi Private Limited operates the ClinicSathi clinic management platform. We are committed to protecting the privacy and security of all personal data processed through our platform.</p>
+        <p className="mb-4">DoctorKaDost Private Limited operates the DoctorKaDost clinic management platform. We are committed to protecting the privacy and security of all personal data processed through our platform.</p>
         <p className="mb-4">This Privacy Policy describes how we collect, use, store, and protect personal data in compliance with The Information Technology Act 2000, SPDI Rules 2011, DPDP Act 2023, and EHR Standards for India 2016.</p>
 
         <h3 className="text-xl font-bold mt-8 mb-4">2. Who We Collect Data From</h3>
@@ -45,7 +45,7 @@ export default function PrivacyPolicy() {
         <p className="mb-4">Patient health records are retained for a minimum of 7 years in accordance with MCI/NMC guidelines. Upon written request, administrators may request deletion of clinic data after account closure.</p>
 
         <h3 className="text-xl font-bold mt-8 mb-4">8. Your Rights</h3>
-        <p className="mb-4">Under the DPDP Act 2023, you have the right to Access, Correct, Erase, and seek Grievance Redressal. Contact <strong>privacy@clinicsathi.com</strong> to exercise these rights.</p>
+        <p className="mb-4">Under the DPDP Act 2023, you have the right to Access, Correct, Erase, and seek Grievance Redressal. Contact <strong>privacy@doctorkadost.com</strong> to exercise these rights.</p>
 
         <h3 className="text-xl font-bold mt-8 mb-4">9. Children's Data</h3>
         <p className="mb-4">For patients under 18, we require a parent or guardian to provide consent on the child's behalf at registration.</p>
@@ -53,8 +53,8 @@ export default function PrivacyPolicy() {
         <h3 className="text-xl font-bold mt-8 mb-4">10. Contact & Grievance Officer</h3>
         <p className="mb-4">
           Data Protection / Grievance Officer<br/>
-          ClinicSathi Private Limited<br/>
-          Email: privacy@clinicsathi.com
+          DoctorKaDost Private Limited<br/>
+          Email: privacy@doctorkadost.com
         </p>
       </main>
     </div>

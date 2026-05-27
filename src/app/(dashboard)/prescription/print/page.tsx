@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
@@ -125,7 +125,7 @@ function PrescriptionSheet({ cfg, clinic, patient }: {
           {cfg.footer.customText
             ? cfg.footer.customText
             : cfg.footer.showPoweredBy
-              ? 'Generated via ClinicSathi. The prescribing doctor is solely responsible for clinical decisions.'
+              ? 'Generated via DoctorKaDost. The prescribing doctor is solely responsible for clinical decisions.'
               : ''}
           {cfg.footer.followUpText && <><br />{cfg.footer.followUpText}</>}
           <br />Printed: {new Date().toLocaleString('en-IN')}

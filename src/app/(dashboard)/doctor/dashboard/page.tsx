@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 
@@ -288,7 +288,7 @@ export default function DoctorDashboard() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `clinicsathi_records_${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `doctorkadost_records_${new Date().toISOString().split('T')[0]}.json`;
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
@@ -598,7 +598,7 @@ export default function DoctorDashboard() {
                         value={settingsForm.metaTitle || ''}
                         onChange={e => setSettingsForm(f => ({ ...f, metaTitle: e.target.value }))}
                         className="w-full p-3 bg-white border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none text-slate-900"
-                        placeholder="Dr. Rahul Kumar - Best Cardiologist in Delhi | ClinicSathi"
+                        placeholder="Dr. Rahul Kumar - Best Cardiologist in Delhi | DoctorKaDost"
                         maxLength={60}
                       />
                       <p className="text-xs text-slate-500 mt-1">Recommended: 50-60 characters</p>
@@ -624,7 +624,7 @@ export default function DoctorDashboard() {
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-bold text-emerald-800">🌐 Your Public Profile</p>
                       <p className="text-xs text-emerald-600 mt-0.5 truncate">
-                        clinicsathi.in/doctor/<span className="font-mono">{settingsForm.slug || clinic.slug || '—'}</span>
+                        doctorkadost.in/doctor/<span className="font-mono">{settingsForm.slug || clinic.slug || '—'}</span>
                       </p>
                     </div>
                     <a

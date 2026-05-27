@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { notFound } from 'next/navigation';
 
 const API_BASE = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000').replace(/\/api\/v1\/?$/, '');
@@ -46,7 +46,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
         <div style={{ maxWidth:800, margin:'0 auto', padding:'16px 24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none' }}>
             <div style={{ width:32, height:32, borderRadius:9, background:'linear-gradient(135deg,#2563eb,#14b8a6)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontWeight:900, fontSize:11 }}>CS</div>
-            <span style={{ fontWeight:800, color:'#0f172a', fontSize:15 }}>ClinicSathi</span>
+            <span style={{ fontWeight:800, color:'#0f172a', fontSize:15 }}>DoctorKaDost</span>
           </Link>
           <Link href="/blog" style={{ color:'#64748b', fontWeight:600, fontSize:13, textDecoration:'none' }}>← Back to Blog</Link>
         </div>
@@ -75,7 +75,7 @@ export default async function BlogPostPage({ params }: { params: { slug: string 
       </main>
 
       <footer style={{ borderTop:'1px solid #f1f5f9', background:'white', padding:'32px 24px', textAlign:'center' }}>
-        <p style={{ color:'#94a3b8', fontSize:13 }}>© 2026 ClinicSathi · <Link href="/blog" style={{ color:'#2563eb', textDecoration:'none', fontWeight:600 }}>More Articles</Link></p>
+        <p style={{ color:'#94a3b8', fontSize:13 }}>© 2026 DoctorKaDost · <Link href="/blog" style={{ color:'#2563eb', textDecoration:'none', fontWeight:600 }}>More Articles</Link></p>
       </footer>
     </div>
   );

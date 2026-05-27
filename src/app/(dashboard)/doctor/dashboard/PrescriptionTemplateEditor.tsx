@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { useState, useRef, useCallback } from 'react';
 import { useClinic, TemplateConfig, DEFAULT_TEMPLATE_CONFIG } from '@/core/store/clinic-context';
 import { ImageUploadWithPreview, uploadWithProgress } from '@/shared/components/ImageUploadWithPreview';
@@ -157,7 +157,7 @@ function LivePreview({ config, clinic }: { config: TemplateConfig; clinic: Retur
       {/* Footer */}
       <div style={{ padding: '5px 10px', borderTop: `1px solid ${c}30`, display: 'flex', justifyContent: 'space-between', background: `${c}05` }}>
         <div style={{ color: '#9ca3af', fontSize: 6 }}>
-          {config.footer.customText || (config.footer.showPoweredBy ? 'ClinicSathi' : '')}
+          {config.footer.customText || (config.footer.showPoweredBy ? 'DoctorKaDost' : '')}
         </div>
         {config.footer.showSignature && (
           <div style={{ color: '#9ca3af', fontSize: 6, borderTop: '1px solid #cbd5e1', paddingTop: 2, minWidth: 60, textAlign: 'center' }}>
@@ -642,7 +642,7 @@ export function PrescriptionTemplateEditor() {
                   <p className="text-sm font-bold text-slate-700 mb-3">📝 Step 4 — Footer</p>
                   <div className="p-4 bg-white rounded-xl border border-slate-200 space-y-3">
                     <Toggle value={config.footer.showSignature} onChange={v => updateFooter({ showSignature: v })} label="Doctor's Signature area" />
-                    <Toggle value={config.footer.showPoweredBy} onChange={v => updateFooter({ showPoweredBy: v })} label="'Powered by ClinicSathi' note" />
+                    <Toggle value={config.footer.showPoweredBy} onChange={v => updateFooter({ showPoweredBy: v })} label="'Powered by DoctorKaDost' note" />
                     <div>
                       <label className="text-xs font-semibold text-slate-600 mb-1 block">Follow-up Reminder Text</label>
                       <input

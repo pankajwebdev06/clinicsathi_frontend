@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { Locale, LOCALES, STRINGS } from './strings';
 import { authApi } from '@/features/auth/api';
@@ -9,7 +9,7 @@ interface LocaleContextValue {
   t: (path: string) => string;   // e.g. "common.bookAppointment"
 }
 
-const STORAGE_KEY = 'clinicsathi_locale';
+const STORAGE_KEY = 'doctorkadost_locale';
 
 const LocaleContext = createContext<LocaleContextValue>({
   locale: 'en',

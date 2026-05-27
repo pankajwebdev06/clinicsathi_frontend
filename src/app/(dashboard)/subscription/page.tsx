@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -63,7 +63,7 @@ export default function SubscriptionPage() {
         <div className="text-center mb-12">
           <h2 className="text-3xl font-extrabold text-slate-900 mb-4">Choose Your Plan</h2>
           <p className="text-lg text-slate-600">
-            Select a plan to start using ClinicSathi. Secure payments powered by Cashfree.
+            Select a plan to start using DoctorKaDost. Secure payments powered by Cashfree.
           </p>
         </div>
 
@@ -85,7 +85,7 @@ export default function SubscriptionPage() {
               <p className="text-slate-500 mb-6">{plans.monthly.billing_cycle}</p>
               
               <ul className="space-y-3 mb-8">
-                <li className="flex items-center text-slate-700">✅ Full Access to ClinicSathi</li>
+                <li className="flex items-center text-slate-700">✅ Full Access to DoctorKaDost</li>
                 <li className="flex items-center text-slate-700">✅ Unlimited Patients</li>
                 <li className="flex items-center text-slate-700">✅ Queue Management</li>
                 <li className="flex items-center text-slate-700">✅ Standard Support</li>

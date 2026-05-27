@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
@@ -51,16 +51,16 @@ export default function DoctorsPage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <Head>
-        <title>Doctors With Us - Find Best Doctors Near You | ClinicSathi</title>
-        <meta name="description" content="Browse our network of qualified doctors across India. Find specialists, general physicians, and healthcare providers in your city. Book appointments with trusted doctors on ClinicSathi." />
+        <title>Doctors With Us - Find Best Doctors Near You | DoctorKaDost</title>
+        <meta name="description" content="Browse our network of qualified doctors across India. Find specialists, general physicians, and healthcare providers in your city. Book appointments with trusted doctors on DoctorKaDost." />
         <meta name="keywords" content="doctors, physicians, specialists, healthcare, medical consultation, book appointment, find doctors near me" />
-        <meta property="og:title" content="Doctors With Us - ClinicSathi" />
+        <meta property="og:title" content="Doctors With Us - DoctorKaDost" />
         <meta property="og:description" content="Find the best doctors in your city. Browse our network of qualified healthcare providers." />
         <meta property="og:type" content="website" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Doctors With Us - ClinicSathi" />
+        <meta name="twitter:title" content="Doctors With Us - DoctorKaDost" />
         <meta name="twitter:description" content="Find the best doctors in your city." />
-        <link rel="canonical" href="https://clinicsathi.com/doctors" />
+        <link rel="canonical" href="https://doctorkadost.com/doctors" />
       </Head>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');*{box-sizing:border-box}`}</style>
 
@@ -69,7 +69,7 @@ export default function DoctorsPage() {
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 12 }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', flexShrink: 0 }}>
             <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg,#2563eb,#14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 11 }}>CS</div>
-            <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 15 }}>ClinicSathi</span>
+            <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 15 }}>DoctorKaDost</span>
           </Link>
           <div style={{ display: 'flex', alignItems: 'center', gap: 10, flexShrink: 0 }}>
             <LanguageToggle compact />
@@ -208,7 +208,7 @@ export default function DoctorsPage() {
 
       {/* Footer */}
       <footer style={{ borderTop: '1px solid #f1f5f9', background: 'white', padding: '40px 24px', textAlign: 'center' }}>
-        <p style={{ color: '#94a3b8', fontSize: 14 }}>© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
+        <p style={{ color: '#94a3b8', fontSize: 14 }}>© 2026 DoctorKaDost. Built for the Indian Subcontinent.</p>
       </footer>
     </div>
   );

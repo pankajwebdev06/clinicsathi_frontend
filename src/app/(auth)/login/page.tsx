@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import { authApi } from "@/features/auth/api";
@@ -96,7 +96,7 @@ export default function LoginPage() {
           <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-sm shadow-md">
             CS
           </div>
-          <span className="font-extrabold text-slate-900 text-xl tracking-tight">ClinicSathi</span>
+          <span className="font-extrabold text-slate-900 text-xl tracking-tight">DoctorKaDost</span>
         </div>
 
         <h2 className="text-2xl font-bold text-slate-900 mb-1">Welcome back</h2>

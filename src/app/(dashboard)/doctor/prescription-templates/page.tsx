@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 
@@ -160,7 +160,7 @@ function PrescriptionPreview({ templateId, clinic, patient, compact = false }: {
         {/* Footer line */}
         <div className={`border-t ${tpl.divider} opacity-20`} />
         <p className="text-slate-300 text-center font-sans" style={{ fontSize: '0.6em' }}>
-          This prescription is valid for 30 days • ClinicSathi
+          This prescription is valid for 30 days • DoctorKaDost
         </p>
       </div>
     </div>

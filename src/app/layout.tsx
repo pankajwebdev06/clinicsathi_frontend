@@ -1,15 +1,15 @@
-import type { Metadata, Viewport } from "next";
+﻿import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 // Use system fonts for fastest loading on 3G/low-end devices
 // No external font requests needed
 export const metadata: Metadata = {
-  title: "ClinicSathi — Modern Clinic Management",
+  title: "DoctorKaDost — Modern Clinic Management",
   description: "Queue management, digital records, and patient check-in for Indian clinics. Built for low-bandwidth connections.",
   keywords: ["clinic management", "patient queue", "digital records", "India", "healthcare"],
-  authors: [{ name: "ClinicSathi" }],
+  authors: [{ name: "DoctorKaDost" }],
   openGraph: {
-    title: "ClinicSathi — Modern Clinic Management",
+    title: "DoctorKaDost — Modern Clinic Management",
     description: "Queue management, digital records, and patient check-in for Indian clinics.",
     type: "website",
   },
@@ -43,7 +43,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         {/* DNS prefetch for API calls */}
-        <link rel="dns-prefetch" href="https://api.clinicsathi.in" />
+        <link rel="dns-prefetch" href="https://api.doctorkadost.in" />
       </head>
       <body className="min-h-full flex flex-col">
         <Providers>{children}</Providers>

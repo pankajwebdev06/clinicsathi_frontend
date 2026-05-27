@@ -1,4 +1,4 @@
-<!-- BEGIN:nextjs-agent-rules -->
+﻿<!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
 This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
@@ -27,8 +27,8 @@ All 3 projects (frontend, admin, reception) must look and feel like a native app
 - Test in browser DevTools at 375px (iPhone SE) before declaring done
 
 ## 🌐 Live Deployment
-- Frontend: Vercel (https://clinicsathi-frontend.vercel.app)
-- Backend:  Render (https://clinicsathi-backend.onrender.com) — free tier sleeps after 15 min idle; first request can take 30–45 s
+- Frontend: Vercel (https://doctorkadost-frontend.vercel.app)
+- Backend:  Render (https://doctorkadost-backend.onrender.com) — free tier sleeps after 15 min idle; first request can take 30–45 s
 - Admin:    separate Vercel deployment
 
 `apiClient.ts` already handles cold-start timeouts (45 s) and surfaces `NetworkError` with a user-friendly message. Don't shorten this timeout.

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useState } from 'react';
 import Link from 'next/link';
@@ -16,7 +16,7 @@ export function NavBar() {
           <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/20">
             CS
           </div>
-          <span className="font-extrabold text-slate-900 text-lg tracking-tight">ClinicSathi</span>
+          <span className="font-extrabold text-slate-900 text-lg tracking-tight">DoctorKaDost</span>
         </div>
 
         {/* Desktop nav — only on lg+ so it never overflows on iPad portrait */}

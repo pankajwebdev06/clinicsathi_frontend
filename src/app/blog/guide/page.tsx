@@ -1,10 +1,10 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import React from 'react';
 
 export const metadata = {
-  title: 'How to Register Your Clinic on ClinicSathi | 5-Minute Setup',
+  title: 'How to Register Your Clinic on DoctorKaDost | 5-Minute Setup',
   description:
-    'Register your clinic on ClinicSathi in 5 simple steps. OTP-based login, no passwords. Built for Indian clinics.',
+    'Register your clinic on DoctorKaDost in 5 simple steps. OTP-based login, no passwords. Built for Indian clinics.',
 };
 
 const STEPS = [
@@ -47,7 +47,7 @@ const BENEFITS = [
 const FAQS = [
   {
     q: 'Do I need to install anything?',
-    a: 'No. ClinicSathi runs in any modern browser — Chrome on your phone, Safari on iPad, anything. Nothing to download or maintain.',
+    a: 'No. DoctorKaDost runs in any modern browser — Chrome on your phone, Safari on iPad, anything. Nothing to download or maintain.',
   },
   {
     q: 'What if my internet is slow or drops?',
@@ -71,7 +71,7 @@ export default function GuidePage() {
         <div className="max-w-5xl mx-auto px-4 py-3 flex justify-between items-center gap-3">
           <Link href="/" className="flex items-center gap-2 min-w-0">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs flex-shrink-0">CS</div>
-            <span className="font-extrabold text-slate-900 truncate">ClinicSathi</span>
+            <span className="font-extrabold text-slate-900 truncate">DoctorKaDost</span>
           </Link>
           <Link href="/doctor/setup" className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold whitespace-nowrap min-h-[40px] flex items-center">
             Register Now →
@@ -176,7 +176,7 @@ export default function GuidePage() {
             Ready? Setup takes 5 minutes.
           </h2>
           <p className="text-blue-100 text-sm md:text-base mb-7">
-            Join clinics across India using ClinicSathi to run smarter, faster, and offline-ready.
+            Join clinics across India using DoctorKaDost to run smarter, faster, and offline-ready.
           </p>
           <Link
             href="/doctor/setup"
@@ -192,7 +192,7 @@ export default function GuidePage() {
         <div className="max-w-5xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4 text-sm text-slate-500">
           <Link href="/" className="flex items-center gap-2">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CS</div>
-            <span className="font-bold text-slate-700">ClinicSathi</span>
+            <span className="font-bold text-slate-700">DoctorKaDost</span>
           </Link>
           <div className="flex flex-wrap justify-center gap-3 md:gap-5">
             <Link href="/" className="hover:text-slate-900">Home</Link>

@@ -1,4 +1,4 @@
-import { create } from 'zustand';
+﻿import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import type { User, Clinic, AuthResponse, LoginCredentials } from '@/types';
 import { authApi } from '@/features/auth/api';
@@ -79,7 +79,7 @@ export const useAuthStore = create<AuthState>()(
         if (typeof window !== 'undefined') {
           localStorage.removeItem('auth_token');
           localStorage.removeItem('user_info');
-          localStorage.removeItem('clinicsathi_clinic');
+          localStorage.removeItem('doctorkadost_clinic');
         }
 
         set({

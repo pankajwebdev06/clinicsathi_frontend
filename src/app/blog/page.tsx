@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import Link from 'next/link';
 import { useEffect, useState, MouseEvent } from 'react';
@@ -14,7 +14,7 @@ interface BlogPost {
 
 // Hardcoded fallback shown if DB has no published posts
 const FALLBACK_POST = {
-  title: 'Complete ClinicSathi Product Guide',
+  title: 'Complete DoctorKaDost Product Guide',
   date: 'May 7, 2026', category: 'Guide', readTime: '15 min read',
   excerpt: 'A comprehensive step-by-step guide covering registration, signing in, doctor dashboard, reception workflow, patient consultation, prescription printing, staff management, and clinic settings.',
   color: 'bg-blue-100 text-blue-700', slug: '/blog/guide/', isFallback: true,
@@ -48,7 +48,7 @@ export default function BlogPage() {
         <div style={{ maxWidth:1100, margin:'0 auto', padding:'16px 24px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <Link href="/" style={{ display:'flex', alignItems:'center', gap:10, textDecoration:'none' }}>
             <div style={{ width:34, height:34, borderRadius:10, background:'linear-gradient(135deg,#2563eb,#14b8a6)', display:'flex', alignItems:'center', justifyContent:'center', color:'white', fontWeight:900, fontSize:12 }}>CS</div>
-            <span style={{ fontWeight:800, color:'#0f172a', fontSize:16 }}>ClinicSathi</span>
+            <span style={{ fontWeight:800, color:'#0f172a', fontSize:16 }}>DoctorKaDost</span>
           </Link>
           <nav style={{ display:'flex', gap:28 }}>
             <Link href="/" style={{ color:'#64748b', fontWeight:600, fontSize:14, textDecoration:'none' }}>Home</Link>
@@ -127,7 +127,7 @@ export default function BlogPage() {
       </main>
 
       <footer style={{ borderTop:'1px solid #f1f5f9', background:'white', padding:'40px 24px', textAlign:'center' }}>
-        <p style={{ color:'#94a3b8', fontSize:14 }}>© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
+        <p style={{ color:'#94a3b8', fontSize:14 }}>© 2026 DoctorKaDost. Built for the Indian Subcontinent.</p>
       </footer>
     </div>
   );

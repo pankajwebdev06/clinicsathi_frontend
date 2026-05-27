@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import React from 'react';
 
 // Visual showcases of new features — pure CSS mockups, no images, fast on 3G.
@@ -76,7 +76,7 @@ function PublicProfileMockup() {
         <div className="w-2 h-2 rounded-full bg-amber-400 flex-shrink-0" />
         <div className="w-2 h-2 rounded-full bg-emerald-400 flex-shrink-0" />
         <div className="flex-1 bg-white rounded-md px-2 py-1 text-[9px] text-slate-500 truncate font-mono min-w-0">
-          clinicsathi.in/doctor/dr-…-mumbai
+          doctorkadost.in/doctor/dr-…-mumbai
         </div>
       </div>
       <div className="bg-gradient-to-br from-blue-600 to-teal-500 p-3 text-white">

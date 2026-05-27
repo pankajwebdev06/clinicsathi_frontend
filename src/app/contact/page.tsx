@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 
 export default function ContactPage() {
   return (
@@ -7,7 +7,7 @@ export default function ContactPage() {
         <div className="max-w-4xl mx-auto px-5 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CS</div>
-            <span className="font-extrabold text-slate-900">ClinicSathi</span>
+            <span className="font-extrabold text-slate-900">DoctorKaDost</span>
           </Link>
           <Link href="/" className="text-sm font-bold text-blue-600">Back to Home</Link>
         </div>
@@ -49,7 +49,7 @@ export default function ContactPage() {
                   <span className="text-2xl">📧</span>
                   <div>
                     <p className="text-blue-100 text-xs font-bold uppercase tracking-wider">Email Us</p>
-                    <p className="font-bold">support@clinicsathi.in</p>
+                    <p className="font-bold">support@doctorkadost.in</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
@@ -80,7 +80,7 @@ export default function ContactPage() {
       </main>
 
       <footer className="py-10 border-t border-slate-200 bg-white text-center text-slate-400 text-sm font-medium">
-        © 2026 ClinicSathi. All rights reserved.
+        © 2026 DoctorKaDost. All rights reserved.
       </footer>
     </div>
   );

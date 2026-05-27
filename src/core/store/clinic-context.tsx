@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
@@ -113,7 +113,7 @@ export function ClinicProvider({ children }: { children: ReactNode }) {
   const [clinic, setClinicState] = useState<ClinicData>(DEFAULT_CLINIC);
 
   useEffect(() => {
-    const saved = localStorage.getItem('clinicsathi_clinic');
+    const saved = localStorage.getItem('doctorkadost_clinic');
     if (saved) {
       try { setClinicState(JSON.parse(saved)); } catch {}
     }
@@ -121,7 +121,7 @@ export function ClinicProvider({ children }: { children: ReactNode }) {
 
   const setClinic = (data: ClinicData) => {
     setClinicState(data);
-    localStorage.setItem('clinicsathi_clinic', JSON.stringify(data));
+    localStorage.setItem('doctorkadost_clinic', JSON.stringify(data));
   };
 
   return (

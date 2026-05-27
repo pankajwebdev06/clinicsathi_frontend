@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 import { StatsBar } from '@/features/landing/ProductShowcase';
 import { PricingCard } from '@/features/landing/PricingCard';
 import { NavBar } from './NavBar';
@@ -45,7 +45,7 @@ const BENEFITS = [
     stat: '5 min',
     statLabel: 'to set up your pad',
     title: 'Prescriptions that look like yours',
-    desc: 'Upload your existing letterhead once. ClinicSathi matches your header, colors, and layout. Patients notice no difference.',
+    desc: 'Upload your existing letterhead once. DoctorKaDost matches your header, colors, and layout. Patients notice no difference.',
     color: 'border-rose-200 bg-rose-50',
     statColor: 'text-rose-600',
   },
@@ -80,7 +80,7 @@ const UPCOMING = [
   {
     icon: '💳',
     title: 'Billing & Invoicing',
-    desc: 'OPD invoice generation, UPI/cash/card tracking, and payment history — all inside ClinicSathi.',
+    desc: 'OPD invoice generation, UPI/cash/card tracking, and payment history — all inside DoctorKaDost.',
     tag: 'Premium Feature',
     tagColor: 'bg-amber-100 text-amber-700 border-amber-200',
     iconBg: 'bg-amber-500',
@@ -204,7 +204,7 @@ export default function LandingPage() {
                   <div className="hidden sm:block w-3 h-3 rounded-full bg-yellow-500/80 flex-shrink-0"></div>
                   <div className="hidden sm:block w-3 h-3 rounded-full bg-emerald-500/80 flex-shrink-0"></div>
                   <div className="flex-1 sm:ml-3 bg-slate-700/50 rounded-md h-5 flex items-center px-3 overflow-hidden">
-                    <span className="text-slate-400 text-xs font-mono truncate">app.clinicsathi.in/reception</span>
+                    <span className="text-slate-400 text-xs font-mono truncate">app.doctorkadost.in/reception</span>
                   </div>
                 </div>
                 {/* Mock Dashboard UI */}
@@ -303,7 +303,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* WHY DOCTORS CHOOSE CLINICSATHI */}
+      {/* WHY DOCTORS CHOOSE DOCTORKADOST */}
       <section className="py-20 md:py-28 bg-white">
         <div className="max-w-6xl mx-auto px-5">
           <div className="text-center mb-14">
@@ -314,7 +314,7 @@ export default function LandingPage() {
               Real results, from day one
             </h2>
             <p className="text-slate-500 text-base md:text-lg font-medium max-w-xl mx-auto">
-              ClinicSathi is built around one goal — give doctors more time with patients, and less time with paperwork.
+              DoctorKaDost is built around one goal — give doctors more time with patients, and less time with paperwork.
             </p>
           </div>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-5">
@@ -450,7 +450,7 @@ export default function LandingPage() {
                 avatar: '👨‍⚕️',
               },
               {
-                quote: "I uploaded my old prescription pad and ClinicSathi matched my header exactly. Patients can’t tell the difference between the printed one and the original.",
+                quote: "I uploaded my old prescription pad and DoctorKaDost matched my header exactly. Patients can’t tell the difference between the printed one and the original.",
                 author: 'Dr. Anjali Sharma',
                 role: 'Pediatrician • Delhi',
                 avatar: '👩‍⚕️',
@@ -494,7 +494,7 @@ export default function LandingPage() {
             Ready to modernize your clinic?
           </h2>
           <p className="text-blue-100 text-lg font-medium mb-10 max-w-xl mx-auto">
-            Join hundreds of doctors across India already using ClinicSathi to run smoother, faster, and smarter clinics.
+            Join hundreds of doctors across India already using DoctorKaDost to run smoother, faster, and smarter clinics.
           </p>
           <Link href="/doctor/setup" className="inline-block px-10 py-5 bg-white text-blue-700 rounded-2xl font-black text-lg shadow-xl hover:shadow-2xl hover:-translate-y-1 transition-all active:scale-[0.98]">
             Register My Clinic — It&apos;s Free
@@ -507,9 +507,9 @@ export default function LandingPage() {
         <div className="max-w-6xl mx-auto px-5 flex flex-col md:flex-row justify-between items-center gap-5">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs flex-shrink-0">CS</div>
-            <span className="font-extrabold text-slate-900">ClinicSathi</span>
+            <span className="font-extrabold text-slate-900">DoctorKaDost</span>
           </div>
-          <p className="text-slate-400 text-sm font-medium text-center">© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
+          <p className="text-slate-400 text-sm font-medium text-center">© 2026 DoctorKaDost. Built for the Indian Subcontinent.</p>
           <div className="flex flex-wrap justify-center gap-4 md:gap-5 text-sm font-semibold text-slate-500">
             <Link href="/privacy-policy" className="hover:text-slate-900 transition-colors">Privacy</Link>
             <Link href="/terms" className="hover:text-slate-900 transition-colors">Terms</Link>

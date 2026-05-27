@@ -1,4 +1,4 @@
-import Link from 'next/link';
+﻿import Link from 'next/link';
 
 export default function PrivacyPage() {
   return (
@@ -7,7 +7,7 @@ export default function PrivacyPage() {
         <div className="max-w-4xl mx-auto px-5 py-4 flex justify-between items-center">
           <Link href="/" className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-blue-600 to-teal-400 flex items-center justify-center text-white font-black text-xs">CS</div>
-            <span className="font-extrabold text-slate-900">ClinicSathi</span>
+            <span className="font-extrabold text-slate-900">DoctorKaDost</span>
           </Link>
           <Link href="/" className="text-sm font-bold text-blue-600">Back to Home</Link>
         </div>
@@ -35,7 +35,7 @@ export default function PrivacyPage() {
           <section className="mb-10">
             <h2 className="text-xl font-bold text-slate-900 mb-4">3. Data Security</h2>
             <p className="text-slate-600 leading-relaxed">
-              We use bank-grade encryption and secure server environments (Render and Supabase) to protect all information stored on ClinicSathi.
+              We use bank-grade encryption and secure server environments (Render and Supabase) to protect all information stored on DoctorKaDost.
             </p>
           </section>
 
@@ -56,7 +56,7 @@ export default function PrivacyPage() {
       </main>
 
       <footer className="py-10 border-t border-slate-200 bg-white text-center text-slate-400 text-sm font-medium">
-        © 2026 ClinicSathi. All rights reserved.
+        © 2026 DoctorKaDost. All rights reserved.
       </footer>
     </div>
   );

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -499,7 +499,7 @@ export default function ReceptionDashboard() {
                       />
                       <span className="text-sm text-green-800">
                         The patient (or their authorized guardian) has given consent for their health information
-                        to be stored and processed by this clinic using ClinicSathi.{' '}
+                        to be stored and processed by this clinic using DoctorKaDost.{' '}
                         <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" className="text-teal-700 underline font-semibold">
                           View Privacy Policy
                         </a>

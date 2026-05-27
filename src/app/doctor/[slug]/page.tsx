@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -89,7 +89,7 @@ export default function DoctorProfilePage() {
     return (
       <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc' }}>
         <Head>
-          <title>Loading Profile - ClinicSathi</title>
+          <title>Loading Profile - DoctorKaDost</title>
           <meta name="description" content="Loading doctor profile..." />
         </Head>
         <div style={{ textAlign: 'center' }}>
@@ -132,7 +132,7 @@ export default function DoctorProfilePage() {
   return (
     <div style={{ minHeight: '100vh', background: '#f8fafc', fontFamily: 'Inter, system-ui, sans-serif' }}>
       <Head>
-        <title>{profile.meta_title || `Dr. ${profile.doctor_name} - ${profile.specialization || 'General Physician'} in ${profile.city || 'India'} | ClinicSathi`}</title>
+        <title>{profile.meta_title || `Dr. ${profile.doctor_name} - ${profile.specialization || 'General Physician'} in ${profile.city || 'India'} | DoctorKaDost`}</title>
         <meta name="description" content={profile.meta_description || `Book appointment with Dr. ${profile.doctor_name}, ${profile.specialization || 'General Physician'} at ${profile.name} in ${profile.city || 'India'}. ${profile.experience ? `${profile.experience}+ years experience.` : ''}`} />
         <meta name="keywords" content={`${profile.doctor_name}, ${profile.specialization || 'doctor'}, ${profile.city || 'clinic'}, ${profile.name}, appointment, consultation, ${profile.services || 'healthcare'}`} />
         <meta property="og:title" content={profile.meta_title || `Dr. ${profile.doctor_name} - ${profile.specialization || 'General Physician'}`} />
@@ -143,7 +143,7 @@ export default function DoctorProfilePage() {
         <meta name="twitter:title" content={profile.meta_title || `Dr. ${profile.doctor_name}`} />
         <meta name="twitter:description" content={profile.meta_description || `Book appointment with Dr. ${profile.doctor_name}`} />
         <meta name="twitter:image" content={profile.doctor_photo || profile.clinic_photo || ''} />
-        <link rel="canonical" href={`https://clinicsathi.com/doctor/${profile.slug}`} />
+        <link rel="canonical" href={`https://doctorkadost.com/doctor/${profile.slug}`} />
       </Head>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');*{box-sizing:border-box}`}</style>
 
@@ -152,7 +152,7 @@ export default function DoctorProfilePage() {
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '12px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
           <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 8, textDecoration: 'none', flexShrink: 0 }}>
             <div style={{ width: 32, height: 32, borderRadius: 10, background: 'linear-gradient(135deg,#2563eb,#14b8a6)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 900, fontSize: 11 }}>CS</div>
-            <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 14 }}>ClinicSathi</span>
+            <span style={{ fontWeight: 800, color: '#0f172a', fontSize: 14 }}>DoctorKaDost</span>
           </Link>
           <div style={{ display: 'flex', gap: 8, alignItems: 'center', flexShrink: 0 }}>
             <LanguageToggle compact />
@@ -275,7 +275,7 @@ export default function DoctorProfilePage() {
 
       {/* Footer */}
       <footer style={{ borderTop: '1px solid #f1f5f9', background: 'white', padding: '40px 24px', textAlign: 'center' }}>
-        <p style={{ color: '#94a3b8', fontSize: 14 }}>© 2026 ClinicSathi. Built for the Indian Subcontinent.</p>
+        <p style={{ color: '#94a3b8', fontSize: 14 }}>© 2026 DoctorKaDost. Built for the Indian Subcontinent.</p>
       </footer>
     </div>
   );
