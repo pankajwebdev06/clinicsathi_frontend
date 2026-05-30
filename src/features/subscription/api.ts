@@ -5,10 +5,24 @@ export const subscriptionApi = {
     return apiClient("/subscriptions/plans", { method: "GET" });
   },
 
-  async createOrder(plan: "monthly" | "annual") {
+  async getActivePromos() {
+    return apiClient("/subscriptions/active-promos", { method: "GET" });
+  },
+
+  async applyPromo(code: string, plan: "monthly" | "annual") {
+    return apiClient("/subscriptions/apply-promo", {
+      method: "POST",
+      body: JSON.stringify({ code, plan }),
+    });
+  },
+
+  async createOrder(plan: "monthly" | "annual", promoCode?: string) {
     return apiClient("/subscriptions/create-order", {
       method: "POST",
-      body: JSON.stringify({ plan }),
+      body: JSON.stringify({
+        plan,
+        ...(promoCode ? { promo_code: promoCode } : {}),
+      }),
     });
   },
 

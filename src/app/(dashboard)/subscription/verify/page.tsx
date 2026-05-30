@@ -11,9 +11,12 @@ function VerifyContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const orderId = searchParams.get("order_id");
+  const isFree = searchParams.get("free") === "true";
 
   const [status, setStatus] = useState<"verifying" | "success" | "failed">("verifying");
-  const [message, setMessage] = useState("Verifying your payment...");
+  const [message, setMessage] = useState(
+    isFree ? "Activating your free trial..." : "Verifying your payment..."
+  );
 
   useEffect(() => {
     if (!orderId) {
@@ -25,9 +28,13 @@ function VerifyContent() {
     const verify = async () => {
       try {
         const response = await subscriptionApi.verifyPayment(orderId);
-        if (response.status === "success" || response.status === "already_active") {
+        if (response.status === "success" || response.status === "already_active" || response.status === "trial_activated") {
           setStatus("success");
-          setMessage("Payment successful! Your subscription is now active.");
+          setMessage(
+            isFree
+              ? "Free trial activated! Welcome to DoctorKaDost 🎉"
+              : "Payment successful! Your subscription is now active."
+          );
           setTimeout(() => {
             router.push("/doctor/dashboard");
           }, 3000);
